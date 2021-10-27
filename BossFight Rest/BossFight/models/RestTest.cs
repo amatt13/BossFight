@@ -1,6 +1,6 @@
-namespace TodoApi
+namespace BossFight.Models
 {
-    public class PostTest
+    public class RestTest
     {
         public int Id { get; set; }
         public string TestString { get; set; }

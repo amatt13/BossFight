@@ -11,9 +11,33 @@ monsterImage.addEventListener("load", () => {
 
 // TEST GET
 async function SendTestGETRequest() {
-	const response = await fetch("https://localhost:5001/WeatherForecast", {
+	const response = await fetch("https://localhost:5001/RestTest", {
 		method: 'GET',
-		headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+		headers : { 
+			'Content-Type': 'application/json',
+			'Accept': 'application/json'
+		},
+	});
+
+	if (!response.ok) 
+	{
+
+	}
+
+	if (response.body !== null) {
+		const body = await response.json();
+		console.log(body);
+	}
+}
+
+// TEST GetMoreStuff
+async function SendTestGetMoreStuffRequest() {
+	const response = await fetch("https://localhost:5001/GetMoreStuff", {
+		method: 'GET',
+		headers : { 
+			'Content-Type': 'application/json',
+			'Accept': 'application/json'
+		},
 	});
 
 	if (!response.ok) 
@@ -30,9 +54,12 @@ async function SendTestGETRequest() {
 // TEST POST
 async function SendTestPOSTRequest() {
 	const obj = { id: 101, testString: 'fucking ', unusedString: 'yes' };
-	const response = await fetch(`https://localhost:5001/PostTest`, {
+	const response = await fetch(`https://localhost:5001/RestTest`, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+		headers : { 
+			'Content-Type': 'application/json',
+			'Accept': 'application/json'
+		},
 		body: JSON.stringify(obj)
 	});
 

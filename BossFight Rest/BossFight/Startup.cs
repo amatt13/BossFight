@@ -4,10 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
-using TodoApi.Models;
 using Microsoft.OpenApi.Models;
+using BossFight.Models;
 
-namespace TodoApi
+namespace BossFight
 {
     public class Startup
     {
@@ -20,11 +20,10 @@ namespace TodoApi
           public void ConfigureServices(IServiceCollection services)
           {
               services.AddControllers();
-              services.AddDbContext<TodoContext>(opt =>
-                                                 opt.UseInMemoryDatabase("TodoList"));
+              
               services.AddSwaggerGen(c =>
               {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoApi", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Boss Fight", Version = "v1" });
               });
               services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
               {
@@ -42,7 +41,7 @@ namespace TodoApi
               {
                   app.UseDeveloperExceptionPage();
                   app.UseSwagger();
-                  app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoApi v1"));
+                  app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Boss Fight v1"));
               }
   
               app.UseRouting();

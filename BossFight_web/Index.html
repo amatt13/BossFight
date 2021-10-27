@@ -11,19 +11,18 @@
 			Status
 		</h1>
 	</div>
- <script>alert('foo');</script>
 	<div class="column" style="float:left">
 		<canvas id="mainCanvas" width="300" height="300" style="border:1px solid #000000;">
 		</canvas>
-		<script type="text/javascript" src="scripts/cf.js"></script>
-		<script type="text/javascript" src="scripts/canvas.js"></script>
-		<script type="text/javascript" src="canvas.js"></script>
 	</div>
 	<div class="column">
 		<div id="ts-example">
 			<br />
 			<button type="button" class="btn btn-primary btn-md" onclick="SendTestGETRequest()">
 				SendTestGetRequest()
+			</button>
+			<button type="button" class="btn btn-primary btn-md" onclick="SendTestGetMoreStuffRequest()">
+				SendTestGetMoreStuffRequest()
 			</button>
 			<button type="button" class="btn btn-primary btn-md" onclick="SendTestPOSTRequest()">
 				SendTestPOSTRequest()
@@ -32,3 +31,7 @@
 	</div>
 </body>
 </html>
+
+
+<script type="text/javascript" src="scripts/cf.js"></script>
+<script type="text/javascript" src="scripts/canvas.js"></script>

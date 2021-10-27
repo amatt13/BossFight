@@ -1,23 +1,36 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using BossFight.Models;
 
-namespace TodoApi.Controllers
+namespace BossFight.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class PostTestController : ControllerBase
+    public class RestTestController : ControllerBase
     {
-        private readonly ILogger<PostTestController> _logger;
+        private readonly ILogger<RestTestController> _logger;
         public static List<object> MyCollection = new List<object>();
 
-        public PostTestController(ILogger<PostTestController> logger)
+        public RestTestController(ILogger<RestTestController> logger)
         {
             _logger = logger;
         }
 
+        [HttpGet]
+        public string Get()
+        {
+            return "Get was a success";
+        }
+
+        [HttpGet("~/GetMoreStuff")]
+        public string GetMoreStuff()
+        {
+            return "GetMoreStuff was a success";
+        }
+
         [HttpPost]
-        public string Post(PostTest postTest)
+        public string Post(RestTest postTest)
         {
             var result = "";
             if (postTest != null)
