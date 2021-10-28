@@ -33,7 +33,7 @@ namespace BossFight.Models
         public static int BaseMana = 10;
 
         public string Name {get; set;}
-        public int Xp {get; set;}
+        public int XP {get; set;}
         public int Level {get; set;}
         Player Player {get; set;}
         public List<WeaponType> ProficientWeaponTypesList {get; set;}
@@ -54,7 +54,7 @@ namespace BossFight.Models
         public PlayerClass(string pName, int pXp, int pLevel, PlayerClass pPlayer, List<WeaponType> pProficientWeaponTypesList, double? pHpScale = null, double? pManaScale = null)
         {
             Name = pName;
-            Xp = pXp;
+            XP = pXp;
             Level = pLevel;
             Player = pPlayer;
             ProficientWeaponTypesList = pProficientWeaponTypesList;
@@ -84,7 +84,7 @@ namespace BossFight.Models
             {
             };
             playerClassDict["name"] = Name;
-            playerClassDict["xp"] = Xp;
+            playerClassDict["xp"] = XP;
             playerClassDict["level"] = Level;
             return playerClassDict;
         }
@@ -144,12 +144,12 @@ namespace BossFight.Models
             return ManaRegenRate;
         }
 
-        public object GetAttackPowerBonus()
+        public int GetAttackPowerBonus()
         {
             return AttackPowerBonus;
         }
 
-        public object GetSpellPowerBonus()
+        public int GetSpellPowerBonus()
         {
             return SpellPowerBonus;
         }
@@ -157,7 +157,7 @@ namespace BossFight.Models
         public void LevelUp()
         {
             Level += 1;
-            Xp = 0;
+            XP = 0;
             Recalculate();
             Player.RestoreAllHealthAndMana();
         }
