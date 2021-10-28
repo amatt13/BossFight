@@ -51,7 +51,7 @@ namespace BossFight.Models
         public int AttackPowerBonus {get; set;} = 0;
         public int SpellPowerBonus {get; set;} = 0;
 
-        public PlayerClass(string pName, int pXp, int pLevel, PlayerClass pPlayer, List<WeaponType> pProficientWeaponTypesList, double? pHpScale = null, double? pManaScale = null)
+        public PlayerClass(string pName, int pXp, int pLevel, Player pPlayer, List<WeaponType> pProficientWeaponTypesList, double? pHpScale = null, double? pManaScale = null)
         {
             Name = pName;
             XP = pXp;
