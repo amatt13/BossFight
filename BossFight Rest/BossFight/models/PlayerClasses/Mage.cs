@@ -4,23 +4,27 @@ using BossFight.BossFightEnums;
 
 namespace BossFight.Models
 {
-    public class Cleric : PlayerClass
+    public class Mage : PlayerClass
     {
-        public Cleric(Player player, int xp = 0, int level = 1)
-            : base("Cleric", xp, level, player, new List<WeaponType> {
-                WeaponType.SWORD,
-                WeaponType.MACE,
+        public Mage(Player pPlayer, int pXp = 0, int pLevel = 1)
+            : base("Mage", pXp, pLevel, pPlayer, new List<WeaponType> {
                 WeaponType.DAGGER,
                 WeaponType.STAFF
-            }, pHpScale: 1.5, pManaScale: 2.5)
+            }, pHpScale: 3, pManaScale: 4.5)
         {
+            PlayerClassCritChance = 4;
+            PurchasePrice = 1000;
+            BaseHealth = 11;
+            BaseMana = 14;
+            ManaRegenRate = 2;
+            SpellPowerBonus = 1;
         }
 
         public override PlayerClass FromDB(object playerClassDict, Player player)
         {
             var xp = 1;//playerClassDict["xp"];
             var level = 1;//Convert.ToInt32(playerClassDict["level"]);
-            Cleric playerClass = new Cleric(player, xp, level);
+            Mage playerClass = new Mage(player, xp, level);
             playerClass.Recalculate();
             return playerClass;
         }
@@ -28,12 +32,12 @@ namespace BossFight.Models
         public override Dictionary<String, Ability> PrepareAvailableAbilities()
         {
             var unlockedAbilities = new Dictionary<String, Ability>();
-            var heal = Abilities.Heal();
-            unlockedAbilities[heal.magicWord] = heal;
+            var ignite = Abilities.Ignite();
+            unlockedAbilities[ignite.magicWord] = ignite;
             if (Level >= 5)
             {
-                var smite = Abilities.Smite();
-                unlockedAbilities[smite.magicWord] = smite;
+                var enchantWeapon = Abilities.EnchantWeapon();
+                unlockedAbilities[enchantWeapon.magicWord] = enchantWeapon;
             }
             return unlockedAbilities;
         }
