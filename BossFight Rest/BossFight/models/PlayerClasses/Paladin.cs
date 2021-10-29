@@ -40,9 +40,9 @@ namespace BossFight.Models.PlayerClass
                 };
         }
 
-        public override Dictionary<String, Ability> PrepareAvailableAbilities()
+        public override Dictionary<String, Ability.Ability> PrepareAvailableAbilities()
         {
-            var unlockedAbilities = new Dictionary<String, Ability>();
+            var unlockedAbilities = new Dictionary<String, Ability.Ability>();
             var sacrifice = Abilities.Sacrifice();
             unlockedAbilities[sacrifice.magicWord] = sacrifice;
             var heal = Abilities.Heal();

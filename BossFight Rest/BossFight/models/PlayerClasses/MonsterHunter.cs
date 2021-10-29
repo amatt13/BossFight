@@ -43,9 +43,9 @@ namespace BossFight.Models.PlayerClass
                 };
         }
 
-        public override Dictionary<String, Ability> PrepareAvailableAbilities()
+        public override Dictionary<String, Ability.Ability> PrepareAvailableAbilities()
         {
-            var unlockedAbilities = new Dictionary<String, Ability>();
+            var unlockedAbilities = new Dictionary<String, Ability.Ability>();
             var overSizedBearTrap = Abilities.OverSizedBearTrap();
             unlockedAbilities[overSizedBearTrap.magicWord] = overSizedBearTrap;
             var turnWeaponToSilver = Abilities.TurnWeaponToSilver();

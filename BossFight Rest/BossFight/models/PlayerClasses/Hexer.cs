@@ -29,9 +29,9 @@ namespace BossFight.Models.PlayerClass
             return playerClass;
         }
 
-        public override Dictionary<String, Ability> PrepareAvailableAbilities()
+        public override Dictionary<String, Ability.Ability> PrepareAvailableAbilities()
         {
-            var unlockedAbilities = new Dictionary<String, Ability>();
+            var unlockedAbilities = new Dictionary<String, Ability.Ability>();
             var hex = Abilities.Hex();
             unlockedAbilities[hex.magicWord] = hex;
             if (Level >= 5)

@@ -26,9 +26,9 @@ namespace BossFight.Models.PlayerClass
             return playerClass;
         }
 
-        public override Dictionary<String, Ability> PrepareAvailableAbilities()
+        public override Dictionary<String, Ability.Ability> PrepareAvailableAbilities()
         {
-            var unlockedAbilities = new Dictionary<String, Ability>();
+            var unlockedAbilities = new Dictionary<String, Ability.Ability>();
             var sackOnHead = Abilities.SackOnHead();
             unlockedAbilities[sackOnHead.magicWord] = sackOnHead;
             if (Level >= 5)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BossFight.BossFightEnums;
+using BossFight.Models.Ability;
 
 namespace BossFight.Models.PlayerClass
 {
@@ -25,9 +26,9 @@ namespace BossFight.Models.PlayerClass
             return playerClass;
         }
 
-        public override Dictionary<String, Ability> PrepareAvailableAbilities()
+        public override Dictionary<String, Ability.Ability> PrepareAvailableAbilities()
         {
-            var unlockedAbilities = new Dictionary<String, Ability>();
+            var unlockedAbilities = new Dictionary<String, Ability.Ability>();
             var heal = Abilities.Heal();
             unlockedAbilities[heal.magicWord] = heal;
             if (Level >= 5)
