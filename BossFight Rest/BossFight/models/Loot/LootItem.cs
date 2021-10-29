@@ -1,6 +1,6 @@
 using System;
 
-namespace BossFight.Models
+namespace BossFight.Models.Loot
 {
     public class LootItem
     {
@@ -29,7 +29,7 @@ namespace BossFight.Models
 
         public int GetSellPrice()
         {
-            return Math.Ceiling(Cost / 4);
+            return (int)Math.Ceiling((double)Cost / 4);
         }
     }
 }

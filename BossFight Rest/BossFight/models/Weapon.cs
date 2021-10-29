@@ -1,94 +1,94 @@
+using System;
+using BossFight.BossFightEnums;
+using BossFight.Models.Loot;
+
 namespace BossFight.Models
 {
     public class Weapon : LootItem
     {
-        public static int DEFAULTWEAPONDROPCHANCE = 1.0;
+        public const float DEFAULTWEAPONDROPCHANCE = 1.0f;
         
-        public Weapon(int pWeaponId, string pName, string pAttackMessage, WeaponType.IMPROVISED pWeaponType, int pAttackPower = 1, int pCost = 0, int pAttackCritChance = 3, double pDropChance = DEFAULTWEAPONDROPCHANCE, 
+        public WeaponType WeaponType { get; set; }
+        public string AttackMessage { get; set; }
+        public bool BossWeapon { get; set; }
+        public int WeaponLvl { get; set; }
+        public int AttackPower { get; set; }
+        public int AttackCritChance { get; set; }
+        public int SpellPower { get; set; }
+        public int SpellCritChance { get; set; }
+
+        public Weapon(int pWeaponId, string pName, string pAttackMessage, WeaponType pWeaponType = WeaponType.IMPROVISED, int pAttackPower = 1, int pCost = 0, int pAttackCritChance = 3, float pDropChance = Weapon.DEFAULTWEAPONDROPCHANCE, 
                       int pSpellPower = 0, int pSpellCritChance = 0, bool pBossWeapon = false, int pWeaponLvl = 1)
-            : base(name, dropChance, cost)
+            : base(pWeaponId, pName, pDropChance, pCost)
         {
-            weaponType = weaponType;
-            attackMessage = attackMessage;
-            bossWeapon = bossWeapon;
-            weaponLvl = weaponLvl;
-            attackPower = attackPower;
-            if (bossWeapon)
-            {
-                calcWeaponStats();
-            }
-            attackCritChance = attackCritChance;
-            spellPower = spellPower;
-            spellCritChance = spellCritChance;
+            WeaponType = pWeaponType;
+            AttackMessage = pAttackMessage;
+            BossWeapon = pBossWeapon;
+            WeaponLvl = pWeaponLvl;
+            AttackPower = pAttackPower;
+            if (pBossWeapon)
+                CalcWeaponStats();
+            AttackCritChance = pAttackCritChance;
+            SpellPower = pSpellPower;
+            SpellCritChance = pSpellCritChance;
         }
 
-        public virtual object setBossWeaponProperties(object weaponLevel)
+        public void SetBossWeaponProperties(int pWeaponLevel)
         {
-            bossWeapon = true;
-            weaponLvl = weaponLevel;
-            calcWeaponStats();
+            BossWeapon = true;
+            WeaponLvl = pWeaponLevel;
+            CalcWeaponStats();
         }
 
-        public virtual object inventoryStr()
+        public string InventoryStr()
         {
             var spellStr = "";
-            if (spellPower != 0 || spellCritChance != 0)
-            {
-                spellStr = " - spell power { self.spellPower } - spell crit chance { self.spellCritChance }";
-            }
-            return "{ self.lootName } ({self.weaponType}) - atk. power { self.attackPower } - atk. crit chance - { self.attackCritChance }{spellStr}";
+            if (SpellPower != 0 || SpellCritChance != 0)
+                spellStr = $" - spell power { SpellPower } - spell crit chance { SpellCritChance }";
+            return $"{ LootName } ({WeaponType}) - atk. power { AttackPower } - atk. crit chance - { AttackCritChance }{spellStr}";
         }
 
-        public virtual object getWeaponTypeStr()
+        public string GetWeaponTypeStr()
         {
-            return weaponType.ToString();
+            return WeaponType.ToString();
         }
 
-        public virtual object shopStr(
-            object lengthOfLongestName,
-            object lengthOfLongestTypeName,
-            object longestAttackDigit,
-            object longestGoldPriceDigit,
-            object longestCritChanceDigit,
-            object longestSpellPowerDigit,
-            object longestSpellCritChanceDigit)
+        public string ShopStr(int pLengthOfLongestName, int pLengthOfLongestTypeName, int pLongestAttackDigit, int pLongestGoldPriceDigit, int pLongestCritChanceDigit, int pLongestSpellPowerDigit, int pLongestSpellCritChanceDigit)
         {
-            var wName = "{self.lootName} ({self.getWeaponTypeStr()})".ljust(lengthOfLongestTypeName + lengthOfLongestName, ".");
-            var wCost = "{self.cost:,}".ljust(longestGoldPriceDigit, " ");
-            var wAttack = attackPower.ToString().ljust(longestAttackDigit, " ");
-            var wCrit = "{self.attackCritChance}%".ljust(longestCritChanceDigit + 1, " ");
+            var wName = $"{ LootName } ({GetWeaponTypeStr() })".PadLeft(pLengthOfLongestTypeName + pLengthOfLongestName, '.');
+            var wCost = String.Format("{0:n0}", Cost).PadLeft(pLongestGoldPriceDigit, ' ');
+            var wAttack = AttackPower.ToString().PadLeft(pLongestAttackDigit, ' ');
+            var wCrit = $"{ AttackCritChance }%".PadLeft(pLongestCritChanceDigit + 1, ' ');
             var wSpellPower = "";
-            if (spellPower != 0)
-            {
-                wSpellPower = "{str(self.spellPower).ljust(longestSpellPowerDigit, ' ')} spell power";
-            }
+            if (SpellPower != 0)
+                wSpellPower = $"{ SpellPower.ToString().PadLeft(pLongestSpellPowerDigit, ' ') } spell power";
+
             var wSpellCrit = "";
-            if (spellCritChance != 0)
-            {
-                wSpellCrit = " {self.spellCritChance}%".ljust(longestSpellCritChanceDigit + 1, " ") + " spell crit chance";
-            }
-            return "{ wName } { wCost} gold { wAttack } atk. power { wCrit } atk. crit chance {wSpellPower}{wSpellCrit}";
+            if (SpellCritChance != 0)
+                wSpellCrit = $" { SpellCritChance }%".PadLeft(pLongestSpellCritChanceDigit + 1, ' ') + " spell crit chance";
+
+            return $"{ wName } { wCost} gold { wAttack } atk. power { wCrit } atk. crit chance { wSpellPower }{ wSpellCrit }";
         }
 
-        public virtual object calcWeaponStats()
+        public void CalcWeaponStats()
         {
-            object attackPower;
-            if (object.ReferenceEquals(weaponType, WeaponType.STAFF))
+            int attackPower, attackCritChance;
+            if (WeaponType == WeaponType.STAFF)
             {
                 attackPower = 1;
-                var attackCritChance = 3;
+                attackCritChance = 3;
             }
             else
             {
-                attackPower = math.floor(weaponLvl / 2);
-                attackCritChance = math.floor(weaponLvl / 3);
+                attackPower = (int)Math.Floor((double)WeaponLvl / 2);
+                attackCritChance = (int)Math.Floor((double)WeaponLvl / 3);
                 if (attackCritChance > 20)
                 {
                     attackCritChance = 20;
                 }
             }
-            attackPower = attackPower;
-            attackCritChance = attackCritChance;
+            AttackPower = attackPower;
+            AttackCritChance = attackCritChance;
         }
     }
 }

@@ -1,3 +1,5 @@
+using System;
+
 namespace BossFight.Models
 {
     public class RestTest
@@ -5,6 +7,9 @@ namespace BossFight.Models
         public int Id { get; set; }
         public string TestString { get; set; }
         public string UnusedString { get; set; }
+
+        public RestTest()
+        { }
 
         public override string ToString()
         {

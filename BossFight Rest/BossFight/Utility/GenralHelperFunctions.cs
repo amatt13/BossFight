@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using BossFight.Models;
+using BossFight.Models.PlayerClass;
 
 namespace BossFight
 {
@@ -9,7 +11,7 @@ namespace BossFight
         public static int XpNeededToNextLevel(PlayerClass pPlayerClass)
         {
             // xpNeeded = (lvl*(1+lvl))^1.5
-            var xpNeeded = Math.Floor(Math.Pow(pPlayerClass.Level * (1 + pPlayerClass.Level), 1.5));
+            var xpNeeded = (int)Math.Floor(Math.Pow(pPlayerClass.Level * (1 + pPlayerClass.Level), 1.5));
             xpNeeded -= pPlayerClass.XP;
             return xpNeeded;
         }
@@ -17,10 +19,10 @@ namespace BossFight
         public static int CalculateExperienceFromDamageDealtToMonster(int pDamageDealt, Monster pMonster)
         {
             var xp = 1;
-            xp += Math.Floor((double)pDamageDealt * 1.1);
-            xp += Math.Floor((double)pMonster.Level / 3);
+            xp += (int)Math.Floor((double)pDamageDealt * 1.1);
+            xp += (int)Math.Floor((double)pMonster.Level / 3);
             if (pMonster.BossMonster)
-                xp += Math.Ceiling(xp * 0.2);
+                xp += (int)Math.Ceiling((double)xp * 0.2);
 
             return xp;
         }
@@ -73,7 +75,7 @@ namespace BossFight
             }
             if (pMonsterLevel > pPlayerLevel + 2)
             {
-                result = pXP * (pPlayerLevel / pMonsterLevel);
+                result = pXP * (pPlayerLevel / pMonsterLevel.Value);
             }
             else if (pMonsterLevel < pPlayerLevel)
             {
@@ -99,30 +101,29 @@ namespace BossFight
                     result = result * 0.05;
                 }
             }
-            return Math.Ceiling(result);
+            return (int)Math.Ceiling(result);
         }
 
-        public static void UpdatePlayersHealthAndManaHelper(List<Player> pPlayers, string pTimestamp, int pMinutesBetweenTicks, Action<Player, int> pRegenFunc)
+        public static string UpdatePlayersHealthAndManaHelper(List<Player> pPlayers, string pTimestamp, int pMinutesBetweenTicks, Action<Player, int> pRegenFunc)
         {
-            var previousTimestamp = new DateTime(pTimestamp);
+            var previousTimestamp = DateTime.Parse(pTimestamp);
             var now = DateTime.Now;
             var minutesDiff = Math.Floor((now - previousTimestamp).TotalSeconds / 60);
-            var ticks = Math.Floor(minutesDiff / pMinutesBetweenTicks);
+            var ticks = (int)Math.Floor(minutesDiff / pMinutesBetweenTicks);
             foreach (var p in pPlayers)
-            {
                 pRegenFunc(p, ticks);
-            }
+
             var minutesToRemove = minutesDiff % pMinutesBetweenTicks;
-            now = now - timedelta(minutes: minutesToRemove);
+            now = now.AddMinutes(minutesToRemove);
             return now.ToString("%Y-%m-%d:%H:%M:00");
         }
 
-        public static void EegenPlayerHealth(Player p, int timesToRegen = 1)
+        public static void RegenPlayerHealth(Player p, int timesToRegen = 1)
         {
             p.RegenHealth(timesToRegen);
         }
 
-        public static void EegenPlayerMana(Player p, int timesToRegen = 1)
+        public static void RegenPlayerMana(Player p, int timesToRegen = 1)
         {
             p.RegenMana(timesToRegen);
         }

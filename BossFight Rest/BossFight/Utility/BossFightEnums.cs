@@ -12,7 +12,6 @@ namespace BossFight.BossFightEnums
 
     public enum WeaponType
     {
-
         POLEARM,
         THROWN,
         IMPROVISED,

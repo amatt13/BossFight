@@ -1,4 +1,4 @@
-namespace BossFight.Models
+namespace BossFight.Models.Loot
 {
     public class LootEntry
     {
@@ -8,13 +8,13 @@ namespace BossFight.Models
         public int GoldEarned { get; set; }
         public Player Player { get; set; }
 
-        public LootEntry(int pPlayerId, int pDamageDealtByPlayer, object pGoldEarned)
+        public LootEntry(int pPlayerId, int pDamageDealtByPlayer, int pGoldEarned)
         {
             PlayerId = pPlayerId;
             DamageDealtByPlayer = pDamageDealtByPlayer;
             RelativeDamageDealtByPlayer = 0.0d;
             GoldEarned = pGoldEarned;
-            Player = new Player("NA", "");
+            Player = new Player("NA", -1);
         }
 
         public void SetPlayer(Player pPlayer)

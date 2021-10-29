@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using BossFight.BossFightEnums;
 
-namespace BossFight.Models
+namespace BossFight.Models.PlayerClass
 {
     public class Cleric : PlayerClass
     {

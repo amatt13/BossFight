@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using BossFight.CustemExceptions;
+using BossFight.Models.PlayerClass;
+using BossFight.Models.Loot;
 
 namespace BossFight.Models
 {
@@ -18,12 +20,12 @@ namespace BossFight.Models
         public int Mana { get; set; }
         public int BonusMagicDmg { get; set; }
         public int BonusMagicDmgDuration { get; set; }
-        public List<PlayerClass> PlayerClassList { get; set; }
-        public PlayerClass PlayerClass { get; set; }
+        public List<PlayerClass.PlayerClass> PlayerClassList { get; set; }
+        public PlayerClass.PlayerClass PlayerClass { get; set; }
         public Weapon Weapon { get; set; }
         public List<int> AutoSellList { get; set; }
 
-        public Player(string pName, int pPlayerId, int pGold = 0, List<int> pLootList = null, int pWeaponId = 1, int pHP = 10, int pPlayerClassId = 0, int pMana = 10, List<PlayerClass> pPlayerClassList = null)
+        public Player(string pName, int pPlayerId, int pGold = 0, List<int> pLootList = null, int pWeaponId = 1, int pHP = 10, int pPlayerClassId = 0, int pMana = 10, List<PlayerClass.PlayerClass> pPlayerClassList = null)
             : base(pName: pName)
         {
             PlayerId = pPlayerId;
@@ -34,10 +36,10 @@ namespace BossFight.Models
             Mana = pMana;
             BonusMagicDmg = 0;
             BonusMagicDmgDuration = 0;
-            PlayerClassList = pPlayerClassList ?? new List<PlayerClass>();
+            PlayerClassList = pPlayerClassList ?? new List<PlayerClass.PlayerClass>();
             //TODO DETERMINE CURRENT PLAYERCLASS ON LOAD
             Level = PlayerClass.Level;
-            Weapon = statics.findWeaponByWeaponId(pWeaponId);
+            //Weapon = FindWeaponByWeaponId(pWeaponId);
         }
 
         // public static Player FromDB(object cls, object playerDict)
@@ -74,7 +76,7 @@ namespace BossFight.Models
         //                           where pc.classId == p.currentPlayerClassId
         //                           select pc);
         //     p.level = p.playerClass.level;
-        //     p.weapon = statics.findWeaponByWeaponId(p.weaponId);
+        //     p.weapon = GenralHelperFunctions.findWeaponByWeaponId(p.weaponId);
         //     return p;
         // }
 
@@ -164,11 +166,11 @@ namespace BossFight.Models
             return IsDead();
         }
 
-        public PlayerClass GainXp(int pGainedXp, int? pMonsterLevel = null)
+        public PlayerClass.PlayerClass GainXp(int pGainedXp, int? pMonsterLevel = null)
         {
-            pGainedXp = statics.calcXpPenalty(pGainedXp, GetLevel(), pMonsterLevel);
+            pGainedXp = GenralHelperFunctions.CalcXpPenalty(pGainedXp, GetLevel(), pMonsterLevel);
             PlayerClass.XP += pGainedXp;
-            var xpNeededToNextLevel = statics.xpNeededToNextLevel(PlayerClass);
+            var xpNeededToNextLevel = GenralHelperFunctions.XpNeededToNextLevel(PlayerClass);
             if (xpNeededToNextLevel <= 0)
             {
                 PlayerClass.LevelUp();
@@ -237,13 +239,13 @@ namespace BossFight.Models
             LootList.Remove(itemToEquip);
             AddLoot(WeaponId);
             WeaponId = itemToEquip;
-            Weapon = statics.findWeaponByWeaponId(pNewWeaponId);
+            //Weapon = GenralHelperFunctions.findWeaponByWeaponId(pNewWeaponId);
         }
 
         public void ChangeClass(string pNewPlayerClassName)
         {
             var newPlayerClassName = pNewPlayerClassName.ToLower();
-            PlayerClass newClass;
+            PlayerClass.PlayerClass newClass;
             if (newPlayerClassName != PlayerClass.Name.ToLower())
             {
                 try
@@ -306,20 +308,20 @@ namespace BossFight.Models
             return durationSubtracted;
         }
 
-        public async virtual Task<object> attackMonsterWithWeapon(Target pTargetMonster, Weapon pPlayerWeapon, bool pRetaliate = true)
+        public string AttackMonsterWithWeapon(Monster pTargetMonster, Weapon pPlayerWeapon, bool pRetaliate = true)
         {
             var bonusCritChance = 0;
-            if (pTargetMonster.easierToCritDuration > 0)
+            if (pTargetMonster.EasierToCritDuration > 0)
             {
-                bonusCritChance = pTargetMonster.easierToCritPercentage;
-                pTargetMonster.easierToCritPercentage -= 1;
+                bonusCritChance = pTargetMonster.EasierToCritPercentage;
+                pTargetMonster.EasierToCritPercentage -= 1;
             }
             var isCrit = PlayerAttackIsCrit(bonusCritChance);
-            var damageDealt = await pTargetMonster.ReceiveDamageFromPlayer(this, pPlayerWeapon, isCrit);
-            var Tup1 = await pTargetMonster.ReceiveDamageFromDamageOverTimeEffects();
+            var damageDealt = pTargetMonster.ReceiveDamageFromPlayer(this, pPlayerWeapon, isCrit);
+            var Tup1 = pTargetMonster.ReceiveDamageFromDamageOverTimeEffects();
             int totalDamageOverTime = Tup1.Item1;
-            object /*TODO correct type*/ playersThatDealtDamageOverTime = Tup1.Item2;
-            var xpEarned = statics.calculateExperienceFromDamageDealtToMonster(damageDealt, pTargetMonster);
+            List<string>  playersThatDealtDamageOverTime = Tup1.Item2;
+            var xpEarned = GenralHelperFunctions.CalculateExperienceFromDamageDealtToMonster(damageDealt, pTargetMonster);
             GainXp(xpEarned, pTargetMonster.Level);
             var attackMessage = AttackMessage(this, pTargetMonster);
             attackMessage.playerCrit = isCrit;
@@ -333,9 +335,9 @@ namespace BossFight.Models
             {
                 attackMessage.playerExtraDamageFromBuffs = true;
             }
-            if (playersThatDealtDamageOverTime.Count > 0)
+            if (playersThatDealtDamageOverTime.Any())
             {
-                attackMessage.monsterAffectedByDots = $"Monster took an additional { totalDamageOverTime } damage from various spell effects by { String.Join(", ", from p in playersThatDealtDamageOverTime select p.Name) }";
+                attackMessage.monsterAffectedByDots = $"Monster took an additional { totalDamageOverTime } damage from various spell effects by { String.Join(", ", from p in playersThatDealtDamageOverTime select p) }";
             }
             return attackMessage;
         }
@@ -361,7 +363,7 @@ namespace BossFight.Models
             var cleric = new Cleric(this);
             var executioner = new Executioner(this);
             var ranger = new Ranger(this);
-            foreach (var pc in new List<PlayerClass> {
+            foreach (var pc in new List<PlayerClass.PlayerClass> {
                     cleric,
                     executioner,
                     ranger
@@ -380,26 +382,30 @@ namespace BossFight.Models
             }
         }
 
-        public void AddLoot(LootItem lootToAdd)
+        public void AddLoot(int pLootToAdd)
         {
-            int lootId = lootToAdd.lootId;
-
-            if (LootIsInAutoSellList(lootId))
+            if (LootIsInAutoSellList(pLootToAdd))
             {
-                var wp = statics.findWeaponByWeaponId(lootId);
-                Gold += wp.getSellPrice();
+                //var wp = GenralHelperFunctions.findWeaponByWeaponId(lootId);
+                Gold += wp.GetSellPrice();
             }
             else
             {
-                LootList.Add(lootId);
+                LootList.Add(pLootToAdd);
                 LootList.Sort();
             }
         }
 
+        public void AddLoot(LootItem pLootToAdd)
+        {
+            int lootId = pLootToAdd.LootId;
+            AddLoot(lootId);
+        }
+
         public string sellLoot(LootItem pLootToSell)
         {
-            LootList.Remove(pLootToSell.lootId);
-            var sellPrice = pLootToSell.getSellPrice();
+            LootList.Remove(pLootToSell.LootId);
+            var sellPrice = pLootToSell.GetSellPrice();
             return $"You sold '{ pLootToSell.GetName()}' for { sellPrice } gold";
         }
 

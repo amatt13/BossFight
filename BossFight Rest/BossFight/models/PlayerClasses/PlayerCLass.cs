@@ -4,7 +4,7 @@ using System.Linq;
 using BossFight.BossFightEnums;
 using BossFight.CustemExceptions;
 
-namespace BossFight.Models
+namespace BossFight.Models.PlayerClass
 {
     public class PlayerClassRequirement
     {
@@ -45,7 +45,7 @@ namespace BossFight.Models
 
         // also properties ?
         public int PurchasePrice {get; set;} = 0;
-        public double PlayerClassCritChance {get; set;} = 0;
+        public int PlayerClassCritChance {get; set;} = 0;
         public int HpRegenRate {get; set;} = 1;
         public int ManaRegenRate {get; set;} = 1;
         public int AttackPowerBonus {get; set;} = 0;

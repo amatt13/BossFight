@@ -5,9 +5,9 @@ namespace BossFight.Models
 {
     public class Target
     {
-        public int HP {get; set;}
-        public string Name {get; set;}
-        public int Level {get; set;}
+        public int HP { get; set; }
+        public string Name { get; set; }
+        public int Level { get; set; }
 
         public Target(int pHP = 1, string pName = "No name", int pLevel = 1)
         {
