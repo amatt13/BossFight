@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using BossFight.BossFightEnums;
 
-namespace BossFight.Models.PlayerClass
+namespace BossFight.Models
 {
     public class Ranger : PlayerClass
     {
@@ -26,15 +26,15 @@ namespace BossFight.Models.PlayerClass
             return playerClass;
         }
 
-        public override Dictionary<String, Ability.Ability> PrepareAvailableAbilities()
+        public override Dictionary<String, Ability> PrepareAvailableAbilities()
         {
-            var unlockedAbilities = new Dictionary<String, Ability.Ability>();
-            var doubleStrike = Abilities.DoubleStrike();
-            unlockedAbilities[doubleStrike.magicWord] = doubleStrike;
+            var unlockedAbilities = new Dictionary<String, Ability>();
+            var doubleStrike = new DoubleStrike();
+            unlockedAbilities[doubleStrike.MagicWord] = doubleStrike;
             if (Level >= 5)
             {
-                var poisonedBait = Abilities.PoisonedBait();
-                unlockedAbilities[poisonedBait.magicWord] = poisonedBait;
+                var poisonedBait = new PoisonedBait();
+                unlockedAbilities[poisonedBait.MagicWord] = poisonedBait;
             }
             return unlockedAbilities;
         }

@@ -32,6 +32,12 @@ namespace BossFight.Models
     //     }
     // }
 
+    public class MonsterKilledEventArgs : EventArgs
+    {
+        public int KillerId { get; set; }
+        public Monster DeadMonster { get; set; }
+    }
+
     public class Monster : Target
     {
         public const string ERRORIMAGEURL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZ5TWeaqjdWuvgco4oq5N50bWNGwE-eJDGpg&usqp=CAU";
@@ -52,6 +58,7 @@ namespace BossFight.Models
         public int EasierToCritPercentage { get; set; }
         public Dictionary<int, DamageTrackerEntry> DamageOverTimeTracker { get; set; }  // key is player_id
         public Dictionary<int, int> FrenzyStackTracker { get; set; }  // key is player_id, value is frenzy stack lvl/size
+        public event EventHandler<MonsterKilledEventArgs>  MonsterDied;
 
         public Monster(string pName, string pImageUrl, Dictionary<int, int> pDamageTracker = null, List<MonsterType> pMonsterTypes = null, bool pBossMonster = false)
         {
@@ -301,7 +308,17 @@ namespace BossFight.Models
             HP -= pDamage;
             if (IsDead())
             {
-                PostEvent(MONSTERKILLEDEVENT, (this, pAttackingPlayerId));
+                var args = new MonsterKilledEventArgs { DeadMonster = this, KillerId = pAttackingPlayerId };
+                OnMonsterKilled(args);
+            }
+        }
+
+        protected virtual void OnMonsterKilled(MonsterKilledEventArgs e)
+        {
+            var handler = MonsterDied;
+            if (handler != null)
+            {
+                handler(this, e);
             }
         }
 

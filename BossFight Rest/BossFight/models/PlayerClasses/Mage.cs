@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using BossFight.BossFightEnums;
 
-namespace BossFight.Models.PlayerClass
+namespace BossFight.Models
 {
     public class Mage : PlayerClass
     {
@@ -29,15 +29,15 @@ namespace BossFight.Models.PlayerClass
             return playerClass;
         }
 
-        public override Dictionary<String, Ability.Ability> PrepareAvailableAbilities()
+        public override Dictionary<String, Ability> PrepareAvailableAbilities()
         {
-            var unlockedAbilities = new Dictionary<String, Ability.Ability>();
-            var ignite = Abilities.Ignite();
-            unlockedAbilities[ignite.magicWord] = ignite;
+            var unlockedAbilities = new Dictionary<String, Ability>();
+            var ignite = new Ignite();
+            unlockedAbilities[ignite.MagicWord] = ignite;
             if (Level >= 5)
             {
-                var enchantWeapon = Abilities.EnchantWeapon();
-                unlockedAbilities[enchantWeapon.magicWord] = enchantWeapon;
+                var enchantWeapon = new EnchantWeapon();
+                unlockedAbilities[enchantWeapon.MagicWord] = enchantWeapon;
             }
             return unlockedAbilities;
         }

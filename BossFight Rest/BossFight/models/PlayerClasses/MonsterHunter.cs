@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using BossFight.BossFightEnums;
 
-namespace BossFight.Models.PlayerClass
+namespace BossFight.Models
 {
     public class MonsterHunter : PlayerClass
     {
@@ -43,17 +43,17 @@ namespace BossFight.Models.PlayerClass
                 };
         }
 
-        public override Dictionary<String, Ability.Ability> PrepareAvailableAbilities()
+        public override Dictionary<String, Ability> PrepareAvailableAbilities()
         {
-            var unlockedAbilities = new Dictionary<String, Ability.Ability>();
-            var overSizedBearTrap = Abilities.OverSizedBearTrap();
-            unlockedAbilities[overSizedBearTrap.magicWord] = overSizedBearTrap;
-            var turnWeaponToSilver = Abilities.TurnWeaponToSilver();
-            unlockedAbilities[turnWeaponToSilver.magicWord] = turnWeaponToSilver;
+            var unlockedAbilities = new Dictionary<String, Ability>();
+            var overSizedBearTrap = new OverSizedBearTrap();
+            unlockedAbilities[overSizedBearTrap.MagicWord] = overSizedBearTrap;
+            var turnWeaponToSilver = new TurnWeaponToSilver();
+            unlockedAbilities[turnWeaponToSilver.MagicWord] = turnWeaponToSilver;
             if (Level >= 5)
             {
-                var bigGameTrophy = Abilities.BigGameTrophy();
-                unlockedAbilities[bigGameTrophy.magicWord] = bigGameTrophy;
+                var bigGameTrophy = new BigGameTrophy();
+                unlockedAbilities[bigGameTrophy.MagicWord] = bigGameTrophy;
             }
             return unlockedAbilities;
         }

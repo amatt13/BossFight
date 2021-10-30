@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using BossFight.BossFightEnums;
 
-namespace BossFight.Models.PlayerClass
+namespace BossFight.Models
 {
     public class Paladin : PlayerClass
     {
@@ -40,17 +40,17 @@ namespace BossFight.Models.PlayerClass
                 };
         }
 
-        public override Dictionary<String, Ability.Ability> PrepareAvailableAbilities()
+        public override Dictionary<String, Ability> PrepareAvailableAbilities()
         {
-            var unlockedAbilities = new Dictionary<String, Ability.Ability>();
-            var sacrifice = Abilities.Sacrifice();
-            unlockedAbilities[sacrifice.magicWord] = sacrifice;
-            var heal = Abilities.Heal();
-            unlockedAbilities[heal.magicWord] = heal;
+            var unlockedAbilities = new Dictionary<String, Ability>();
+            var sacrifice = new Sacrifice();
+            unlockedAbilities[sacrifice.MagicWord] = sacrifice;
+            var heal = new Heal();
+            unlockedAbilities[heal.MagicWord] = heal;
             if (Level >= 5)
             {
-                var fullRestore = Abilities.GreaterHeal();
-                unlockedAbilities[fullRestore.magicWord] = fullRestore;
+                var fullRestore = new GreaterHeal();
+                unlockedAbilities[fullRestore.MagicWord] = fullRestore;
             }
             return unlockedAbilities;
         }

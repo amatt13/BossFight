@@ -1,84 +1,89 @@
-namespace BossFight.Models.Ability
+using System.Collections.Generic;
+using System.Linq;
+using BossFight.CustemExceptions;
+
+namespace BossFight.Models
 {
     public class Ability
     {
-        public Ability(object name = str, object description = str, object mana_cost = @int, object magic_word = str)
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public Player Caster { get; set; }
+        public string UseAbilityText { get; set; }
+        public bool OnlyTargetMonster { get; set; }
+        public int ManaCost { get; set; }
+        public string MagicWord { get; set; }
+        public bool AffectsAllPlayers { get; set; }
+        public string AffectsAllPlayersStr { get; set; }
+
+        public Ability(string pName, string pDescription, int pManaCost, string pMagicWord)
         {
-            this.name = name;
-            this.description = description;
-            this.caster = null;
-            this.use_ability_text = "";
-            this.only_target_monster = false;
-            this.mana_cost = mana_cost;
-            this.magic_word = magic_word.lower();
-            this.affects_all_players = false;
-            this.affects_all_players_str = "";
+            Name = pName;
+            Description = pDescription;
+            Caster = null;
+            UseAbilityText = "";
+            OnlyTargetMonster = false;
+            ManaCost = pManaCost;
+            MagicWord = pMagicWord.ToLower();
+            AffectsAllPlayers = false;
+            AffectsAllPlayersStr = "";
         }
 
         public override string ToString()
         {
-            var only_target_monster = "";
-            if (this.only_target_monster)
-            {
-                only_target_monster = "*";
-            }
-            return "{self.mana_cost} mana - **{self.magic_word}**/**{self.name}**{only_target_monster} -> {self.description}";
+            var onlyTargetMonsterString = "";
+            if (OnlyTargetMonster)
+                onlyTargetMonsterString = "*";
+                
+            return $"{ ManaCost } mana - **{ MagicWord }**/**{ Name }**{ onlyTargetMonsterString } -> { Description }";
         }
 
-        public virtual string use_ability(object caster, object target_target = target.Target, object dont_use_caster_effect = false)
+        public virtual string UseAbility(Player pCaster, Target pTarget, bool pDontUseCasterEffect = false)
         {
-            this.use_ability_text = "";
-            this.caster = caster;
-            if (this.only_target_monster && !(target_target is target.Target))
-            {
-                throw TypeError("Can only target monsters");
-            }
-            if (!dont_use_caster_effect)
-            {
-                this.caster_effect();
-            }
-            if (target_target != null)
-            {
-                await this.target_effect(target_target);
-            }
-            this.subtract_mana_cost_from_caster();
-            this.add_mana_text();
-            return this.affects_all_players_str + this.use_ability_text;
+            UseAbilityText = "";
+            Caster = pCaster;
+            if (OnlyTargetMonster && pTarget is Player)
+                throw new MyException("Can only target monsters");
+                
+            if (!pDontUseCasterEffect)
+                CasterEffect();
+                
+            if (pTarget != null)
+                TargetEffect(pTarget);
+                
+            SubtractManaCostFromCaster();
+            AddManaText();
+            return AffectsAllPlayersStr + UseAbilityText;
         }
 
         // The effect that will be executed on the caster
-        public virtual void caster_effect()
-        {
-        }
+        public virtual void CasterEffect()
+        { }
 
         // The effect that will be executed on the target
-        public virtual void target_effect(object target_target = target.Target)
+        public virtual void TargetEffect(Target pTarget)
+        { }
+
+        public virtual void AffectsAllPlayersEffect(List<Player> allPlayers)
+        { }
+
+        public void SubtractManaCostFromCaster()
         {
+            if (Caster.Mana < ManaCost)
+                throw new WTFException($"caster mana: { Caster.Mana} mana cost: { ManaCost }");
+                
+            Caster.Mana -= ManaCost;
         }
 
-        public virtual void affects_all_players_effect(object all_players = list[target.Target])
+        public void AddManaText()
         {
+            if (UseAbilityText.Any() && !UseAbilityText.EndsWith('\n'))
+                UseAbilityText += "\n";
+                
+            UseAbilityText += $"**Mana:** You have { Caster.Mana } mana left";
         }
 
-        public void subtract_mana_cost_from_caster()
-        {
-            if (this.caster.mana < this.mana_cost)
-            {
-                throw source.games.boss_fight.statics.WTFException("caster mana: {self.caster.mana} mana cost: {self.mana_cost}");
-            }
-            this.caster.mana -= this.mana_cost;
-        }
-
-        public void add_mana_text()
-        {
-            if (this.use_ability_text.Count > 0 && this.use_ability_text[-1] != "\n")
-            {
-                this.use_ability_text += "\n";
-            }
-            this.use_ability_text += "**Mana:** You have { self.caster.mana } mana left";
-        }
-
-        public string bold_name_with_colon()
+        public string BoldNameWithColon()
         {
             return $"**{Name}:**";
         }

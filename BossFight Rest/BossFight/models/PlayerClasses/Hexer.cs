@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using BossFight.BossFightEnums;
 
-namespace BossFight.Models.PlayerClass
+namespace BossFight.Models
 {
     public class Hexer : PlayerClass
     {
@@ -29,15 +29,15 @@ namespace BossFight.Models.PlayerClass
             return playerClass;
         }
 
-        public override Dictionary<String, Ability.Ability> PrepareAvailableAbilities()
+        public override Dictionary<String, Ability> PrepareAvailableAbilities()
         {
-            var unlockedAbilities = new Dictionary<String, Ability.Ability>();
-            var hex = Abilities.Hex();
-            unlockedAbilities[hex.magicWord] = hex;
+            var unlockedAbilities = new Dictionary<String, Ability>();
+            var hex = new Hex();
+            unlockedAbilities[hex.MagicWord] = hex;
             if (Level >= 5)
             {
-                var fractureSkin = Abilities.FractureSkin();
-                unlockedAbilities[fractureSkin.magicWord] = fractureSkin;
+                var fractureSkin = new FractureSkin();
+                unlockedAbilities[fractureSkin.MagicWord] = fractureSkin;
             }
             return unlockedAbilities;
         }

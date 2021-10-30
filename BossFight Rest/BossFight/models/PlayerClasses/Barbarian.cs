@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using BossFight.BossFightEnums;
 
-namespace BossFight.Models.PlayerClass
+namespace BossFight.Models
 {
     public class Barbarian : PlayerClass
     {
@@ -43,15 +43,15 @@ namespace BossFight.Models.PlayerClass
                 };
         }
 
-        public override Dictionary<String, Ability.Ability> PrepareAvailableAbilities()
+        public override Dictionary<String, Ability> PrepareAvailableAbilities()
         {
-            var unlockedAbilities = new Dictionary<String, Ability.Ability>();
-            var shout = Abilities.Shout();
-            unlockedAbilities[shout.magicWord] = shout;
+            var unlockedAbilities = new Dictionary<String, Ability>();
+            var shout = new Shout();
+            unlockedAbilities[shout.MagicWord] = shout;
             if (Level >= 5)
             {
-                var frenzy = Abilities.Frenzy();
-                unlockedAbilities[frenzy.magicWord] = frenzy;
+                var frenzy = new Frenzy();
+                unlockedAbilities[frenzy.MagicWord] = frenzy;
             }
             return unlockedAbilities;
         }

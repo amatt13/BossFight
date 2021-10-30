@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using BossFight.Models;
-using BossFight.Models.PlayerClass;
 
 namespace BossFight
 {

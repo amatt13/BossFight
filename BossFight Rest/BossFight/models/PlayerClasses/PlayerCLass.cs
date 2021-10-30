@@ -4,7 +4,7 @@ using System.Linq;
 using BossFight.BossFightEnums;
 using BossFight.CustemExceptions;
 
-namespace BossFight.Models.PlayerClass
+namespace BossFight.Models
 {
     public class PlayerClassRequirement
     {
@@ -37,7 +37,7 @@ namespace BossFight.Models.PlayerClass
         public int Level {get; set;}
         Player Player {get; set;}
         public List<WeaponType> ProficientWeaponTypesList {get; set;}
-        public Dictionary<string, Ability.Ability> Abilities {get; set;}
+        public Dictionary<string, Ability> Abilities {get; set;}
         public double HpScale {get; set;} = DefaultHpScale;
         public double ManaScale {get; set;} = DefaultManaScale;
         public int MaxHp {get; set;}
@@ -68,7 +68,7 @@ namespace BossFight.Models.PlayerClass
             Recalculate();
         }
 
-        public abstract Dictionary<String, Ability.Ability> PrepareAvailableAbilities();
+        public abstract Dictionary<String, Ability> PrepareAvailableAbilities();
 
         // fromDict
         public abstract PlayerClass FromDB(object playerClassDict, Player player);

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using BossFight.BossFightEnums;
 
-namespace BossFight.Models.PlayerClass
+namespace BossFight.Models
 {
     public class Executioner : PlayerClass
     {
@@ -26,15 +26,15 @@ namespace BossFight.Models.PlayerClass
             return playerClass;
         }
 
-        public override Dictionary<String, Ability.Ability> PrepareAvailableAbilities()
+        public override Dictionary<String, Ability> PrepareAvailableAbilities()
         {
-            var unlockedAbilities = new Dictionary<String, Ability.Ability>();
-            var sackOnHead = Abilities.SackOnHead();
-            unlockedAbilities[sackOnHead.magicWord] = sackOnHead;
+            var unlockedAbilities = new Dictionary<String, Ability>();
+            var sackOnHead = new SackOnHead();
+            unlockedAbilities[sackOnHead.MagicWord] = sackOnHead;
             if (Level >= 5)
             {
-                var execute = Abilities.Execute();
-                unlockedAbilities[execute.magicWord] = execute;
+                var execute = new Execute();
+                unlockedAbilities[execute.MagicWord] = execute;
             }
             return unlockedAbilities;
         }
