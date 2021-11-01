@@ -25,7 +25,7 @@ namespace BossFight.Models
 
         public MySqlDataReader ExecuteQuery(string pQuery)
         {
-            var command = new MySqlCommand("pQuery", _connector.Connection);
+            var command = new MySqlCommand(pQuery, _connector.Connection);
             return command.ExecuteReader();
         }
 

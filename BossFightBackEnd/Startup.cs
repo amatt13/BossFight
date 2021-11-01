@@ -21,7 +21,7 @@ namespace BossFight
         public void ConfigureServices(IServiceCollection services)
         {
             DBSingleton.Init(Configuration["ConnectionStrings:DefaultConnection"]);
-            var rest = DBSingleton.GetInstance().TEST();
+            var p = Player.FetchFromDB(1337);
 
             services.AddControllers();
 

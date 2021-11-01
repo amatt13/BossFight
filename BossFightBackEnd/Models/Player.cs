@@ -23,6 +23,11 @@ namespace BossFight.Models
         public Weapon Weapon { get; set; }
         public List<int> AutoSellList { get; set; }
 
+        public Player()
+        {
+            
+        }
+
         public Player(string pName, int pPlayerId, int pGold = 0, List<int> pLootList = null, int pWeaponId = 1, int pHP = 10, int pPlayerClassId = 0, int pMana = 10, List<PlayerClass> pPlayerClassList = null)
             : base(pName: pName)
         {
@@ -40,11 +45,31 @@ namespace BossFight.Models
             //Weapon = FindWeaponByWeaponId(pWeaponId);
         }
 
-        // public static Player FetchFromDB(int pPlayerId)
-        // {
-        //     var reader = DBSingleton.ExecuteQuery(@"SELECT * FROM player WHERE player.player_id = {pPlayerId}");
-        //     Player player = null;
-        //     if (reader.HasRows)
+        public static Player BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        {
+            Player player = new Player();
+
+            while (reader.Read())
+            {
+                player.PlayerId = reader.GetInt32("player_id");
+                player.Gold = reader.GetInt32("gold");
+                player.Name = reader.GetString("name");
+                player.HP = reader.GetInt32("hp");
+                player.Mana = reader.GetInt32("mana");
+            }
+
+            return player;
+        }
+
+         public static Player FetchFromDB(int pPlayerId)
+         {
+             var reader = DBSingleton.GetInstance().ExecuteQuery($"SELECT * FROM player WHERE player.player_id = {pPlayerId}");
+             Player player = null;
+             if (reader.HasRows)
+                player = BuildObjectFromReader(reader);
+
+            return player;
+         }
         //     {
         //         while (reader.Read())
         //         {
