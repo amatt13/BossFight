@@ -354,4 +354,4 @@ MigrationBackup/
 # CUSTOOM STUFF
 */.vscode/
 BossFight Rest/TodoApi/.vscode/*
-BossFightBackEnd/appsettings.json
+BossFightBackEnd/appsettings.Development.json
