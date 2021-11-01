@@ -1,3 +1,5 @@
+using System;
+using BossFight.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
@@ -7,6 +9,7 @@ namespace BossFight
     {
         public static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);           
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -16,5 +19,11 @@ namespace BossFight
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
+        static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            Console.WriteLine("bye bye!");
+            DBSingleton.GetInstance().CloseConnection();
+        }
     }
 }

@@ -40,42 +40,51 @@ namespace BossFight.Models
             //Weapon = FindWeaponByWeaponId(pWeaponId);
         }
 
-        // public static Player FromDB(object cls, object playerDict)
+        // public static Player FetchFromDB(int pPlayerId)
         // {
-        //     var p = cls("NO NAME", "-1", -1, new List<object>(), 1, 10, 10);
-        //     p.name = playerDict["name"];
-        //     p.playerId = playerDict["playerId"].ToString();
-        //     p.gold = Convert.ToInt32(playerDict["gold"]);
-        //     p.loot = playerDict["loot"];
-        //     p.weaponId = playerDict["weaponId"];
-        //     p.hp = Convert.ToInt32(playerDict["hp"]);
-        //     p.currentPlayerClassId = Convert.ToInt32(playerDict["currentPlayerClassId"]);
-        //     p.mana = Convert.ToInt32(playerDict["mana"]);
-        //     p.bonusMagicDmg = Convert.ToInt32(playerDict["bonusMagicDmg"]);
-        //     p.bonusMagicDmgDuration = Convert.ToInt32(playerDict["bonusMagicDmgDuration"]);
-        //     p.PlayerClassList = new List<object>();
-        //     p.autoSellList = playerDict["autoSellList"];
-        //     if (playerDict.keys().Contains("PlayerClassList"))
+        //     var reader = DBSingleton.ExecuteQuery(@"SELECT * FROM player WHERE player.player_id = {pPlayerId}");
+        //     Player player = null;
+        //     if (reader.HasRows)
         //     {
-        //         var playerClassDictionaries = playerDict["PlayerClassList"];
-        //         foreach (var playerClassDict in playerClassDictionaries)
+        //         while (reader.Read())
         //         {
-        //             try
+        //             Console.WriteLine(reader.GetString(0));
+        //         }
+
+        //         p.name = playerDict["name"];
+        //         p.playerId = playerDict["playerId"].ToString();
+        //         p.gold = Convert.ToInt32(playerDict["gold"]);
+        //         p.loot = playerDict["loot"];
+        //         p.weaponId = playerDict["weaponId"];
+        //         p.hp = Convert.ToInt32(playerDict["hp"]);
+        //         p.currentPlayerClassId = Convert.ToInt32(playerDict["currentPlayerClassId"]);
+        //         p.mana = Convert.ToInt32(playerDict["mana"]);
+        //         p.bonusMagicDmg = Convert.ToInt32(playerDict["bonusMagicDmg"]);
+        //         p.bonusMagicDmgDuration = Convert.ToInt32(playerDict["bonusMagicDmgDuration"]);
+        //         p.PlayerClassList = new List<object>();
+        //         p.autoSellList = playerDict["autoSellList"];
+        //         if (playerDict.keys().Contains("PlayerClassList"))
+        //         {
+        //             var playerClassDictionaries = playerDict["PlayerClassList"];
+        //             foreach (var playerClassDict in playerClassDictionaries)
         //             {
-        //                 p.PlayerClassList.append(cls.FromDictPlayerClassHelper(playerClassDict, p));
-        //             }
-        //             catch (ValueError)
-        //             {
-        //                 quit(ve.ToString());
+        //                 try
+        //                 {
+        //                     p.PlayerClassList.append(cls.FromDictPlayerClassHelper(playerClassDict, p));
+        //                 }
+        //                 catch (ValueError)
+        //                 {
+        //                     quit(ve.ToString());
+        //                 }
         //             }
         //         }
+        //         p.playerClass = next(from pc in p.PlayerClassList
+        //                              where pc.classId == p.currentPlayerClassId
+        //                              select pc);
+        //         p.level = p.playerClass.level;
+        //         p.weapon = GenralHelperFunctions.findWeaponByWeaponId(p.weaponId);
         //     }
-        //     p.playerClass = next(from pc in p.PlayerClassList
-        //                           where pc.classId == p.currentPlayerClassId
-        //                           select pc);
-        //     p.level = p.playerClass.level;
-        //     p.weapon = GenralHelperFunctions.findWeaponByWeaponId(p.weaponId);
-        //     return p;
+        //     return player;
         // }
 
         // public virtual object toDict()
@@ -318,7 +327,7 @@ namespace BossFight.Models
             var damageDealt = pTargetMonster.ReceiveDamageFromPlayer(this, pPlayerWeapon, isCrit);
             var Tup1 = pTargetMonster.ReceiveDamageFromDamageOverTimeEffects();
             int totalDamageOverTime = Tup1.Item1;
-            List<string>  playersThatDealtDamageOverTime = Tup1.Item2;
+            List<string> playersThatDealtDamageOverTime = Tup1.Item2;
             var xpEarned = GenralHelperFunctions.CalculateExperienceFromDamageDealtToMonster(damageDealt, pTargetMonster);
             GainXp(xpEarned, pTargetMonster.Level);
             var attackMessage = new AttackMessage(this, pTargetMonster);
