@@ -9,70 +9,60 @@ monsterImage.addEventListener("load", () => {
 	ctx.drawImage(monsterImage, initialMonsterImageX, initialMMonsterImageY);
 });
 
-// TEST GET
-async function SendTestGETRequest() {
-	const response = await fetch("https://localhost:5001/RestTest", {
-		method: 'GET',
-		headers : { 
-			'Content-Type': 'application/json',
-			'Accept': 'application/json'
-		},
-	});
 
-	if (!response.ok) 
-	{
+let socket = new WebSocket("ws://localhost:5000/ws");
 
+socket.onopen = function(e) {
+	LogToTextLog("[open] Connection established")
+};
+
+socket.onmessage = function(event) {
+	LogToTextLog(`[message] Data received from server: ${event.data}`);
+	var json_dict = JSON.parse(event.data);
+	document.getElementById("player_name").innerHTML = json_dict["Name"];
+	document.getElementById("player_Level").innerHTML = json_dict["Level"];
+	document.getElementById("player_hp").innerHTML = json_dict["HP"];
+	document.getElementById("player_mana").innerHTML = json_dict["Mana"];
+	document.getElementById("player_gold").innerHTML = json_dict["Gold"];
+};
+
+socket.onclose = function(event) {
+	if (event.wasClean) {
+		LogToTextLog(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+	} else {
+		// e.g. server process killed or network down
+		// event.code is usually 1006 in this case
+		LogToTextLog('[close] Connection died');
 	}
+};
 
-	if (response.body !== null) {
-		const body = await response.json();
-		console.log(body);
-	}
+socket.onerror = function(error) {
+	LogToTextLog(`[error] ${error.message}`);
+};
+
+// TEST Get WebSocket button
+async function LoginTestUser() {
+	const obj = { 
+		request_key: "FetchPlayer", 
+		request_data: JSON.stringify({
+			player_id: "1337"
+		})
+	};
+	const json_obj = JSON.stringify(obj);
+	LogToTextLog("Sending to server");
+	socket.send(json_obj);
 }
 
-// TEST GetMoreStuff
-async function SendTestGetMoreStuffRequest() {
-	const response = await fetch("https://localhost:5001/GetMoreStuff", {
-		method: 'GET',
-		headers : { 
-			'Content-Type': 'application/json',
-			'Accept': 'application/json'
-		},
-	});
 
-	if (!response.ok) 
-	{
 
-	}
-
-	if (response.body !== null) {
-		const body = await response.json();
-		console.log(body);
-	}
+function LogToTextLog(pText)
+{
+	document.getElementById("text_log").innerHTML += pText + '\n'
 }
 
-// TEST POST
-async function SendTestPOSTRequest() {
-	const obj = { id: 101, testString: 'fucking ', unusedString: 'yes' };
-	const response = await fetch(`https://localhost:5001/RestTest`, {
-		method: 'POST',
-		headers : { 
-			'Content-Type': 'application/json',
-			'Accept': 'application/json'
-		},
-		body: JSON.stringify(obj)
-	});
 
-	if (!response.ok) {
-		
-	}
 
-	if (response.body !== null) {
-		const body = await response.json();
-		console.log(body);
-	}
-}
-
+// canvas stuff
 function ReSizeCanvas() {
 	if (canvas.width != Math.floor(window.innerWidth * 0.33) || canvas.height != Math.floor(window.innerHeight * 0.66)) {
 		canvas.width = Math.floor(window.innerWidth * 0.33);

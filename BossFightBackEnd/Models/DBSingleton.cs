@@ -1,6 +1,7 @@
 using System;
 using MySqlConnector;
 using BossFight.Models.DB;
+using System.Threading.Tasks;
 
 namespace BossFight.Models
 {
@@ -23,10 +24,10 @@ namespace BossFight.Models
             return _instance;
         }
 
-        public MySqlDataReader ExecuteQuery(string pQuery)
+        public async Task<MySqlDataReader> ExecuteQuery(string pQuery)
         {
             var command = new MySqlCommand(pQuery, _connector.Connection);
-            return command.ExecuteReader();
+            return await command.ExecuteReaderAsync();
         }
 
         public void CloseConnection()

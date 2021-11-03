@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BossFight.CustemExceptions;
 using BossFight.Models.Loot;
 
@@ -61,9 +62,9 @@ namespace BossFight.Models
             return player;
         }
 
-         public static Player FetchFromDB(int pPlayerId)
+         public async static Task<Player> FetchFromDB(int pPlayerId)
          {
-             var reader = DBSingleton.GetInstance().ExecuteQuery($"SELECT * FROM player WHERE player.player_id = {pPlayerId}");
+             var reader = await DBSingleton.GetInstance().ExecuteQuery($"SELECT * FROM player WHERE player.player_id = {pPlayerId}");
              Player player = null;
              if (reader.HasRows)
                 player = BuildObjectFromReader(reader);

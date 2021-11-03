@@ -11,22 +11,50 @@
 			Status
 		</h1>
 	</div>
-	<div class="column" style="float:left">
-		<canvas id="mainCanvas" width="300" height="300" style="border:1px solid #000000;">
-		</canvas>
-	</div>
-	<div class="column">
-		<div id="ts-example">
-			<br />
-			<button type="button" class="btn btn-primary btn-md" onclick="SendTestGETRequest()">
-				SendTestGetRequest()
-			</button>
-			<button type="button" class="btn btn-primary btn-md" onclick="SendTestGetMoreStuffRequest()">
-				SendTestGetMoreStuffRequest()
-			</button>
-			<button type="button" class="btn btn-primary btn-md" onclick="SendTestPOSTRequest()">
-				SendTestPOSTRequest()
-			</button>
+	<div class="row">
+		<div class="column" style="float:left; width: 33.33%">
+			<canvas id="mainCanvas" width="300" height="300" style="border:1px solid #000000;">
+			</canvas>
+		</div>
+		<div class="column" style="float:left; width: 33.33%">
+			<div id="ts-example">
+				<button type="button" class="btn btn-primary btn-md" onclick="LoginTestUser()">
+					Login "Test User"
+				</button>
+			</div>
+		</div>
+		<div class="column" style="float:left; width: 33.33%">
+			<!--
+			AutoSellList: null
+			BonusMagicDmg: 0
+			BonusMagicDmgDuration: 0
+			Gold: 100
+			HP: 10
+			Level: 1
+			LootList: null
+			Mana: 15
+			Name: "test user"
+			PlayerClass: null
+			PlayerClassList: null
+			PlayerId: 1337
+			Weapon: null
+			WeaponId: 0
+			-->
+			<label">Name: </label>
+			<label id="player_name"></label>
+			<br/>
+			<label">Level: </label>
+			<label id="player_Level"></label>
+			<br/>
+			<label">HP: </label>
+			<label id="player_hp"></label>
+			<br/>
+			<label">Mana: </label>
+			<label id="player_mana"></label>
+			<br/>
+			<label">Gold: </label>
+			<label id="player_gold"></label>
+			<textarea id="text_log" style="width: 100%; height: 300px;" placeholder="log..."></textarea>
 		</div>
 	</div>
 </body>
