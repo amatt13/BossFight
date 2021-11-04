@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BossFight.CustemExceptions;
+using BossFight.Models.DB;
 using BossFight.Models.Loot;
 
 namespace BossFight.Models
 {
-    public class Player : Target
+    public class Player : Target, IPersist<Player>
     {
         private static Random _random = new Random();
 
@@ -23,11 +24,14 @@ namespace BossFight.Models
         public PlayerClass PlayerClass { get; set; }
         public Weapon Weapon { get; set; }
         public List<int> AutoSellList { get; set; }
+        public override string TableName { get; set; } = "player";
+        public override string IdColumn { get; set; } = "player_id";
 
         public Player()
-        {
-            
-        }
+        { }
+
+        // public Player(AppDb db) : base(db)
+        // { }
 
         public Player(string pName, int pPlayerId, int pGold = 0, List<int> pLootList = null, int pWeaponId = 1, int pHP = 10, int pPlayerClassId = 0, int pMana = 10, List<PlayerClass> pPlayerClassList = null)
             : base(pName: pName)
@@ -43,12 +47,16 @@ namespace BossFight.Models
             PlayerClassList = pPlayerClassList ?? new List<PlayerClass>();
             //TODO DETERMINE CURRENT PLAYERCLASS ON LOAD
             Level = PlayerClass.Level;
-            //Weapon = FindWeaponByWeaponId(pWeaponId);
         }
 
-        public static Player BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        public Player FindOne(int id)
         {
-            Player player = new Player();
+            return (Player)_findOne(id);
+        }
+
+        public override PersistableBase BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        {
+            var player = new Player();
 
             while (reader.Read())
             {
@@ -57,20 +65,24 @@ namespace BossFight.Models
                 player.Name = reader.GetString("name");
                 player.HP = reader.GetInt32("hp");
                 player.Mana = reader.GetInt32("mana");
+                
+                var weaponID = reader.GetInt32("weapon_id");
+                if (weaponID != -1)
+                    player.LoadPlayerWeapon(weaponID);
             }
 
             return player;
         }
 
-         public async static Task<Player> FetchFromDB(int pPlayerId)
-         {
-             var reader = await DBSingleton.GetInstance().ExecuteQuery($"SELECT * FROM player WHERE player.player_id = {pPlayerId}");
-             Player player = null;
-             if (reader.HasRows)
-                player = BuildObjectFromReader(reader);
+        public void LoadPlayerWeapon(int? pWeaponId)
+        {
+            if (pWeaponId.HasValue)
+            {
+                var weapon = new Weapon().FindOne(pWeaponId.Value);
+                this.Weapon = weapon;
+            }
+        }
 
-            return player;
-         }
         //     {
         //         while (reader.Read())
         //         {

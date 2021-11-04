@@ -19,11 +19,8 @@ socket.onopen = function(e) {
 socket.onmessage = function(event) {
 	LogToTextLog(`[message] Data received from server: ${event.data}`);
 	var json_dict = JSON.parse(event.data);
-	document.getElementById("player_name").innerHTML = json_dict["Name"];
-	document.getElementById("player_Level").innerHTML = json_dict["Level"];
-	document.getElementById("player_hp").innerHTML = json_dict["HP"];
-	document.getElementById("player_mana").innerHTML = json_dict["Mana"];
-	document.getElementById("player_gold").innerHTML = json_dict["Gold"];
+	_player = new Player(json_dict["Name"], json_dict["Level"], json_dict["HP"], json_dict["Mana"], json_dict["Gold"]);
+	UpdateUiPlayerStats(_player);
 };
 
 socket.onclose = function(event) {
@@ -61,50 +58,23 @@ function LogToTextLog(pText)
 }
 
 
+function UpdateUiPlayerStats(player) {
+	document.getElementById("player_name").innerHTML = player.name;
+	document.getElementById("player_Level").innerHTML = player.level; 
+	document.getElementById("player_hp").innerHTML = player.hp;
+	document.getElementById("player_mana").innerHTML = player.mana;
+	document.getElementById("player_gold").innerHTML = player.gold;
+}
 
-// canvas stuff
-function ReSizeCanvas() {
-	if (canvas.width != Math.floor(window.innerWidth * 0.33) || canvas.height != Math.floor(window.innerHeight * 0.66)) {
-		canvas.width = Math.floor(window.innerWidth * 0.33);
-		canvas.height = Math.floor(window.innerHeight * 0.66);
-		initialMMonsterImageY = canvas.height / 2;
-		monsterImageX = initialMonsterImageX, monsterImageY = initialMMonsterImageY;
-		monsterImageMoveForward = true, monsterImageMoveDown = false;
+
+class Player {
+	constructor(name, level, hp, mana, gold) {
+		this.name = name;
+		this.level = level;
+		this.hp = hp;
+		this.mana = mana;
+		this.gold = gold;
 	}
 }
 
-function Draw() {
-	ReSizeCanvas();  // MUST be the first thing that happens
-	ctx.globalCompositeOperation = 'destination-over';
-	ctx.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
-	AnimateMonster();
-}
-
-let monsterImageX = initialMonsterImageX, monsterImageY = initialMMonsterImageY;
-let monsterImageMoveForward = true, monsterImageMoveDown = false;
-function AnimateMonster() {
-	if (initialMMonsterImageY == -1)
-		initialMMonsterImageY = canvas.height / 2;
-
-	if (monsterImageX >= initialMonsterImageX + 100) {
-		monsterImageMoveForward = false;
-	}
-	else if (monsterImageX <= 0) {
-		monsterImageMoveForward = true;
-	}
-
-	if (monsterImageY <= initialMMonsterImageY - 50) {
-		monsterImageMoveDown = true;
-	}
-	else if (monsterImageY >= initialMMonsterImageY) {
-		monsterImageMoveDown = false;
-	}
-
-	monsterImageX = monsterImageMoveForward ? monsterImageX + 0.5 : monsterImageX - 0.5;
-	monsterImageY = monsterImageMoveDown ? monsterImageY + 0.5 : monsterImageY - 0.5;
-
-	ctx.drawImage(monsterImage, monsterImageX, monsterImageY);
-	ctx.fillText('monsterImageY:' + monsterImageY.toString(), 300, 50);
-	ctx.fillText('initialMMonsterImageY:' + initialMMonsterImageY.toString(), 300, 100);
-	ctx.fillText('monsterImageMoveDown: ' + monsterImageMoveDown.toString(), 300, 150);
-}
+let _player = new Player();

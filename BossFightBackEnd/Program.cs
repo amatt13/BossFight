@@ -23,7 +23,6 @@ namespace BossFight
         static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
             Console.WriteLine("bye bye!");
-            DBSingleton.GetInstance().CloseConnection();
         }
     }
 }

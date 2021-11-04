@@ -13,15 +13,21 @@ using System.Text;
 using System.Linq;
 using Newtonsoft.Json;
 using System.IO;
+using BossFight.Models.DB;
 
 namespace BossFight.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class SignalRtest : ControllerBase
+    public class WebSocketController : ControllerBase
     {
-        public SignalRtest()
-        { }
+        //public AppDb Db { get; }
+
+        //public WebSocketController(AppDb db)
+        public WebSocketController()
+        {
+            //Db = db;
+        }
 
         [HttpGet("/ws")]
         public async Task GetWebsocketMessage()
@@ -39,8 +45,6 @@ namespace BossFight.Controllers
 
         private async Task ReadMessage(HttpContext pContext, WebSocket pWebSocket)
         {
-            //var smh = new SocketMessageHandler();
-
             var buffer = new byte[1024 * 4];
             var arraySegment = new ArraySegment<byte>(buffer);
             string jsonString = String.Empty;
@@ -53,7 +57,8 @@ namespace BossFight.Controllers
                 jsonString = Encoding.UTF8.GetString(arraySegment);
                 jsonDictionary = JsonConvert.DeserializeObject<Dictionary<String, Object>>(jsonString);
                 
-                await SocketMessageHandler.HandleMessage(jsonDictionary, result, pWebSocket);
+                //await new SocketMessageHandler(Db).HandleMessage(jsonDictionary, result, pWebSocket);
+                await new SocketMessageHandler().HandleMessage(jsonDictionary, result, pWebSocket);
                 
                 result = await pWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             }

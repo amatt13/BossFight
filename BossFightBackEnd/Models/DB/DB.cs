@@ -3,16 +3,28 @@ using MySqlConnector;
 
 namespace BossFight.Models.DB
 {
-    public class DBConnector : IDisposable
+    public class AppDb : IDisposable
     {
-        public MySqlConnection Connection { get; }
+        public ConnectionWrapper Connection { get; private set; }
 
-        public DBConnector(string connectionString)
+        public AppDb(string pConnectionString)
         {
-            Connection = new MySqlConnection(connectionString);
-            Connection.Open();
+            Connection = new ConnectionWrapper(pConnectionString);
         }
 
         public void Dispose() => Connection.Dispose();
+
+
+        public class ConnectionWrapper : IDisposable
+        {
+            public MySqlConnection Connection { get; }            
+
+            public ConnectionWrapper(string pConnectionString)
+            {
+                Connection = new MySqlConnection(pConnectionString);
+            }
+
+            public void Dispose() => Connection.Dispose();
+        }
     }
 }

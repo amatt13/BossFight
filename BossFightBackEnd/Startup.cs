@@ -21,14 +21,10 @@ namespace BossFight
 
         public void ConfigureServices(IServiceCollection services)
         {
-            DBSingleton.Init(Configuration["ConnectionStrings:DefaultConnection"]);
-
+            //services.AddTransient<AppDb>(_ => new AppDb(Configuration["ConnectionStrings:DefaultConnection"]));
+            GlobalConnection.ConnString = Configuration["ConnectionStrings:DefaultConnection"];
+            //GlobalConnection.AppDb = new AppDb(Configuration["ConnectionStrings:DefaultConnection"]);
             services.AddControllers();
-
-            // services.AddSwaggerGen(c =>
-            // {
-            //     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Boss Fight", Version = "v1" });
-            // });
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
                 builder.AllowAnyOrigin()
@@ -42,17 +38,8 @@ namespace BossFight
         {
             app.UseWebSockets();
             app.UseCors("MyPolicy");
-            // if (env.IsDevelopment())
-            // {
-            //     app.UseDeveloperExceptionPage();
-            //     app.UseSwagger();
-            //     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Boss Fight v1"));
-            // }
-
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

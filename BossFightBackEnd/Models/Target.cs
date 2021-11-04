@@ -1,13 +1,20 @@
 using System;
 using System.Linq;
+using BossFight.Models.DB;
+using MySqlConnector;
 
 namespace BossFight.Models
 {
-    public class Target
+    public abstract class Target : PersistableBase
     {
         public int HP { get; set; }
         public string Name { get; set; }
         public int Level { get; set; }
+        public override string TableName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override string IdColumn { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        // public Target(AppDb db) : base(db)
+        // {}
 
         public Target(int pHP = 1, string pName = "No name", int pLevel = 1)
         {

@@ -5,60 +5,34 @@ using System.Threading.Tasks;
 
 namespace BossFight.Models
 {
-    public class DBSingleton
-    {
-        private static DBSingleton _instance { get; set; } = null;
-        private static DBConnector _connector { get; set; }
+    // public class DBSingleton
+    // {
+    //     private static DBSingleton _instance { get; set; } = null;
+    //     private static string _dbConnectionString {get; set; }
 
-        private DBSingleton(string pConnectionString)
-        { }
+    //     private DBSingleton(string pConnectionString)
+    //     { 
+    //         _dbConnectionString = pConnectionString;
+    //     }
 
-        public static void Init(string pConnectionString)
-        {
-            _instance = new DBSingleton(pConnectionString);
-            _connector = new DBConnector(pConnectionString);
-        }
+    //     public static void Init(string pConnectionString)
+    //     {
+    //         _instance = new DBSingleton(pConnectionString);
+    //     }
 
-        public static DBSingleton GetInstance()
-        {
-            return _instance;
-        }
+    //     public static DBSingleton GetInstance()
+    //     {
+    //         return _instance;
+    //     }
 
-        public async Task<MySqlDataReader> ExecuteQuery(string pQuery)
-        {
-            var command = new MySqlCommand(pQuery, _connector.Connection);
-            return await command.ExecuteReaderAsync();
-        }
-
-        public void CloseConnection()
-        {
-            _connector.Connection.Close();
-        }
-
-        public string TEST(string pQuery = "select 'I am a test';")
-        {
-            var command = new MySqlCommand(pQuery, _connector.Connection);
-            var reader = command.ExecuteReader();
-            string text = "";
-            while (reader.Read())
-            {
-                text = reader.GetString(0);
-                Console.WriteLine("DBSingleton.TEST: " + text);
-            }
-            return text;
-        }
-
-        // private DBSingleton()
-        // {
-        //     using (var )
-        //     {
-        //         connection.Open();
-
-        //         using ()
-        //         using (var reader = )
-        //             while (reader.Read())
-        //                 Console.WriteLine(reader.GetString(0));
-        //     }
-        // }
-    }
+    //     public async Task<MySqlDataReader> ExecuteQuery(string pQuery)
+    //     {
+    //         using (MySqlConnection connection = new MySqlConnection(_dbConnectionString))
+    //         {
+    //             connection.Open();
+    //             var command = new MySqlCommand(pQuery, connection);
+    //             return await command.ExecuteReaderAsync();
+    //         }  
+    //     }
+    // }
 }

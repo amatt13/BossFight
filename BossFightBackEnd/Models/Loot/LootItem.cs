@@ -1,13 +1,19 @@
 using System;
+using BossFight.Models.DB;
 
 namespace BossFight.Models.Loot
 {
-    public class LootItem
+    public abstract class LootItem : PersistableBase
     {
         public int LootId { get; set; }
         public string LootName { get; set; }
         public float LootDropChance { get; set; }
         public int Cost { get; set; }
+
+        public LootItem() { }
+
+        // public LootItem(AppDb db) : base(db)
+        // {}
 
         public LootItem(int pLootId, string pLootName, float pLootDropChance, int pCost)
         {

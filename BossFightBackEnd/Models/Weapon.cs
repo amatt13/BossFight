@@ -1,11 +1,11 @@
 using System;
 using BossFight.BossFightEnums;
+using BossFight.Models.DB;
 using BossFight.Models.Loot;
 
 namespace BossFight.Models
 {
-    public class Weapon : LootItem
-    {
+    public class Weapon : LootItem, IPersist<Weapon>    {
         public const float DEFAULTWEAPONDROPCHANCE = 1.0f;
         
         public WeaponType WeaponType { get; set; }
@@ -16,6 +16,13 @@ namespace BossFight.Models
         public int AttackCritChance { get; set; }
         public int SpellPower { get; set; }
         public int SpellCritChance { get; set; }
+        public override string TableName { get; set; } = "weapon";
+        public override string IdColumn { get; set; } = "id";
+
+        public Weapon() { }
+
+        // public Weapon(AppDb db) : base(db)
+        // { }
 
         public Weapon(int pWeaponId, string pName, string pAttackMessage, WeaponType pWeaponType = WeaponType.IMPROVISED, int pAttackPower = 1, int pCost = 0, int pAttackCritChance = 3, float pDropChance = Weapon.DEFAULTWEAPONDROPCHANCE, 
                       int pSpellPower = 0, int pSpellCritChance = 0, bool pBossWeapon = false, int pWeaponLvl = 1)
@@ -31,6 +38,35 @@ namespace BossFight.Models
             AttackCritChance = pAttackCritChance;
             SpellPower = pSpellPower;
             SpellCritChance = pSpellCritChance;
+        }
+
+        public Weapon FindOne(int id)
+        {
+            return (Weapon)_findOne(id);
+        }
+
+        public override PersistableBase BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        {
+            var weapon = new Weapon();
+
+            while (reader.Read())
+            {
+                weapon.LootId = reader.GetInt32("id");
+                weapon.LootName = reader.GetString("name");
+                weapon.AttackMessage = reader.GetString("attack_message");
+                weapon.BossWeapon = reader.GetBoolean("boss_weapon");
+                weapon.WeaponLvl = reader.GetInt32("weapon_level");
+                weapon.AttackPower = reader.GetInt32("attack_power");
+                weapon.AttackCritChance = reader.GetInt32("attack_crit_chance");
+                weapon.SpellPower = reader.GetInt32("spell_power");
+                weapon.SpellCritChance = reader.GetInt32("spell_crit_chance");
+                weapon.Cost = reader.GetInt32("gold_cost");
+            }
+
+            if (weapon.BossWeapon)
+                weapon.CalcWeaponStats();
+
+            return weapon;
         }
 
         public void SetBossWeaponProperties(int pWeaponLevel)
