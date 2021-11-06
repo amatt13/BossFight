@@ -9,17 +9,4 @@ namespace BossFight.BossFightEnums
         DEMON,
         MAGIC_CREATURE
     }
-
-    public enum WeaponType
-    {
-        POLEARM,
-        THROWN,
-        IMPROVISED,
-        MACE,
-        DAGGER,
-        BOW,
-        SWORD,
-        AXE,
-        STAFF
-    }
 }

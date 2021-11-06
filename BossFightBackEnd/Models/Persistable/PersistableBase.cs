@@ -13,15 +13,9 @@ namespace BossFight.Models
 
         public virtual string TableName { get; set; }
         public virtual string IdColumn { get; set; }
-        //public AppDb Db { get; set; }
 
         public PersistableBase()
         { }
-        
-        // public PersistableBase(AppDb Db) 
-        // {
-        //     this.Db = Db;
-        // }
 
         protected virtual PersistableBase _findOne(int id)
         {

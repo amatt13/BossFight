@@ -7,7 +7,7 @@ namespace BossFight
     public static class GenralHelperFunctions
     {
         // return a negative value if above required amount
-        public static int XpNeededToNextLevel(PlayerClass pPlayerClass)
+        public static int XpNeededToNextLevel(PlayerPlayerClass pPlayerClass)
         {
             // xpNeeded = (lvl*(1+lvl))^1.5
             var xpNeeded = (int)Math.Floor(Math.Pow(pPlayerClass.Level * (1 + pPlayerClass.Level), 1.5));

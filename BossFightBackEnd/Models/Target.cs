@@ -7,7 +7,7 @@ namespace BossFight.Models
 {
     public abstract class Target : PersistableBase
     {
-        public int HP { get; set; }
+        public int Hp { get; set; }
         public string Name { get; set; }
         public int Level { get; set; }
         public override string TableName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -18,7 +18,7 @@ namespace BossFight.Models
 
         public Target(int pHP = 1, string pName = "No name", int pLevel = 1)
         {
-            HP = pHP;
+            Hp = pHP;
             Name = pName;
             Level = pLevel;
         }
@@ -30,7 +30,7 @@ namespace BossFight.Models
 
         public virtual bool IsDead()
         {
-            return HP <= 0;
+            return Hp <= 0;
         }
 
         public virtual bool IsAlive()
@@ -40,7 +40,7 @@ namespace BossFight.Models
 
         public virtual bool IsAtFullHealth()
         {
-            return HP >= GetMaxHp();
+            return Hp >= GetMaxHp();
         }
 
         public virtual object PossessiveName()

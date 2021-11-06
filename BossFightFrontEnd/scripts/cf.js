@@ -19,7 +19,11 @@ socket.onopen = function(e) {
 socket.onmessage = function(event) {
 	LogToTextLog(`[message] Data received from server: ${event.data}`);
 	var json_dict = JSON.parse(event.data);
-	_player = new Player(json_dict["Name"], json_dict["Level"], json_dict["HP"], json_dict["Mana"], json_dict["Gold"]);
+	var weapon_dict = json_dict["Weapon"];
+	var weapon = new Weapon(weapon_dict["WeaponType"], weapon_dict["AttackMessage"], weapon_dict["BossWeapon"], weapon_dict["WeaponLvl"], weapon_dict["AttackPower"], 
+		weapon_dict["AttackCritChance"], weapon_dict["SpellPower"], weapon_dict["SpellCritChance"], weapon_dict["LootId"], weapon_dict["LootName"], 
+		weapon_dict["LootDropChance"], weapon_dict["Cost"]);
+	_player = new Player(json_dict["Name"], json_dict["Level"], json_dict["HP"], json_dict["Mana"], json_dict["Gold"], weapon);
 	UpdateUiPlayerStats(_player);
 };
 
@@ -68,12 +72,31 @@ function UpdateUiPlayerStats(player) {
 
 
 class Player {
-	constructor(name, level, hp, mana, gold) {
+	constructor(name, level, hp, mana, gold, weapon) {
 		this.name = name;
 		this.level = level;
 		this.hp = hp;
 		this.mana = mana;
 		this.gold = gold;
+		this.player_class = null;
+		this.weapon = weapon
+	}
+}
+
+class Weapon {
+	constructor(WeaponType, AttackMessage, BossWeapon, WeaponLvl, AttackPower, AttackCritChance, SpellPower, SpellCritChance, LootId, LootName, LootDropChance, Cost) {
+		this.weapon_type = WeaponType
+		this.attack_message = AttackMessage
+		this.boss_weapon = BossWeapon
+		this.weapon_lvl = WeaponLvl
+		this.attack_power = AttackPower
+		this.attack_crit_chance = AttackCritChance
+		this.spell_power = SpellPower
+		this.spell_crit_chance = SpellCritChance
+		this.loot_id = LootId
+		this.loot_name = LootName
+		this.loot_drop_chance = LootDropChance
+		this.cost = Cost
 	}
 }
 

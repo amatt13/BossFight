@@ -5,13 +5,14 @@ using BossFight.Models.Loot;
 
 namespace BossFight.Models
 {
-    public class Weapon : LootItem, IPersist<Weapon>    {
+    public class Weapon : LootItem, IPersist<Weapon>
+    {
         public const float DEFAULTWEAPONDROPCHANCE = 1.0f;
         
         public WeaponType WeaponType { get; set; }
         public string AttackMessage { get; set; }
         public bool BossWeapon { get; set; }
-        public int WeaponLvl { get; set; }
+        public int WeaponLevel { get; set; }
         public int AttackPower { get; set; }
         public int AttackCritChance { get; set; }
         public int SpellPower { get; set; }
@@ -21,20 +22,17 @@ namespace BossFight.Models
 
         public Weapon() { }
 
-        // public Weapon(AppDb db) : base(db)
-        // { }
-
-        public Weapon(int pWeaponId, string pName, string pAttackMessage, WeaponType pWeaponType = WeaponType.IMPROVISED, int pAttackPower = 1, int pCost = 0, int pAttackCritChance = 3, float pDropChance = Weapon.DEFAULTWEAPONDROPCHANCE, 
+        public Weapon(int pWeaponId, string pName, string pAttackMessage, WeaponType pWeaponType = null, int pAttackPower = 1, int pCost = 0, int pAttackCritChance = 3, float pDropChance = Weapon.DEFAULTWEAPONDROPCHANCE, 
                       int pSpellPower = 0, int pSpellCritChance = 0, bool pBossWeapon = false, int pWeaponLvl = 1)
             : base(pWeaponId, pName, pDropChance, pCost)
         {
             WeaponType = pWeaponType;
             AttackMessage = pAttackMessage;
             BossWeapon = pBossWeapon;
-            WeaponLvl = pWeaponLvl;
+            WeaponLevel = pWeaponLvl;
             AttackPower = pAttackPower;
-            if (pBossWeapon)
-                CalcWeaponStats();
+            // if (pBossWeapon)
+            //     CalcWeaponStats();
             AttackCritChance = pAttackCritChance;
             SpellPower = pSpellPower;
             SpellCritChance = pSpellCritChance;
@@ -51,20 +49,22 @@ namespace BossFight.Models
 
             while (reader.Read())
             {
-                weapon.LootId = reader.GetInt32("id");
-                weapon.LootName = reader.GetString("name");
-                weapon.AttackMessage = reader.GetString("attack_message");
-                weapon.BossWeapon = reader.GetBoolean("boss_weapon");
-                weapon.WeaponLvl = reader.GetInt32("weapon_level");
-                weapon.AttackPower = reader.GetInt32("attack_power");
-                weapon.AttackCritChance = reader.GetInt32("attack_crit_chance");
-                weapon.SpellPower = reader.GetInt32("spell_power");
-                weapon.SpellCritChance = reader.GetInt32("spell_crit_chance");
-                weapon.Cost = reader.GetInt32("gold_cost");
+                weapon.LootId = reader.GetInt32("WeaponId");
+                weapon.LootName = reader.GetString("Name");
+                weapon.AttackMessage = reader.GetString(nameof(AttackMessage));
+                weapon.BossWeapon = reader.GetBoolean(nameof(BossWeapon));
+                weapon.WeaponLevel = reader.GetInt32(nameof(WeaponLevel));
+                weapon.AttackPower = reader.GetInt32(nameof(AttackPower));
+                weapon.AttackCritChance = reader.GetInt32(nameof(AttackCritChance));
+                weapon.SpellPower = reader.GetInt32(nameof(SpellPower));
+                weapon.SpellCritChance = reader.GetInt32(nameof(SpellCritChance));
+                weapon.Cost = reader.GetInt32(nameof(Cost));
+                var weaponTypeId = reader.GetIntNullable("WeaponTypeId");
+                weapon.WeaponType = new WeaponType().FindOne(weaponTypeId.GetValueOrDefault(1));  // 1 == "Fists"
+                
             }
-
-            if (weapon.BossWeapon)
-                weapon.CalcWeaponStats();
+            // if (weapon.BossWeapon)
+            //     weapon.CalcWeaponStats();
 
             return weapon;
         }
@@ -72,8 +72,8 @@ namespace BossFight.Models
         public void SetBossWeaponProperties(int pWeaponLevel)
         {
             BossWeapon = true;
-            WeaponLvl = pWeaponLevel;
-            CalcWeaponStats();
+            WeaponLevel = pWeaponLevel;
+            // CalcWeaponStats();
         }
 
         public string InventoryStr()
@@ -104,27 +104,6 @@ namespace BossFight.Models
                 wSpellCrit = $" { SpellCritChance }%".PadLeft(pLongestSpellCritChanceDigit + 1, ' ') + " spell crit chance";
 
             return $"{ wName } { wCost} gold { wAttack } atk. power { wCrit } atk. crit chance { wSpellPower }{ wSpellCrit }";
-        }
-
-        public void CalcWeaponStats()
-        {
-            int attackPower, attackCritChance;
-            if (WeaponType == WeaponType.STAFF)
-            {
-                attackPower = 1;
-                attackCritChance = 3;
-            }
-            else
-            {
-                attackPower = (int)Math.Floor((double)WeaponLvl / 2);
-                attackCritChance = (int)Math.Floor((double)WeaponLvl / 3);
-                if (attackCritChance > 20)
-                {
-                    attackCritChance = 20;
-                }
-            }
-            AttackPower = attackPower;
-            AttackCritChance = attackCritChance;
         }
     }
 }

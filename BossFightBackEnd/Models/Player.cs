@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BossFight.CustemExceptions;
-using BossFight.Models.DB;
 using BossFight.Models.Loot;
 
 namespace BossFight.Models
@@ -12,42 +10,30 @@ namespace BossFight.Models
     {
         private static Random _random = new Random();
 
+        public override string TableName { get; set; } = "Player";
+        public override string IdColumn { get; set; } = nameof(PlayerId);
+
+        // Persisted on Player table
         public int PlayerId { get; set; }
         public int Gold { get; set; }
-        public List<int> LootList { get; set; }
         public int WeaponId { get; set; }
-        //public int CurrentPlayerClassId { get; set; }
         public int Mana { get; set; }
-        public int BonusMagicDmg { get; set; }
-        public int BonusMagicDmgDuration { get; set; }
-        public List<PlayerClass> PlayerClassList { get; set; }
+        public int CurentPlayerClassId { get; set; }
+        
+        // From other tables
+
         public PlayerClass PlayerClass { get; set; }
+        public PlayerPlayerClass PlayerPlayerClass { get; set; }
+        public List<PlayerClass> PlayerClassList { get; set; }
+        public List<PlayerPlayerClass> UnlockedPlayerPlayerClassList { get; set; }
+        public List<int> LootList { get; set; }
         public Weapon Weapon { get; set; }
         public List<int> AutoSellList { get; set; }
-        public override string TableName { get; set; } = "player";
-        public override string IdColumn { get; set; } = "player_id";
 
-        public Player()
-        { }
+        public int BonusMagicDmg { get; set; }
+        public int BonusMagicDmgDuration { get; set; }
 
-        // public Player(AppDb db) : base(db)
-        // { }
-
-        public Player(string pName, int pPlayerId, int pGold = 0, List<int> pLootList = null, int pWeaponId = 1, int pHP = 10, int pPlayerClassId = 0, int pMana = 10, List<PlayerClass> pPlayerClassList = null)
-            : base(pName: pName)
-        {
-            PlayerId = pPlayerId;
-            Gold = pGold;
-            LootList = pLootList ?? new List<int>();
-            WeaponId = pWeaponId;
-            //CurrentPlayerClassId = pPlayerClassId;
-            Mana = pMana;
-            BonusMagicDmg = 0;
-            BonusMagicDmgDuration = 0;
-            PlayerClassList = pPlayerClassList ?? new List<PlayerClass>();
-            //TODO DETERMINE CURRENT PLAYERCLASS ON LOAD
-            Level = PlayerClass.Level;
-        }
+        public Player() { }
 
         public Player FindOne(int id)
         {
@@ -60,124 +46,22 @@ namespace BossFight.Models
 
             while (reader.Read())
             {
-                player.PlayerId = reader.GetInt32("player_id");
-                player.Gold = reader.GetInt32("gold");
-                player.Name = reader.GetString("name");
-                player.HP = reader.GetInt32("hp");
-                player.Mana = reader.GetInt32("mana");
+                player.PlayerId = reader.GetInt32(nameof(PlayerId));
+                player.Gold = reader.GetInt32(nameof(Gold));
+                player.Name = reader.GetString(nameof(Name));
+                player.Hp = reader.GetInt32(nameof(Hp));
+                player.Mana = reader.GetInt32(nameof(Mana));
+                player.CurentPlayerClassId = reader.GetInt(nameof(CurentPlayerClassId));
                 
-                var weaponID = reader.GetInt32("weapon_id");
-                if (weaponID != -1)
-                    player.LoadPlayerWeapon(weaponID);
+                player.PlayerClass = new PlayerClass().FindOne(player.CurentPlayerClassId);
+                player.PlayerPlayerClass = new PlayerPlayerClass().FindOne(player.CurentPlayerClassId);
+                var weaponId = reader.GetIntNullable("WeaponId");
+                if (weaponId.HasValue)
+                    player.Weapon = new Weapon().FindOne(weaponId.Value);
             }
 
             return player;
         }
-
-        public void LoadPlayerWeapon(int? pWeaponId)
-        {
-            if (pWeaponId.HasValue)
-            {
-                var weapon = new Weapon().FindOne(pWeaponId.Value);
-                this.Weapon = weapon;
-            }
-        }
-
-        //     {
-        //         while (reader.Read())
-        //         {
-        //             Console.WriteLine(reader.GetString(0));
-        //         }
-
-        //         p.name = playerDict["name"];
-        //         p.playerId = playerDict["playerId"].ToString();
-        //         p.gold = Convert.ToInt32(playerDict["gold"]);
-        //         p.loot = playerDict["loot"];
-        //         p.weaponId = playerDict["weaponId"];
-        //         p.hp = Convert.ToInt32(playerDict["hp"]);
-        //         p.currentPlayerClassId = Convert.ToInt32(playerDict["currentPlayerClassId"]);
-        //         p.mana = Convert.ToInt32(playerDict["mana"]);
-        //         p.bonusMagicDmg = Convert.ToInt32(playerDict["bonusMagicDmg"]);
-        //         p.bonusMagicDmgDuration = Convert.ToInt32(playerDict["bonusMagicDmgDuration"]);
-        //         p.PlayerClassList = new List<object>();
-        //         p.autoSellList = playerDict["autoSellList"];
-        //         if (playerDict.keys().Contains("PlayerClassList"))
-        //         {
-        //             var playerClassDictionaries = playerDict["PlayerClassList"];
-        //             foreach (var playerClassDict in playerClassDictionaries)
-        //             {
-        //                 try
-        //                 {
-        //                     p.PlayerClassList.append(cls.FromDictPlayerClassHelper(playerClassDict, p));
-        //                 }
-        //                 catch (ValueError)
-        //                 {
-        //                     quit(ve.ToString());
-        //                 }
-        //             }
-        //         }
-        //         p.playerClass = next(from pc in p.PlayerClassList
-        //                              where pc.classId == p.currentPlayerClassId
-        //                              select pc);
-        //         p.level = p.playerClass.level;
-        //         p.weapon = GenralHelperFunctions.findWeaponByWeaponId(p.weaponId);
-        //     }
-        //     return player;
-        // }
-
-        // public virtual object toDict()
-        // {
-        //     var playerDict = new Dictionary<object, object>
-        //     {
-        //     };
-        //     var PlayerClassList = new List<object>();
-        //     foreach (var playerClass in PlayerClassList)
-        //     {
-        //         PlayerClassList.append(playerClass.toDict());
-        //     }
-        //     playerDict["PlayerClassList"] = PlayerClassList;
-        //     playerDict["gold"] = Gold;
-        //     playerDict["hp"] = HP;
-        //     playerDict["loot"] = LootList;
-        //     playerDict["mana"] = Mana;
-        //     playerDict["name"] = Name;
-        //     playerDict["currentPlayerClassId"] = PlayerClass.classId;
-        //     playerDict["playerId"] = PlayerId;
-        //     playerDict["weaponId"] = Weapon.lootId;
-        //     playerDict["bonusMagicDmg"] = BonusMagicDmg;
-        //     playerDict["bonusMagicDmgDuration"] = BonusMagicDmgDuration;
-        //     playerDict["autoSellList"] = autoSellList;
-        //     return playerDict;
-        // }
-
-        // public static PlayerClass fromDictPlayerClassHelper(object playerClassDict, Player p)
-        // {
-        //     PlayerClass result;
-        //     var playerClassName = str(playerClassDict["name"]).ToLower();
-        //     if (playerClassName == "cleric")
-        //         result = Cleric.FromDB(playerClassDict, p);
-        //     else if (playerClassName == "executioner")
-        //         result = Executioner.FromDB(playerClassDict, p);
-        //     else if (playerClassName == "ranger")
-        //         result = Ranger.FromDB(playerClassDict, p);
-        //     else if (playerClassName == "hexer")
-        //         result = Hexer.FromDB(playerClassDict, p);
-        //     else if (playerClassName == "mage")
-        //         result = Mage.FromDB(playerClassDict, p);
-        //     else if (playerClassName == "barbarian")
-        //         result = Barbarian.FromDB(playerClassDict, p);
-        //     else if (playerClassName == "paladin")
-        //         result = Paladin.FromDB(playerClassDict, p);
-        //     else if (playerClassName == "monster hunter")
-        //         result = MonsterHunter.FromDB(playerClassDict, p);
-        //     else
-        //     {
-        //         var errorMsg = "Could not convert find class with name " + playerClassName;
-        //         Console.WriteLine(errorMsg);
-        //         throw new MyException(errorMsg);
-        //     }
-        //     return result;
-        // }
 
         public override string ToString()
         {
@@ -193,17 +77,17 @@ namespace BossFight.Models
 
         public override int GetMaxHp()
         {
-            return PlayerClass.MaxHp;
+            return PlayerPlayerClass.MaxHp;
         }
 
         public int GetMaxMana()
         {
-            return PlayerClass.MaxMana;
+            return PlayerPlayerClass.MaxMana;
         }
 
         public int GetLevel()
         {
-            return PlayerClass.Level;
+            return PlayerPlayerClass.Level;
         }
 
         public bool IsKnockedOut()
@@ -214,11 +98,11 @@ namespace BossFight.Models
         public PlayerClass GainXp(int pGainedXp, int? pMonsterLevel = null)
         {
             pGainedXp = GenralHelperFunctions.CalcXpPenalty(pGainedXp, GetLevel(), pMonsterLevel);
-            PlayerClass.XP += pGainedXp;
-            var xpNeededToNextLevel = GenralHelperFunctions.XpNeededToNextLevel(PlayerClass);
+            PlayerPlayerClass.XP += pGainedXp;
+            var xpNeededToNextLevel = GenralHelperFunctions.XpNeededToNextLevel(PlayerPlayerClass);
             if (xpNeededToNextLevel <= 0)
             {
-                PlayerClass.LevelUp();
+                PlayerPlayerClass.LevelUp();
                 if (xpNeededToNextLevel < 0)
                 {
                     GainXp(-xpNeededToNextLevel, pMonsterLevel);
@@ -234,25 +118,25 @@ namespace BossFight.Models
 
         public int GetAttackBonus()
         {
-            return (int)Math.Floor((double)Level / 2) + BonusMagicDmg + PlayerClass.GetAttackPowerBonus();
+            return (int)Math.Floor((double)Level / 2) + BonusMagicDmg + PlayerClass.AttackPowerBonus;
         }
 
         public int GetSpellBonus()
         {
-            return (int)Math.Floor((double)Level / 2) + PlayerClass.GetSpellPowerBonus();
+            return (int)Math.Floor((double)Level / 2) + PlayerClass.SpellPowerBonus;
         }
 
         public int GetAttackCritChance()
         {
             var critChance = Weapon.AttackCritChance;
-            critChance += PlayerClass.PlayerClassCritChance;
+            critChance += PlayerClass.CritChance;
             return critChance;
         }
 
         public int GetSpellCritChance()
         {
             var critChance = Weapon.SpellCritChance;
-            critChance += PlayerClass.PlayerClassCritChance;
+            critChance += PlayerClass.CritChance;
             return critChance;
         }
 
@@ -272,56 +156,51 @@ namespace BossFight.Models
             return roll <= critChance;
         }
 
-        public bool IsProficientWithWeapon(Weapon pWeapon)
-        {
-            return PlayerClass.ProficientWeaponTypesList.Contains(pWeapon.WeaponType);
-        }
-
         // Throws an exception if the weapon is not found
-        public void ChangeWeapon(int pNewWeaponId)
-        {
-            var itemToEquip = LootList.First(i => i == Convert.ToInt32(pNewWeaponId));
-            LootList.Remove(itemToEquip);
-            AddLoot(WeaponId);
-            WeaponId = itemToEquip;
-            //Weapon = GenralHelperFunctions.findWeaponByWeaponId(pNewWeaponId);
-        }
+        // public void ChangeWeapon(int pNewWeaponId)
+        // {
+        //     var itemToEquip = LootList.First(i => i == Convert.ToInt32(pNewWeaponId));
+        //     LootList.Remove(itemToEquip);
+        //     AddLoot(WeaponId);
+        //     WeaponId = itemToEquip;
+        //     //Weapon = GenralHelperFunctions.findWeaponByWeaponId(pNewWeaponId);
+        // }
 
-        public void ChangeClass(string pNewPlayerClassName)
-        {
-            var newPlayerClassName = pNewPlayerClassName.ToLower();
-            PlayerClass newClass;
-            if (newPlayerClassName != PlayerClass.Name.ToLower())
-            {
-                try
-                {
-                    newClass = PlayerClassList.First(pc => pc.Name.ToLower() == newPlayerClassName);
-                    if (newClass != null)
-                    {
-                        PlayerClass = newClass;
-                        double currentHealthPercentage = Math.Floor((double)HP / PlayerClass.MaxHp);
-                        if (currentHealthPercentage > 1.0d)
-                            currentHealthPercentage = 1.0d;
-                        //CurrentPlayerClassId = newClass.classId;
-                        HP = (int)Math.Floor(GetMaxHp() * currentHealthPercentage);
-                        if (HP < -3)
-                            HP = -3;
-                        Mana = 0;
-                    }
-                }
-                catch (InvalidOperationException)
-                {
-                    PlayerClassList.OrderBy(x => x.Name);
-                    var unlockedClasses = String.Join(", ", from pc in PlayerClassList select $"{ pc.Name }");
-                    throw new MyException($"Class with name '{ pNewPlayerClassName }' is not unlocked. Your unlocked classes is: { unlockedClasses }");
-                }
-            }
-        }
+        // public void ChangeClass(string pNewPlayerClassName)
+        // {
+        //     var newPlayerClassName = pNewPlayerClassName.ToLower();
+        //     PlayerClass newClass;
+        //     if (newPlayerClassName != PlayerClass.Name.ToLower())
+        //     {
+        //         try
+        //         {
+        //             newClass = PlayerClassList.First(pc => pc.Name.ToLower() == newPlayerClassName);
+        //             if (newClass != null)
+        //             {
+        //                 PlayerClass = newClass;
+        //                 double currentHealthPercentage = Math.Floor((double)Hp / GetMaxHp());
+        //                 if (currentHealthPercentage > 1.0d)
+        //                     currentHealthPercentage = 1.0d;
+        //                 //CurrentPlayerClassId = newClass.classId;
+        //                 Hp = (int)Math.Floor(GetMaxHp() * currentHealthPercentage);
+        //                 if (Hp < -3)
+        //                     Hp = -3;
+        //                 Mana = 0;
+        //             }
+        //         }
+        //         catch (InvalidOperationException)
+        //         {
+        //             PlayerClassList.OrderBy(x => x.Name);
+        //             var unlockedClasses = String.Join(", ", from pc in PlayerClassList select $"{ pc.Name }");
+        //             throw new MyException($"Class with name '{ pNewPlayerClassName }' is not unlocked. Your unlocked classes is: { unlockedClasses }");
+        //         }
+        //     }
+        // }
 
         public string UnlockedClassesInfo()
         {
             var info = "Unlocked classes\n";
-            info += String.Join("\n", from pc in PlayerClassList select $"{ pc.Name } level { pc.Level }\nHp { pc.MaxHp } Mana { pc.MaxMana }");
+            info += String.Join("\n", from pc in UnlockedPlayerPlayerClassList select $"{ pc.PlayerClassName } level { pc.Level }\nHp { pc.MaxHp } Mana { pc.MaxMana }");
             return info;
         }
 
@@ -389,42 +268,18 @@ namespace BossFight.Models
 
         public string ReceiveDamageFromMonster(int pDamage, string pMonsterName, bool pNewLine = true)
         {
-            HP -= pDamage;
+            Hp -= pDamage;
             var damageText = $"You received { pDamage } damage from { pMonsterName }";
             if (IsKnockedOut())
             {
-                if (HP < -3)
-                    HP = -3;
+                if (Hp < -3)
+                    Hp = -3;
                 damageText += ", and is knocked out";
             }
             if (pNewLine)
                 damageText += "\n";
 
             return damageText;
-        }
-
-        public void AddAllMissingStartingClasses()
-        {
-            var cleric = new Cleric(this);
-            var executioner = new Executioner(this);
-            var ranger = new Ranger(this);
-            foreach (var pc in new List<PlayerClass> {
-                    cleric,
-                    executioner,
-                    ranger
-                })
-            {
-                // try
-                // {
-                //     next(from playerClass in PlayerClassList
-                //          where playerClass.classId == pc.classId
-                //          select playerClass);
-                // }
-                // catch (StopIteration)
-                // {
-                //     PlayerClassList.append(pc);
-                // }
-            }
         }
 
         public void AddLoot(int pLootToAdd)
@@ -461,8 +316,8 @@ namespace BossFight.Models
 
         public void RestoreAllHealthAndMana()
         {
-            HP = PlayerClass.MaxHp;
-            Mana = PlayerClass.MaxMana;
+            Hp = GetMaxHp();
+            Mana = GetMaxMana();
         }
 
         public void RegenHealth(int PTimesToRegen = 1)
@@ -473,20 +328,20 @@ namespace BossFight.Models
                 hpToRegen = 1 * PTimesToRegen;
             }
             else
-                hpToRegen = PlayerClass.GetHealthRegenRate() * PTimesToRegen;
+                hpToRegen = PlayerClass.HpRegenRate * PTimesToRegen;
 
-            var newHp = HP + hpToRegen;
+            var newHp = Hp + hpToRegen;
             if (newHp > GetMaxHp())
             {
-                HP = GetMaxHp();
+                Hp = GetMaxHp();
             }
             else
-                HP = newHp;
+                Hp = newHp;
         }
 
         public void RegenMana(int pTimesToRegen = 1)
         {
-            var manaToRegen = PlayerClass.GetManaRegenRate() * pTimesToRegen;
+            var manaToRegen = PlayerClass.ManaRegenRate * pTimesToRegen;
             var newMana = Mana + manaToRegen;
             if (newMana > GetMaxMana())
             {

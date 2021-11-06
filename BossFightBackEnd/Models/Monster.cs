@@ -162,7 +162,7 @@ namespace BossFight.Models
                 dots = $"\nDot damage next turn: { DamageOverTimeTracker.Sum(dot => dot.Value.GetDamage()) }";
                 
             var debuffs = DebuffsString();
-            return $"{ boss }{ Name }{ hasLoot }{ monsterType } : Level { Level }\nHP: { HP }/{ MaxHp }{ debuffs }{ dots }{ isDead }";
+            return $"{ boss }{ Name }{ hasLoot }{ monsterType } : Level { Level }\nHP: { Hp }/{ MaxHp }{ debuffs }{ dots }{ isDead }";
         }
 
         public bool HasMonsterType(List<MonsterType> pMonsterTypeList)
@@ -247,7 +247,7 @@ namespace BossFight.Models
                 hp += _random.Next(-variance, variance + 1);
             }
             MaxHp = (int)hp;
-            HP = (int)hp;
+            Hp = (int)hp;
         }
 
         public void DebuffBlind(int pDuration)
@@ -305,7 +305,7 @@ namespace BossFight.Models
 
         public void TakeDamage(int pDamage, int pAttackingPlayerId)
         {
-            HP -= pDamage;
+            Hp -= pDamage;
             if (IsDead())
             {
                 var args = new MonsterKilledEventArgs { DeadMonster = this, KillerId = pAttackingPlayerId };
@@ -449,7 +449,7 @@ namespace BossFight.Models
                 damageDealt = Math.Ceiling(damageDealt);
                 damageText += pPlayerToAttack.ReceiveDamageFromMonster((int)damageDealt, Name);
             }
-            var resultText = $"{ damageText }**Player hp:** { pPlayerToAttack.HP }/{ pPlayerToAttack.PlayerClass.MaxHp }";
+            var resultText = $"{ damageText }**Player hp:** { pPlayerToAttack.Hp }/{ pPlayerToAttack.PlayerClass.MaxHp }";
             return resultText;
         }
 
