@@ -14,7 +14,7 @@ namespace BossFight.Models.Loot
             DamageDealtByPlayer = pDamageDealtByPlayer;
             RelativeDamageDealtByPlayer = 0.0d;
             GoldEarned = pGoldEarned;
-            Player = new Player("NA", -1);
+            Player = new Player();
         }
 
         public void SetPlayer(Player pPlayer)

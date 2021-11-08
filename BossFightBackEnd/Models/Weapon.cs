@@ -1,13 +1,20 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using BossFight.BossFightEnums;
 using BossFight.Models.DB;
 using BossFight.Models.Loot;
+using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
     public class Weapon : LootItem, IPersist<Weapon>
     {
         public const float DEFAULTWEAPONDROPCHANCE = 1.0f;
+        [JsonIgnore]
+        public override string TableName { get; set; } = "Weapon";
+        [JsonIgnore]
+        public override string IdColumn { get; set; } = "WeaponId";
         
         public WeaponType WeaponType { get; set; }
         public string AttackMessage { get; set; }
@@ -17,8 +24,6 @@ namespace BossFight.Models
         public int AttackCritChance { get; set; }
         public int SpellPower { get; set; }
         public int SpellCritChance { get; set; }
-        public override string TableName { get; set; } = "weapon";
-        public override string IdColumn { get; set; } = "id";
 
         public Weapon() { }
 
@@ -43,12 +48,18 @@ namespace BossFight.Models
             return (Weapon)_findOne(id);
         }
 
-        public override PersistableBase BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        public IEnumerable<Weapon> FindAll(int? id = null)
         {
-            var weapon = new Weapon();
+            return _findAll(id).Cast<Weapon>();
+        }
+
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        {
+            var result = new List<PersistableBase>();
 
             while (reader.Read())
             {
+                var weapon = new Weapon();
                 weapon.LootId = reader.GetInt32("WeaponId");
                 weapon.LootName = reader.GetString("Name");
                 weapon.AttackMessage = reader.GetString(nameof(AttackMessage));
@@ -61,12 +72,10 @@ namespace BossFight.Models
                 weapon.Cost = reader.GetInt32(nameof(Cost));
                 var weaponTypeId = reader.GetIntNullable("WeaponTypeId");
                 weapon.WeaponType = new WeaponType().FindOne(weaponTypeId.GetValueOrDefault(1));  // 1 == "Fists"
-                
+                result.Add(weapon);
             }
-            // if (weapon.BossWeapon)
-            //     weapon.CalcWeaponStats();
 
-            return weapon;
+            return result;
         }
 
         public void SetBossWeaponProperties(int pWeaponLevel)

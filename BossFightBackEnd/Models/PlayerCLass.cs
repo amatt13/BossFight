@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using BossFight.BossFightEnums;
 using BossFight.CustemExceptions;
+using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
     public class PlayerClass : PersistableBase, IPersist<PlayerClass>
     {
+        [JsonIgnore]
         public override string TableName { get; set; } = "PlayerClass";
+        [JsonIgnore]
         public override string IdColumn { get; set; } = nameof(PlayerClassId);
 
         // Persisted on PlayerClass table
@@ -26,20 +29,52 @@ namespace BossFight.Models
         public int BaseMana { get; set; }
 
         // From other tables
-        public List<WeaponType> ProficientWeaponTypesList { get; set; }
-        public List<PlayerClassRequirement> PlayerClassRequirementList { get; set; }
+        public IEnumerable<PlayerClassWeaponProficiency> ProficientWeaponTypesList { get; set; }
+        public IEnumerable<PlayerClassRequirement> PlayerClassRequirementList { get; set; }
         public Dictionary<string, Ability> Abilities { get; set; }        
         
         public PlayerClass() { }
+
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        {
+            var result = new List<PersistableBase>();
+
+            while (reader.Read())
+            {
+                var playerClass = new PlayerClass();
+                playerClass.PlayerClassId = reader.GetInt(nameof(PlayerClassId));
+                playerClass.Name = reader.GetString(nameof(Name));
+                playerClass.HpScale = reader.GetDouble(nameof(HpScale));
+                playerClass.ManaScale = reader.GetDouble(nameof(ManaScale));
+                playerClass.PurchasePrice = reader.GetInt(nameof(PurchasePrice));
+                playerClass.CritChance = reader.GetInt(nameof(CritChance));
+                playerClass.HpRegenRate = reader.GetInt(nameof(HpRegenRate));
+                playerClass.ManaRegenRate = reader.GetInt(nameof(ManaRegenRate));
+                playerClass.AttackPowerBonus = reader.GetInt(nameof(AttackPowerBonus));
+                playerClass.SpellPowerBonus = reader.GetInt(nameof(SpellPowerBonus));
+                playerClass.BaseHealth = reader.GetInt(nameof(BaseHealth));
+                playerClass.BaseMana = reader.GetInt(nameof(BaseMana));
+                
+                playerClass.ProficientWeaponTypesList = new PlayerClassWeaponProficiency().FindAll(playerClass.PlayerClassId);
+                foreach(var x in playerClass.ProficientWeaponTypesList) { x.PlayerClass = playerClass; }
+                
+                playerClass.PlayerClassRequirementList = new PlayerClassRequirement().FindAll(playerClass.PlayerClassId);
+                foreach(var x in playerClass.PlayerClassRequirementList) { x.PlayerClass = playerClass; }
+                
+                result.Add(playerClass);
+            }
+
+            return result;
+        }
 
         public PlayerClass FindOne(int id)
         {
             return (PlayerClass)_findOne(id);
         }
 
-        public override PersistableBase BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        public IEnumerable<PlayerClass> FindAll(int? id = null)
         {
-            throw new NotImplementedException("BuildObjectFromReader() cannot be called from base class 'PlayerClass'");
+            return _findAll(id).Cast<PlayerClass>();
         }
 
         public override string ToString()
@@ -51,7 +86,7 @@ namespace BossFight.Models
         {
             var purchasePriceString = String.Format("{0:n0}", PurchasePrice);
             purchasePriceString = purchasePriceString.Replace(",", ".");  //TODO is this needed?
-            var playerClassRequirementsString = String.Join(", ", (from req in PlayerClassRequirementList select $"Level {req.LevelRequirement} {req.ClassName}"));
+            var playerClassRequirementsString = String.Join(", ", (from req in PlayerClassRequirementList select $"Level {req.LevelRequirement} {req.RequiredPlayerClassName}"));
             return $"{Name.PadLeft(pLengthOfLongestPlayerClassName, '.')} {purchasePriceString.PadLeft(pLengthOfLongestPlayerClassCost)} gold {playerClassRequirementsString}";
         }
 
@@ -85,27 +120,20 @@ namespace BossFight.Models
             return (int)Math.Floor(ManaScale * pClassLevel) + BaseMana;
         }
 
-        public bool HaveMetRequirements(IEnumerable<PlayerPlayerClass> pPlayersUnlockedClasses)
+        public bool HaveMetRequirementsForPlayerClass(IEnumerable<PlayerPlayerClass> pPlayersUnlockedClasses)
         {
-            var requirementsMet = true;
             foreach (var classReq in PlayerClassRequirementList)
             {
-                try
-                {
-                    pPlayersUnlockedClasses.First(x => x.GetType() == classReq.PlayerClassType);
-                }
-                catch (InvalidOperationException)
-                {
-                    throw new MyException($"You need to unlock '{classReq.ClassName}' first");
-                }
-                foreach (var pc in pPlayersUnlockedClasses)
-                {
-                    if (pc.GetType() == classReq.PlayerClassType)
-                        if (pc.Level < classReq.LevelRequirement)
-                            throw new MyException($"Did not meet level requirements for {classReq.ClassName}");
-                }
+                if (!pPlayersUnlockedClasses.Any(puc => puc.PlayerClassId == classReq.PlayerClassId))
+                    throw new MyException($"You need to unlock '{ classReq.RequiredPlayerClassName }' first");
             }
-            return requirementsMet;
+
+            foreach (var classReq in PlayerClassRequirementList)
+                {
+                    if (!pPlayersUnlockedClasses.Any(puc => puc.PlayerClassId == classReq.PlayerClassId && classReq.LevelRequirement <= puc.Level))
+                        throw new MyException($"Did not meet level requirements for { classReq.RequiredPlayerClassName }. Needs to be level {classReq.LevelRequirement} or above.");
+                }
+            return true;
         }
     }
 }

@@ -1,11 +1,18 @@
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
+
 namespace BossFight.Models
 {
     public class WeaponType : PersistableBase, IPersist<WeaponType>
     {
+        [JsonIgnore]
+        public override string TableName { get; set; } =  "WeaponType";
+        [JsonIgnore]
+        public override string IdColumn { get; set; } = nameof(WeaponTypeId);
+
         public int WeaponTypeId { get; private set; }
         public string WeaponTypename { get; private set; }
-        public override string TableName { get; set; } =  "WeaponType";
-        public override string IdColumn { get; set; } = nameof(WeaponTypeId);
 
         public WeaponType() { }
 
@@ -15,22 +22,29 @@ namespace BossFight.Models
             WeaponTypename = pWeaponTypename;
         }
 
-        public override PersistableBase BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
         {
-            var weaponType = new WeaponType();
+            var result = new List<PersistableBase>();
 
             while (reader.Read())
             {   
+                var weaponType = new WeaponType();
                 weaponType.WeaponTypeId = reader.GetInt(nameof(WeaponTypeId));
                 weaponType.WeaponTypename = reader.GetString(nameof(WeaponTypename));
+                result.Add(weaponType);
             }
 
-            return weaponType;
+            return result;
         }
 
         public WeaponType FindOne(int id)
         {
             return (WeaponType)_findOne(id);
+        }
+
+        public IEnumerable<WeaponType> FindAll(int? id = null)
+        {
+            return _findAll(id).Cast<WeaponType>();
         }
     }
 }

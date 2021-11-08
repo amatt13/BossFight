@@ -11,9 +11,9 @@ init();
 
 
 function ReSizeCanvas() {
-	if (canvas.width != Math.floor(window.innerWidth * 0.33) || canvas.height != Math.floor(window.innerHeight * 0.66)) {
-		canvas.width = Math.floor(window.innerWidth * 0.33);
-		canvas.height = Math.floor(window.innerHeight * 0.66);
+	if (canvas.width != Math.floor(window.innerWidth * 0.25) || canvas.height != Math.floor(window.innerHeight * 0.90)) {
+		canvas.width = Math.floor(window.innerWidth * 0.25);
+		canvas.height = Math.floor(window.innerHeight * 0.90);
 		initialMMonsterImageY = canvas.height / 2;
 		monsterImageX = initialMonsterImageX, monsterImageY = initialMMonsterImageY;
 		monsterImageMoveForward = true, monsterImageMoveDown = false;
@@ -51,6 +51,7 @@ function AnimateMonster() {
 	monsterImageY = monsterImageMoveDown ? monsterImageY + 0.5 : monsterImageY - 0.5;
 
 	ctx.drawImage(monsterImage, monsterImageX, monsterImageY);
+	ctx.fillStyle = "hsl(349, 19%, 45%)"
 	ctx.fillText('monsterImageY:' + monsterImageY.toString(), 300, 50);
 	ctx.fillText('initialMMonsterImageY:' + initialMMonsterImageY.toString(), 300, 100);
 	ctx.fillText('monsterImageMoveDown: ' + monsterImageMoveDown.toString(), 300, 150);

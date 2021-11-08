@@ -3,35 +3,46 @@ using System.Collections.Generic;
 using System.Linq;
 using BossFight.CustemExceptions;
 using BossFight.Models.Loot;
+using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
     public class Player : Target, IPersist<Player>
     {
+        [JsonIgnore]
         private static Random _random = new Random();
-
-        public override string TableName { get; set; } = "Player";
+        
+        [JsonIgnore]
+        public override string TableName { get; set; } = nameof(Player);
+        [JsonIgnore]
         public override string IdColumn { get; set; } = nameof(PlayerId);
 
         // Persisted on Player table
+        [PersistPropertyAttribute]
         public int PlayerId { get; set; }
+
+        [PersistPropertyAttribute]
         public int Gold { get; set; }
+
+        [PersistPropertyAttribute]
         public int WeaponId { get; set; }
+
+        [PersistPropertyAttribute]
         public int Mana { get; set; }
+
+        [PersistPropertyAttribute]
         public int CurentPlayerClassId { get; set; }
         
         // From other tables
-
-        public PlayerClass PlayerClass { get; set; }
         public PlayerPlayerClass PlayerPlayerClass { get; set; }
-        public List<PlayerClass> PlayerClassList { get; set; }
-        public List<PlayerPlayerClass> UnlockedPlayerPlayerClassList { get; set; }
-        public List<int> LootList { get; set; }
+        public IEnumerable<PlayerPlayerClass> UnlockedPlayerPlayerClassList { get; set; }
+        public List<int> LootList { get; set; }  //TODO change to real loot list (combinded list -> see PlayerWeapon.cs)
         public Weapon Weapon { get; set; }
         public List<int> AutoSellList { get; set; }
-
+        public int Level { get => PlayerPlayerClass.Level; }
         public int BonusMagicDmg { get; set; }
         public int BonusMagicDmgDuration { get; set; }
+        public IEnumerable<PlayerWeapon> PlayerWeaponList { get; set; }
 
         public Player() { }
 
@@ -40,27 +51,38 @@ namespace BossFight.Models
             return (Player)_findOne(id);
         }
 
-        public override PersistableBase BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        public IEnumerable<Player> FindAll(int? id = null)
         {
-            var player = new Player();
+            return _findAll(id).Cast<Player>();
+        }
+
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        {
+            var result = new List<PersistableBase>();
 
             while (reader.Read())
             {
-                player.PlayerId = reader.GetInt32(nameof(PlayerId));
-                player.Gold = reader.GetInt32(nameof(Gold));
+                var player = new Player();
+                player.PlayerId = reader.GetInt(nameof(PlayerId));
+                player.Gold = reader.GetInt(nameof(Gold));
                 player.Name = reader.GetString(nameof(Name));
-                player.Hp = reader.GetInt32(nameof(Hp));
-                player.Mana = reader.GetInt32(nameof(Mana));
+                player.Hp = reader.GetInt(nameof(Hp));
+                player.Mana = reader.GetInt(nameof(Mana));
                 player.CurentPlayerClassId = reader.GetInt(nameof(CurentPlayerClassId));
+                player.WeaponId = reader.GetInt(nameof(WeaponId));
                 
-                player.PlayerClass = new PlayerClass().FindOne(player.CurentPlayerClassId);
-                player.PlayerPlayerClass = new PlayerPlayerClass().FindOne(player.CurentPlayerClassId);
-                var weaponId = reader.GetIntNullable("WeaponId");
-                if (weaponId.HasValue)
-                    player.Weapon = new Weapon().FindOne(weaponId.Value);
+                player.PlayerPlayerClass = new PlayerPlayerClass{Active = true}.FindOne(player.PlayerId);
+                player.PlayerPlayerClass.Player = player;
+                player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{}.FindAll(player.PlayerId);
+                player.Weapon = new Weapon().FindOne(player.WeaponId);
+
+                player.PlayerWeaponList = new PlayerWeapon{ PlayerId =  player.PlayerId}.FindAll();
+                foreach(var x in player.PlayerWeaponList) { x.Player = player; }
+
+                result.Add(player);
             }
 
-            return player;
+            return result;
         }
 
         public override string ToString()
@@ -95,7 +117,7 @@ namespace BossFight.Models
             return IsDead();
         }
 
-        public PlayerClass GainXp(int pGainedXp, int? pMonsterLevel = null)
+        public void GainXp(int pGainedXp, int? pMonsterLevel = null)
         {
             pGainedXp = GenralHelperFunctions.CalcXpPenalty(pGainedXp, GetLevel(), pMonsterLevel);
             PlayerPlayerClass.XP += pGainedXp;
@@ -108,7 +130,6 @@ namespace BossFight.Models
                     GainXp(-xpNeededToNextLevel, pMonsterLevel);
                 }
             }
-            return PlayerClass;
         }
 
         public bool HasEnoughManaForAbility(Ability pAbility)
@@ -118,25 +139,25 @@ namespace BossFight.Models
 
         public int GetAttackBonus()
         {
-            return (int)Math.Floor((double)Level / 2) + BonusMagicDmg + PlayerClass.AttackPowerBonus;
+            return (int)Math.Floor((double)Level / 2) + BonusMagicDmg + PlayerPlayerClass.AttackPowerBonus;
         }
 
         public int GetSpellBonus()
         {
-            return (int)Math.Floor((double)Level / 2) + PlayerClass.SpellPowerBonus;
+            return (int)Math.Floor((double)Level / 2) + PlayerPlayerClass.SpellPowerBonus;
         }
 
         public int GetAttackCritChance()
         {
             var critChance = Weapon.AttackCritChance;
-            critChance += PlayerClass.CritChance;
+            critChance += PlayerPlayerClass.CritChance;
             return critChance;
         }
 
         public int GetSpellCritChance()
         {
             var critChance = Weapon.SpellCritChance;
-            critChance += PlayerClass.CritChance;
+            critChance += PlayerPlayerClass.CritChance;
             return critChance;
         }
 
@@ -155,47 +176,6 @@ namespace BossFight.Models
             var roll = _random.Next(0, 101);
             return roll <= critChance;
         }
-
-        // Throws an exception if the weapon is not found
-        // public void ChangeWeapon(int pNewWeaponId)
-        // {
-        //     var itemToEquip = LootList.First(i => i == Convert.ToInt32(pNewWeaponId));
-        //     LootList.Remove(itemToEquip);
-        //     AddLoot(WeaponId);
-        //     WeaponId = itemToEquip;
-        //     //Weapon = GenralHelperFunctions.findWeaponByWeaponId(pNewWeaponId);
-        // }
-
-        // public void ChangeClass(string pNewPlayerClassName)
-        // {
-        //     var newPlayerClassName = pNewPlayerClassName.ToLower();
-        //     PlayerClass newClass;
-        //     if (newPlayerClassName != PlayerClass.Name.ToLower())
-        //     {
-        //         try
-        //         {
-        //             newClass = PlayerClassList.First(pc => pc.Name.ToLower() == newPlayerClassName);
-        //             if (newClass != null)
-        //             {
-        //                 PlayerClass = newClass;
-        //                 double currentHealthPercentage = Math.Floor((double)Hp / GetMaxHp());
-        //                 if (currentHealthPercentage > 1.0d)
-        //                     currentHealthPercentage = 1.0d;
-        //                 //CurrentPlayerClassId = newClass.classId;
-        //                 Hp = (int)Math.Floor(GetMaxHp() * currentHealthPercentage);
-        //                 if (Hp < -3)
-        //                     Hp = -3;
-        //                 Mana = 0;
-        //             }
-        //         }
-        //         catch (InvalidOperationException)
-        //         {
-        //             PlayerClassList.OrderBy(x => x.Name);
-        //             var unlockedClasses = String.Join(", ", from pc in PlayerClassList select $"{ pc.Name }");
-        //             throw new MyException($"Class with name '{ pNewPlayerClassName }' is not unlocked. Your unlocked classes is: { unlockedClasses }");
-        //         }
-        //     }
-        // }
 
         public string UnlockedClassesInfo()
         {
@@ -306,7 +286,7 @@ namespace BossFight.Models
         {
             LootList.Remove(pLootToSell.LootId);
             var sellPrice = pLootToSell.GetSellPrice();
-            return $"You sold '{ pLootToSell.GetName()}' for { sellPrice } gold";
+            return $"You sold '{ pLootToSell.LootName }' for { sellPrice } gold";
         }
 
         public bool LootIsInAutoSellList(int pLootId)
@@ -320,35 +300,35 @@ namespace BossFight.Models
             Mana = GetMaxMana();
         }
 
-        public void RegenHealth(int PTimesToRegen = 1)
-        {
-            int hpToRegen;
-            if (IsKnockedOut())
-            {
-                hpToRegen = 1 * PTimesToRegen;
-            }
-            else
-                hpToRegen = PlayerClass.HpRegenRate * PTimesToRegen;
+        // public void RegenHealth(int PTimesToRegen = 1)
+        // {
+        //     int hpToRegen;
+        //     if (IsKnockedOut())
+        //     {
+        //         hpToRegen = 1 * PTimesToRegen;
+        //     }
+        //     else
+        //         hpToRegen = PlayerPlayerClass.HpRegenRate * PTimesToRegen;
 
-            var newHp = Hp + hpToRegen;
-            if (newHp > GetMaxHp())
-            {
-                Hp = GetMaxHp();
-            }
-            else
-                Hp = newHp;
-        }
+        //     var newHp = Hp + hpToRegen;
+        //     if (newHp > GetMaxHp())
+        //     {
+        //         Hp = GetMaxHp();
+        //     }
+        //     else
+        //         Hp = newHp;
+        // }
 
-        public void RegenMana(int pTimesToRegen = 1)
-        {
-            var manaToRegen = PlayerClass.ManaRegenRate * pTimesToRegen;
-            var newMana = Mana + manaToRegen;
-            if (newMana > GetMaxMana())
-            {
-                Mana = GetMaxMana();
-            }
-            else
-                Mana = newMana;
-        }
+        // public void RegenMana(int pTimesToRegen = 1)
+        // {
+        //     var manaToRegen = PlayerPlayerClass.ManaRegenRate * pTimesToRegen;
+        //     var newMana = Mana + manaToRegen;
+        //     if (newMana > GetMaxMana())
+        //     {
+        //         Mana = GetMaxMana();
+        //     }
+        //     else
+        //         Mana = newMana;
+        // }
     }
 }

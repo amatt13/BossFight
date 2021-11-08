@@ -12,25 +12,12 @@ namespace BossFight.Models.Loot
 
         public LootItem() { }
 
-        // public LootItem(AppDb db) : base(db)
-        // {}
-
         public LootItem(int pLootId, string pLootName, float pLootDropChance, int pCost)
         {
             LootId = pLootId;
             LootName = pLootName;
             LootDropChance = pLootDropChance;
             Cost = pCost;
-        }
-
-        public void SetName(string pName)
-        {
-            LootName = pName;
-        }
-
-        public string GetName()
-        {
-            return LootName;
         }
 
         public int GetSellPrice()

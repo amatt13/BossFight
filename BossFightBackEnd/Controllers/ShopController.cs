@@ -166,7 +166,7 @@ namespace BossFight.Controllers
             string mes;
             try
             {
-                var autoSellingPlayer = new Player("test user", -1);
+                var autoSellingPlayer = new Player();
                 var weaponToUpdateAutoSellStatus = new Weapon(-1, "", "");
                 
                 if (autoSellingPlayer.LootIsInAutoSellList(weaponToUpdateAutoSellStatus.LootId))

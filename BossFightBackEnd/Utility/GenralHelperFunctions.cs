@@ -117,14 +117,14 @@ namespace BossFight
             return now.ToString("%Y-%m-%d:%H:%M:00");
         }
 
-        public static void RegenPlayerHealth(Player p, int timesToRegen = 1)
-        {
-            p.RegenHealth(timesToRegen);
-        }
+        // public static void RegenPlayerHealth(Player p, int timesToRegen = 1)
+        // {
+        //     p.RegenHealth(timesToRegen);
+        // }
 
-        public static void RegenPlayerMana(Player p, int timesToRegen = 1)
-        {
-            p.RegenMana(timesToRegen);
-        }
+        // public static void RegenPlayerMana(Player p, int timesToRegen = 1)
+        // {
+        //     p.RegenMana(timesToRegen);
+        // }
     }
 }

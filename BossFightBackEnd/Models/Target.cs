@@ -9,18 +9,14 @@ namespace BossFight.Models
     {
         public int Hp { get; set; }
         public string Name { get; set; }
-        public int Level { get; set; }
         public override string TableName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public override string IdColumn { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        // public Target(AppDb db) : base(db)
-        // {}
 
-        public Target(int pHP = 1, string pName = "No name", int pLevel = 1)
+        public Target(int pHP = 1, string pName = "No name")
         {
             Hp = pHP;
             Name = pName;
-            Level = pLevel;
         }
 
         public virtual int GetMaxHp()

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Reflection;
 using System.Text;
@@ -41,8 +42,24 @@ namespace BossFight.Controllers
             var player = new Player().FindOne(Convert.ToInt32(pJsonParameters["player_id"]));
             string output = JsonConvert.SerializeObject(player);
             var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
-            //Db.Connection.Close();
             await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+        }
+
+        // player_id: "int", weapon_id: "int
+        public async Task SellWeapon(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            if (RequestValidator.PlayerCanSellWeapon(pJsonParameters["player_id"].ToString(), pJsonParameters["weapon_id"].ToString(), out string error))
+            {
+                var player = new Player().FindOne(Convert.ToInt32(pJsonParameters["player_id"]));
+                var weaponId = Convert.ToInt32(pJsonParameters["weapon_id"]);
+                var weaponToSell = player.PlayerWeaponList.First(pw => pw.WeaponId == weaponId);
+                weaponToSell.Sell();
+            }
+            else
+            {
+            var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(error));
+            await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+            }
         }
     }
 }

@@ -1,65 +1,145 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+	<link rel="stylesheet" href="css/stylesheet.css" type="text/css" charset="utf-8" />
 	<meta charset="utf-8">
 	<meta http-equiv="content_security_policy" content="script-src 'self'; script-src-elem 'self'">
+	<style>		
+	progress[value] {
+		/* Reset the default appearance */
+		-webkit-appearance: none;
+		appearance: none;
+		height: 20px;
+	}
+	progress::-webkit-progress-bar {
+		background-color: #eee;
+		border-radius: 2px;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+	}
+	progress::-webkit-progress-value {
+		background-color: crimson;
+		border-radius: 2px; 
+		background-size: 35px 20px, 100% 100%, 100% 100%;
+	}
+	Body
+	{
+		color:hsl(349, 19%, 45%);
+	}
+	.custom-menu {
+		display: none;
+		z-index: 1000;
+		position: absolute;
+		overflow: hidden;
+		border: 1px solid #CCC;
+		white-space: nowrap;
+		font-family: sans-serif;
+		background: #FFF;
+		color: #333;
+		border-radius: 5px;
+	}
+
+	.custom-menu li {
+		padding: 8px 12px;
+		cursor: pointer;
+	}
+
+	.custom-menu li:hover {
+		background-color: #DEF;
+	}
+	</style>
 	<title>Boss Fight</title>
 </head>
-<body style="background-color:rgb(185, 185, 185);">
+<body style="background-color:	hsl(235, 22%, 20%); ">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> <!-- allow jquery -->
 	<div class="text-center">
 		<h1 class="display-4">
-			Status
+			Boss Fight
 		</h1>
 	</div>
-	<div class="row">
-		<div class="column" style="float:left; width: 33.33%">
-			<canvas id="mainCanvas" width="300" height="300" style="border:1px solid #000000;">
+	<div class="row" style="width: 100%; display: flex; lign-items:flex-end;">
+		<!-- Canvas/Left column -->
+		<div class="column" style="float:left; flex: 24%; border: solid; color: hsl(256, 13%, 28%);">
+			<canvas id="mainCanvas">
 			</canvas>
 		</div>
-		<div class="column" style="float:left; width: 33.33%">
-			<div id="ts-example">
-				<button type="button" class="btn btn-primary btn-md" onclick="LoginTestUser()">
-					Login "Test User"
-				</button>
+		<!-- Main menu/centre column -->
+		<div class="column" style="float:left; padding-left: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: hsl(256, 13%, 28%);">
+			<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color:hsl(349, 19%, 45%); padding-top: 15px;">
+				<div style="grid-column: 1; grid-row: 1;">
+					<label>User: </label>
+					<label id="player_name">Player name</label>
+				</div>
+				<div style="grid-column: 1; grid-row: 2;">
+					<img src="images/sprites/player_classes/duelist.png" alt="Player class sprite" width="150" height="150" style="object-fit: fill;">
+				</div>
+				<!-- Player info column -->
+				<div style="grid-column: 1; grid-row: 3;">
+					<label style="display: inline-block; width: 50px;">HP: </label>
+					<progress id="progress_player_health" value="0" max="100"></progress>
+					<label id="player_hp"></label>
+				</div>
+				<div style="grid-column: 1; grid-row: 4;">
+					<label style="display: inline-block; width: 50px;">Mana: </label>
+					<progress id="progress_player_mana" value="0" max="100"></progress>
+					<label id="player_mana"></label>
+				</div>
+				<div style="grid-column: 1; grid-row: 5;">
+					<label>Level: </label>
+					<label id="player_level_and_class"></label>
+				</div>
+				<div style="grid-column: 1; grid-row: 6;">
+					<label>XP: </label>
+					<label id="player_xp"></label>			
+				</div>
+				<div style="grid-column: 1; grid-row: 7;">
+					<label>Gold: </label>
+					<label id="player_gold"></label>
+				</div>
+				<div style="grid-column: 1; grid-row: 8;">
+					<label>Equipped weapon: </label>
+					<label id="player_equipped_weapon_name"></label>
+				</div>
+				<div style="grid-column: 1; grid-row: 9;">
+					<button type="button" class="btn btn-primary btn-md" onclick="LoginTestUser()">
+						Login "Test User"
+					</button>
+					<button type="button" class="btn btn-primary btn-md" onclick="LoginTestUser2()">
+						Login "Test User2"
+					</button>
+				</div>
+				<div style="grid-column: 2; grid-row: 1/20;">
+					<select id="player_inventory" size="1" style="flex-grow:1; float:left; width: 95%;"></select>
+				</div>
 			</div>
 		</div>
-		<div class="column" style="float:left; width: 33.33%">
-			<!--
-			AutoSellList: null
-			BonusMagicDmg: 0
-			BonusMagicDmgDuration: 0
-			Gold: 100
-			HP: 10
-			Level: 1
-			LootList: null
-			Mana: 15
-			Name: "test user"
-			PlayerClass: null
-			PlayerClassList: null
-			PlayerId: 1337
-			Weapon: null
-			WeaponId: 0
-			-->
-			<label">Name: </label>
-			<label id="player_name"></label>
-			<br/>
-			<label">Level: </label>
-			<label id="player_Level"></label>
-			<br/>
-			<label">HP: </label>
-			<label id="player_hp"></label>
-			<br/>
-			<label">Mana: </label>
-			<label id="player_mana"></label>
-			<br/>
-			<label">Gold: </label>
-			<label id="player_gold"></label>
-			<textarea id="text_log" style="width: 100%; height: 300px;" placeholder="log..."></textarea>
+		<!-- Right column -->
+		<div class="column" style="float:right; flex: 10%; border: solid; color: hsl(256, 13%, 28%);">
+			<div style="color:hsl(349, 19%, 45%); display: grid; grid-template-columns: repeat(1, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; padding-top: 15px;">
+				<div style="grid-column: 1; grid-row: 1;">
+					<label">Log: </label>
+				</div>
+				<div style="grid-column: 1; grid-row: 2;">
+					<textarea id="text_log" style="width: 95%; height: 750px; resize: none;" placeholder="log..." readonly=true></textarea>
+				</div>
+					<div style="grid-column: 1; grid-row: 3;">
+					<div style="background-color: hsl(235, 22%, 20%); width: 30px; height: 30px; float: left; border: solid; color: white; border-width: 1px;"></div>
+					<div style="background-color: hsl(256, 13%, 28%); width: 30px; height: 30px; float: left; border: solid; color: white; border-width: 1px;"></div>
+					<div style="background-color: hsl(256, 15%, 14%); width: 30px; height: 30px; float: left; border: solid; color: white; border-width: 1px;"></div>
+					<div style="background-color: hsl(318, 11%, 35%); width: 30px; height: 30px; float: left; border: solid; color: white; border-width: 1px;"></div>
+					<div style="background-color: hsl(349, 19%, 45%); width: 30px; height: 30px; float: left; border: solid; color: white; border-width: 1px;"></div>
+				</div>
+			</div>
 		</div>
 	</div>
 </body>
 </html>
 
 
+<ul class='custom-menu'>
+	<li id=custom_menu_equip data-action = "equip" data-equip_id=none>Equip weapon</li>
+	<li id=custom_menu_sell data-action = "sell" data-sell_id=none>Sell weapon</li>
+</ul>
+
 <script type="text/javascript" src="scripts/cf.js"></script>
 <script type="text/javascript" src="scripts/canvas.js"></script>
+<script type="text/javascript" src="scripts/custom_context_menu.js"></script>

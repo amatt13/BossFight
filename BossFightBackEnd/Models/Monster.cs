@@ -47,6 +47,7 @@ namespace BossFight.Models
 
         public Dictionary<int, int> DamageTracker { get; set; }  // key is PlayerId, value is totaled damge from player
         public int MaxHp { get; set; }
+        public int Level { get; set; }
         public string ImageUrl { get; set; }
         public List<MonsterType> MonsterTypeList { get; set; }
         public bool BossMonster { get; set; }
@@ -59,6 +60,8 @@ namespace BossFight.Models
         public Dictionary<int, DamageTrackerEntry> DamageOverTimeTracker { get; set; }  // key is player_id
         public Dictionary<int, int> FrenzyStackTracker { get; set; }  // key is player_id, value is frenzy stack lvl/size
         public event EventHandler<MonsterKilledEventArgs>  MonsterDied;
+
+        public Monster () { }
 
         public Monster(string pName, string pImageUrl, Dictionary<int, int> pDamageTracker = null, List<MonsterType> pMonsterTypes = null, bool pBossMonster = false)
         {
@@ -92,6 +95,23 @@ namespace BossFight.Models
          public Monster(string pName, string pImageUrl)
             : this(pName, pImageUrl, pMonsterTypes: new List<MonsterType> { MonsterType.HUMANOID })
         { }
+
+        public Monster FindOne(int id)
+        {
+            return (Monster)_findOne(id);
+        }
+
+        public IEnumerable<Monster> FindAll(int? id)
+        {
+            return _findAll(id).Cast<Monster>();
+        }
+
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        {
+            var result = new List<PersistableBase>();
+
+            return result;
+        }
 
         // public static object fromDict(object cls, object monsterDict = dict)
         // {
@@ -449,7 +469,7 @@ namespace BossFight.Models
                 damageDealt = Math.Ceiling(damageDealt);
                 damageText += pPlayerToAttack.ReceiveDamageFromMonster((int)damageDealt, Name);
             }
-            var resultText = $"{ damageText }**Player hp:** { pPlayerToAttack.Hp }/{ pPlayerToAttack.PlayerClass.MaxHp }";
+            var resultText = $"{ damageText }**Player hp:** { pPlayerToAttack.Hp }/{ pPlayerToAttack.GetMaxHp() }";
             return resultText;
         }
 
