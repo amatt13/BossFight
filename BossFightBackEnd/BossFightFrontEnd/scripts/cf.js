@@ -19,23 +19,13 @@ socket.onopen = function(e) {
 socket.onmessage = function(event) {
 	LogToTextLog(`[message] Data received from server: ${event.data}`);
 	var json_dict = JSON.parse(event.data);
-
-	var weapon_dict = json_dict["Weapon"];
-	var weapon = new Weapon(weapon_dict["WeaponType"], weapon_dict["AttackMessage"], weapon_dict["BossWeapon"], weapon_dict["WeaponLvl"], weapon_dict["AttackPower"], 
-		weapon_dict["AttackCritChance"], weapon_dict["SpellPower"], weapon_dict["SpellCritChance"], weapon_dict["LootId"], weapon_dict["LootName"], 
-		weapon_dict["LootDropChance"], weapon_dict["Cost"]);
 	
-	var player_player_class_dict = json_dict["PlayerPlayerClass"];
-	var player_player_class = new PlayerPlayerClass(player_player_class_dict["XP"], player_player_class_dict["Level"], player_player_class_dict["MaxHp"], player_player_class_dict["MaxMana"], player_player_class_dict["PlayerClassName"], );
-	
-	var player_weapon_list = [];
-	var player_weapon_dict = json_dict["PlayerWeaponList"];
-	player_weapon_dict.forEach(pw => {
-		player_weapon_list.push(new PlayerWeapon(pw["WeaponId"], pw["WeaponName"]))
-	});
-
-	_player = new Player(json_dict["PlayerId"], json_dict["Name"], json_dict["Hp"], json_dict["Mana"], json_dict["Gold"], weapon, player_player_class, player_weapon_list);
-	UpdateUiPlayerStats(_player);
+	if ("update_player" in json_dict)
+		ReadPlayerMessage(json_dict["update_player"]);
+	else if ("update_player_sold_weapon" in json_dict)
+		UpdateUiPlayerSoldWeapon(json_dict["update_player_sold_weapon"])
+	else if ("error_message" in json_dict)
+		LogToTextLog(json_dict["error_message"], true)
 };
 
 socket.onclose = function(event) {
@@ -79,12 +69,37 @@ async function LoginTestUser2() {
 }
 
 
-
-function LogToTextLog(pText)
+function LogToTextLog(pText, blink = false)
 {
 	document.getElementById("text_log").innerHTML += pText + '\n'
+	if (blink)
+	{
+		BlinkDiv("text_log", 'red');
+	}
 }
 
+function ReadPlayerMessage(json_dict) {
+	var weapon_dict = json_dict["Weapon"];
+	var weapon = new Weapon(weapon_dict["WeaponType"], weapon_dict["AttackMessage"], weapon_dict["BossWeapon"], weapon_dict["WeaponLvl"], weapon_dict["AttackPower"], 
+		weapon_dict["AttackCritChance"], weapon_dict["SpellPower"], weapon_dict["SpellCritChance"], weapon_dict["LootId"], weapon_dict["LootName"], 
+		weapon_dict["LootDropChance"], weapon_dict["Cost"]);
+	
+	var player_player_class_dict = json_dict["PlayerPlayerClass"];
+	var player_player_class = new PlayerPlayerClass(player_player_class_dict["XP"], player_player_class_dict["Level"], player_player_class_dict["MaxHp"], player_player_class_dict["MaxMana"], player_player_class_dict["PlayerClassName"], );
+	
+	var player_weapon_list = [];
+	var player_weapon_dict = json_dict["PlayerWeaponList"];
+	player_weapon_dict.forEach(pw => {
+		player_weapon_list.push(new PlayerWeapon(pw["WeaponId"], pw["WeaponName"]))
+	});
+
+	_player = new Player(json_dict["PlayerId"], json_dict["Name"], json_dict["Hp"], json_dict["Mana"], json_dict["Gold"], weapon, player_player_class, player_weapon_list);
+	UpdateUiPlayerStats(_player);
+}
+
+function UpdateUiPlayerStats() {
+
+}
 
 function UpdateUiPlayerStats(player) {
 	document.getElementById("player_name").innerHTML = player.name;
@@ -92,23 +107,10 @@ function UpdateUiPlayerStats(player) {
 	document.getElementById("player_xp").innerHTML = player.player_player_class.xp; 
 	document.getElementById("player_hp").innerHTML = `${ player.hp }/${ player.player_player_class.max_hp }`;
 	document.getElementById("player_mana").innerHTML = `${ player.mana }/${ player.player_player_class.max_mana }`;
-	document.getElementById("player_gold").innerHTML = player.gold;
+	document.getElementById("player_gold").innerHTML = _player.gold;
 	document.getElementById("player_equipped_weapon_name").innerHTML = player.weapon.loot_name;
 	
-	// clear inventory, and repopulate it again
-	$("#player_inventory").empty();
-	var player_inventory = document.getElementById("player_inventory");
-	player.player_weapon_list.forEach(player_weapon => {
-		var option = document.createElement("option");
-		option.text = player_weapon.name;
-		option.dataset.weapon_id = player_weapon.weapon_id;
-		player_inventory.add(option);
-	});
-	
-	var inventory_lenght = player.player_weapon_list.length;
-	if (inventory_lenght < 10)
-	{ inventory_lenght = 10; }
-	player_inventory.size = inventory_lenght;
+	RepopulatePlayerInventory();
 	
 	// set HP bar
 	var progress_player_health = document.getElementById("progress_player_health");
@@ -119,8 +121,54 @@ function UpdateUiPlayerStats(player) {
 	var progress_player_mana = document.getElementById("progress_player_mana");
 	progress_player_mana.max = player.player_player_class.max_mana;
 	progress_player_mana.value = player.mana;
+
+	// set player sprite
+	// const fs = require('fs')
+	// var files = fs.readdirSync('~/images/player_classes/');
+	// files.forEach(element => {
+	// 	LogToTextLog(element);
+	// });
 }
 
+function RepopulatePlayerInventory() {
+	// clear inventory, and repopulate it again
+	$("#player_inventory").empty();
+	var player_inventory = document.getElementById("player_inventory");
+	_player.player_weapon_list.forEach(player_weapon => {
+		var option = document.createElement("option");
+		option.text = player_weapon.name;
+		option.dataset.weapon_id = player_weapon.weapon_id;
+		player_inventory.add(option);
+	});
+	var inventory_lenght = _player.player_weapon_list.length;
+	if (inventory_lenght < 10)
+	{ inventory_lenght = 10; }
+	player_inventory.size = inventory_lenght;
+}
+
+function UpdateUiPlayerSoldWeapon(json_dict) {
+	const gold = json_dict["gold"]
+	_player.gold = gold;
+	document.getElementById("player_gold").innerHTML = _player.gold;
+	BlinkDiv("player_gold");
+
+	var player_weapon_list = [];
+	var player_weapon_dict = json_dict["weapons"];
+	player_weapon_dict.forEach(pw => {
+		player_weapon_list.push(new PlayerWeapon(pw["WeaponId"], pw["WeaponName"]))
+	});
+	_player.player_weapon_list = player_weapon_list;
+	RepopulatePlayerInventory();
+}
+
+function BlinkDiv(div_id, color = 'yellow') {
+	var element = document.getElementById(div_id)
+    var origcolor = element.style.backgroundColor
+    element.style.backgroundColor = color;
+    var t = setTimeout(function(){
+       element.style.backgroundColor = origcolor;
+    },(1*1000));
+ }
 
 class Player {
 	constructor(player_id, name, hp, mana, gold, weapon, player_player_class, player_weapon_list) {

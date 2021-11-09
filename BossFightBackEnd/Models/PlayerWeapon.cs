@@ -14,8 +14,13 @@ namespace BossFight.Models
         public override string IdColumn { get; set; } = nameof(PlayerWeaponId);
 
         // Persisted on PlayerWeapon table
+        [PersistPropertyAttribute]
         public int PlayerWeaponId { get; set; }
+
+        [PersistPropertyAttribute]
         public int? PlayerId { get; set; }
+
+        [PersistPropertyAttribute]
         public int WeaponId { get; set; }
 
         // From other tables
@@ -67,14 +72,14 @@ namespace BossFight.Models
             return pStartWithAnd ? additionalSearchCriteriaText : additionalSearchCriteriaText.Substring(4, additionalSearchCriteriaText.Length- 4);
         }
 
+        #endregion PersistableBase implementation
+
         public void Sell()
         {
-            var earnedGold = Weapon.GetSellPrice();
-            Player.Gold += earnedGold;
+            Player.Gold += Weapon.GetSellPrice();
+            Player.PlayerWeaponList = Player.PlayerWeaponList.Remove(x => x.PlayerWeaponId == this.PlayerWeaponId);
             Player.Persist(Player.PlayerId);
-            //this.Delete(); //TODO DELETE DB FUNC
+            Delete(PlayerWeaponId);
         }
-
-        #endregion PersistableBase implementation
     }
 }

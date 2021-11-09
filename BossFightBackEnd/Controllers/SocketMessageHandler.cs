@@ -18,14 +18,7 @@ namespace BossFight.Controllers
         public static string REQUEST_KEY = "request_key";
         public static string REQUEST_DATA = "request_data";
 
-        // public AppDb Db { get; }
-
-        // public SocketMessageHandler(AppDb db)
-        public SocketMessageHandler()
-        {
-            // Db = db;
-            // Db.Connection.Open();
-        }
+        public SocketMessageHandler() { }
         
         public async Task HandleMessage(Dictionary<string, object> pJsonObject, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
@@ -40,7 +33,11 @@ namespace BossFight.Controllers
         public async Task FetchPlayer(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var player = new Player().FindOne(Convert.ToInt32(pJsonParameters["player_id"]));
-            string output = JsonConvert.SerializeObject(player);
+            var response = new Dictionary<string, Player>
+                { 
+                    { "update_player", player }
+                };
+            string output = JsonConvert.SerializeObject(response);
             var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
             await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
         }
@@ -54,11 +51,26 @@ namespace BossFight.Controllers
                 var weaponId = Convert.ToInt32(pJsonParameters["weapon_id"]);
                 var weaponToSell = player.PlayerWeaponList.First(pw => pw.WeaponId == weaponId);
                 weaponToSell.Sell();
+                
+                var response = new Dictionary<string, object>
+                { 
+                    { "update_player_sold_weapon", new Dictionary<string, object>
+                        {
+                            { "gold", player.Gold },
+                            { "weapons", player.PlayerWeaponList }
+                        } }
+                };
+                var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
+                await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
             }
             else
             {
-            var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(error));
-            await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                var response = new Dictionary<string, string>
+                { 
+                    { "error_message", error }
+                };
+                var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
+                await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
             }
         }
     }

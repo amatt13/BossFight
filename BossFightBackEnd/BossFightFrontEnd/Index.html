@@ -21,6 +21,10 @@
 		border-radius: 2px; 
 		background-size: 35px 20px, 100% 100%, 100% 100%;
 	}
+	mana-progress {
+		background-color: midnightblue;
+	}
+
 	Body
 	{
 		color:hsl(349, 19%, 45%);
@@ -46,13 +50,18 @@
 	.custom-menu li:hover {
 		background-color: #DEF;
 	}
+
+	* {
+		font-family: myFirstFont;
+		font-size: 18px;
+	}
 	</style>
 	<title>Boss Fight</title>
 </head>
 <body style="background-color:	hsl(235, 22%, 20%); ">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> <!-- allow jquery -->
 	<div class="text-center">
-		<h1 class="display-4">
+		<h1 class="display-4" style="font-size: 60px;">
 			Boss Fight
 		</h1>
 	</div>
@@ -63,15 +72,14 @@
 			</canvas>
 		</div>
 		<!-- Main menu/centre column -->
-		<!-- tilføj melleu,mrum div på 5px -->
-		<div class="column" style="float:left; padding-left: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: hsl(256, 13%, 28%);">
+		<div class="column" style="float:left; padding-left: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: hsl(256, 13%, 28%); margin-left: 5px; margin-right: 5px;">
 			<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color:hsl(349, 19%, 45%); padding-top: 15px;">
 				<div style="grid-column: 1; grid-row: 1;">
 					<label>User: </label>
 					<label id="player_name">Player name</label>
 				</div>
 				<div style="grid-column: 1; grid-row: 2;">
-					<img src="images/sprites/player_classes/duelist.png" alt="Player class sprite" width="150" height="150" style="object-fit: fill;">
+					<img id="playerSprite" src="./images/sprites/player_classes/peasant.png" alt="Player class sprite" width="150" height="150" style="object-fit: fill;">
 				</div>
 				<!-- Player info column -->
 				<div style="grid-column: 1; grid-row: 3;">
@@ -81,7 +89,7 @@
 				</div>
 				<div style="grid-column: 1; grid-row: 4;">
 					<label style="display: inline-block; width: 50px;">Mana: </label>
-					<progress id="progress_player_mana" value="0" max="100"></progress>
+					<progress class="mana-progress" id="progress_player_mana" value="0" max="100"></progress>
 					<label id="player_mana"></label>
 				</div>
 				<div style="grid-column: 1; grid-row: 5;">
@@ -136,7 +144,7 @@
 </html>
 
 
-<ul class='custom-menu'>
+<ul class='custom-menu' style="list-style-type: none; padding: 0; margin: 0;">
 	<li id=custom_menu_equip data-action = "equip" data-equip_id=none>Equip weapon</li>
 	<li id=custom_menu_sell data-action = "sell" data-sell_id=none>Sell weapon</li>
 </ul>

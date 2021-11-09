@@ -96,5 +96,21 @@ namespace BossFight.Models
             cmd.ExecuteNonQuery();
             connection.Close();
         }
+
+        public virtual void Delete(int id)
+        {
+            using var connection = GlobalConnection.GetNewOpenConnection();
+            using var cmd = connection.CreateCommand();
+
+            cmd.CommandText = $"DELETE FROM { TableName } WHERE { IdColumn } = @id LIMIT 1";
+            cmd.Parameters.Add(new MySqlParameter
+            {
+                ParameterName = "@id",
+                DbType = DbType.String,
+                Value = id.ToString(),
+            });
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
     }
 }
