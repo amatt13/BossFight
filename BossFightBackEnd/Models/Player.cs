@@ -85,6 +85,14 @@ namespace BossFight.Models
             return result;
         }
 
+        public void SubtractHealth(int pDamageToReceive)
+        {
+            Hp -= pDamageToReceive;
+
+            if (Hp < -3)
+                Hp = -3;
+        }
+
         public override string ToString()
         {
             return Name;
@@ -130,6 +138,12 @@ namespace BossFight.Models
                     GainXp(-xpNeededToNextLevel, pMonsterLevel);
                 }
             }
+        }
+
+        public void EquipWeapon(int pWeaponId)
+        {
+            WeaponId = pWeaponId;
+            Persist(this.PlayerId);
         }
 
         public bool HasEnoughManaForAbility(Ability pAbility)
@@ -212,7 +226,7 @@ namespace BossFight.Models
             return durationSubtracted;
         }
 
-        public AttackMessage AttackMonsterWithWeapon(Monster pTargetMonster, Weapon pPlayerWeapon, bool pRetaliate = true)
+        public AttackMessage AttackMonsterWithWeapon(MonsterTemplate pTargetMonster, Weapon pPlayerWeapon, bool pRetaliate = true)
         {
             var bonusCritChance = 0;
             if (pTargetMonster.EasierToCritDuration > 0)
@@ -244,22 +258,6 @@ namespace BossFight.Models
                 attackMessage.MonsterAffectedByDots = $"Monster took an additional { totalDamageOverTime } damage from various spell effects by { String.Join(", ", from p in playersThatDealtDamageOverTime select p) }";
             }
             return attackMessage;
-        }
-
-        public string ReceiveDamageFromMonster(int pDamage, string pMonsterName, bool pNewLine = true)
-        {
-            Hp -= pDamage;
-            var damageText = $"You received { pDamage } damage from { pMonsterName }";
-            if (IsKnockedOut())
-            {
-                if (Hp < -3)
-                    Hp = -3;
-                damageText += ", and is knocked out";
-            }
-            if (pNewLine)
-                damageText += "\n";
-
-            return damageText;
         }
 
         public void AddLoot(int pLootToAdd)

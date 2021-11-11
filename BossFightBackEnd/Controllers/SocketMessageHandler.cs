@@ -42,7 +42,7 @@ namespace BossFight.Controllers
             await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
         }
 
-        // player_id: "int", weapon_id: "int
+        // player_id: "int", weapon_id: "int"
         public async Task SellWeapon(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             if (RequestValidator.PlayerCanSellWeapon(pJsonParameters["player_id"].ToString(), pJsonParameters["weapon_id"].ToString(), out string error))
@@ -58,6 +58,36 @@ namespace BossFight.Controllers
                         {
                             { "gold", player.Gold },
                             { "weapons", player.PlayerWeaponList }
+                        } }
+                };
+                var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
+                await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+            }
+            else
+            {
+                var response = new Dictionary<string, string>
+                { 
+                    { "error_message", error }
+                };
+                var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
+                await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+            }
+        }
+
+        // player_id: "int", weapon_id: "int
+        public async Task EquipWeapon(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            if (RequestValidator.PlayerCanEquipWeapon(pJsonParameters["player_id"].ToString(), pJsonParameters["weapon_id"].ToString(), out string error))
+            {
+                var player = new Player().FindOne(Convert.ToInt32(pJsonParameters["player_id"]));
+                var weaponId = Convert.ToInt32(pJsonParameters["weapon_id"]);
+                player.EquipWeapon(weaponId);
+                
+                var response = new Dictionary<string, object>
+                { 
+                    { "update_player_equipped_weapon", new Dictionary<string, Weapon>
+                        {
+                            { "Weapon", player.PlayerWeaponList.First(pw => pw.WeaponId == weaponId).Weapon }
                         } }
                 };
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
