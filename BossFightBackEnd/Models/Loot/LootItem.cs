@@ -5,9 +5,16 @@ namespace BossFight.Models.Loot
 {
     public abstract class LootItem : PersistableBase
     {
-        public int LootId { get; set; }
+        [PersistProperty(true)]
+        public int? LootId { get; set; }
+
+        [PersistProperty]
         public string LootName { get; set; }
+
+        [PersistProperty]
         public float LootDropChance { get; set; }
+
+        [PersistProperty]
         public int Cost { get; set; }
 
         public LootItem() { }

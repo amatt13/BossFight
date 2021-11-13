@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using BossFight.Extentions;
 using MySqlConnector;
 using Newtonsoft.Json;
 
@@ -10,28 +11,40 @@ namespace BossFight.Models
     public class PlayerPlayerClass : PersistableBase, IPersist<PlayerPlayerClass>
     {
         [JsonIgnore]
-        public override string TableName { get; set; } = "PlayerPlayerClass";
+        public override string TableName { get; set; } = nameof(PlayerPlayerClass);
         [JsonIgnore]
-        public override string IdColumn { get; set; } = nameof(PlayerId);
+        public override string IdColumn { get; set; } = nameof(PlayerClassId);
 
         // Persisted on PlayerPlayerClass table
+        [PersistPropertyAttribute(true)]
+        public int? PlayerId { get; set; }
+        
         [JsonIgnore]
-        public int PlayerId { get; set; }
-        [JsonIgnore]
+        [PersistPropertyAttribute]
         public int PlayerClassId { get; set; }
+
+        [PersistPropertyAttribute]
         public int XP { get; set; }
+
+        [PersistPropertyAttribute]
         public int Level { get; set; }
+
+        [PersistPropertyAttribute]
         public bool? Active { get; set; }  // Indicates if this is the current Player-PlayerClass relation
 
         // From other tables
         [JsonIgnore]
         public Player Player { get; set; }
+
         [JsonIgnore]
         public PlayerClass PlayerClass { get; set; }
+
         [JsonIgnore]
         public int AttackPowerBonus { get => PlayerClass.AttackPowerBonus; }
+
         [JsonIgnore]
         public int SpellPowerBonus { get => PlayerClass.SpellPowerBonus; }
+        
         [JsonIgnore]
         public int CritChance { get => PlayerClass.CritChance; }
 
@@ -101,7 +114,10 @@ namespace BossFight.Models
             var ppc = pSearchObject as PlayerPlayerClass;
             var additionalSearchCriteriaText = String.Empty;
             if (ppc.Active.HasValue)
-                additionalSearchCriteriaText += $" AND Active = { (ppc.Active.Value ? "TRUE" : "FALSE") }\n";
+                additionalSearchCriteriaText += $" AND { nameof(Active) } = { (ppc.Active.Value ? "TRUE" : "FALSE") }\n";
+
+            if (ppc.PlayerId.HasValue)
+                additionalSearchCriteriaText += $" AND { nameof(PlayerId) } = { ppc.PlayerId.Value }\n";
 
             return pStartWithAnd ? additionalSearchCriteriaText : additionalSearchCriteriaText.Substring(4, additionalSearchCriteriaText.Length- 4);
         }

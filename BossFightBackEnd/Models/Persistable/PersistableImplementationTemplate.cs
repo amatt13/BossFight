@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using BossFight.Extentions;
 using MySqlConnector;
 using Newtonsoft.Json;
 
@@ -13,7 +14,7 @@ namespace BossFight.Models.DB
         public override string IdColumn { get; set; } = nameof(PersistableImplementationTemplateId);
 
         // Persisted on PersistableImplementationTemplate table
-        public int PersistableImplementationTemplateId { get; set; }
+        public int? PersistableImplementationTemplateId { get; set; }
 
         // From other tables
         // bla bla bla

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BossFight.BossFightEnums;
+using BossFight.Extentions;
 using BossFight.Models.DB;
 using BossFight.Models.Loot;
 using Newtonsoft.Json;
@@ -10,19 +11,36 @@ namespace BossFight.Models
 {
     public class Weapon : LootItem, IPersist<Weapon>
     {
+        [JsonIgnore]
         public const float DEFAULTWEAPONDROPCHANCE = 1.0f;
+
         [JsonIgnore]
         public override string TableName { get; set; } = "Weapon";
+
         [JsonIgnore]
         public override string IdColumn { get; set; } = "WeaponId";
         
         public WeaponType WeaponType { get; set; }
+
+        [PersistPropertyAttribute]
         public string AttackMessage { get; set; }
+
+        [PersistPropertyAttribute]
         public bool BossWeapon { get; set; }
+
+        [PersistPropertyAttribute]
         public int WeaponLevel { get; set; }
+
+        [PersistPropertyAttribute]
         public int AttackPower { get; set; }
+
+        [PersistPropertyAttribute]
         public int AttackCritChance { get; set; }
+
+        [PersistPropertyAttribute]
         public int SpellPower { get; set; }
+
+        [PersistPropertyAttribute]
         public int SpellCritChance { get; set; }
 
         public Weapon() { }
@@ -36,8 +54,6 @@ namespace BossFight.Models
             BossWeapon = pBossWeapon;
             WeaponLevel = pWeaponLvl;
             AttackPower = pAttackPower;
-            // if (pBossWeapon)
-            //     CalcWeaponStats();
             AttackCritChance = pAttackCritChance;
             SpellPower = pSpellPower;
             SpellCritChance = pSpellCritChance;

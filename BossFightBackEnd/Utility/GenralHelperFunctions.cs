@@ -15,55 +15,16 @@ namespace BossFight
             return xpNeeded;
         }
 
-        public static int CalculateExperienceFromDamageDealtToMonster(int pDamageDealt, Monster pMonster)
+        public static int CalculateExperienceFromDamageDealtToMonster(int pDamageDealt, MonsterInstance pMonster)
         {
             var xp = 1;
             xp += (int)Math.Floor((double)pDamageDealt * 1.1);
             xp += (int)Math.Floor((double)pMonster.Level / 3);
-            if (pMonster.BossMonster)
-                xp += (int)Math.Ceiling((double)xp * 0.2);
+            if (pMonster.IsBossMonster)
+                xp = (int)Math.Ceiling((double)xp * 1.2);
 
             return xp;
         }
-
-        // public static Weapon FindWeaponByWeaponId(int weaponId)
-        // {
-        //     var weapon = WeaponList.fists;
-        //     try
-        //     {
-        //         if (weaponId is int)
-        //         {
-        //             weapon = next(from w in WeaponList.ALLWEAPONS
-        //                           where w.lootId == weaponId
-        //                           select w);
-        //         }
-        //     }
-        //     catch (StopIteration)
-        //     {
-        //         Console.WriteLine("Could not find weapon with id: {weaponId}");
-        //     }
-        //     return weapon;
-        // }
-
-        // public static object findLootByName(object lootName = str)
-        // {
-        //     lootName = lootName.lower();
-        //     var weapon = WeaponList.fists;
-        //     try
-        //     {
-        //         if (lootName is str)
-        //         {
-        //             weapon = next(from w in WeaponList.ALLWEAPONS
-        //                           where w.lootName.lower() == lootName
-        //                           select w);
-        //         }
-        //     }
-        //     catch (StopIteration)
-        //     {
-        //         Console.WriteLine("Could not find weapon with name: {lootName}");
-        //     }
-        //     return weapon;
-        // }
 
         public static int CalcXpPenalty(int pXP, int pPlayerLevel, int? pMonsterLevel)
         {

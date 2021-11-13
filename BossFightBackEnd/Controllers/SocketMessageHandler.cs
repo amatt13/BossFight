@@ -29,6 +29,19 @@ namespace BossFight.Controllers
             await (Task)this.GetType().GetMethod(handler).Invoke(this, new object[] { dataJsonDictionary, pWebSocketReceiveResult, pWebSocket });
         }
 
+        // no data
+        public async Task FetchActiveMonster(Dictionary<string, object> _, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            var monster = new MonsterInstance{ Active = true }.FindAll().First();
+            var response = new Dictionary<string, MonsterInstance>
+                { 
+                    { "fetch_active_monster", monster }
+                };
+            string output = JsonConvert.SerializeObject(response);
+            var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
+            await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+        }
+
         // player_id: "int"
         public async Task FetchPlayer(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
@@ -64,14 +77,7 @@ namespace BossFight.Controllers
                 await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
             }
             else
-            {
-                var response = new Dictionary<string, string>
-                { 
-                    { "error_message", error }
-                };
-                var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
-                await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
-            }
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
         // player_id: "int", weapon_id: "int
@@ -94,14 +100,40 @@ namespace BossFight.Controllers
                 await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
             }
             else
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        }
+
+        // player_id: "int"
+        public async Task PlayerAttackMonsterWithEquippedWeapon(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            if (RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(pJsonParameters["player_id"].ToString(), out string error))
             {
-                var response = new Dictionary<string, string>
+                var player = new Player().FindOne(Convert.ToInt32(pJsonParameters["player_id"]));
+                var monster = new MonsterInstance { Active = true }.FindAll().First();
+                var summary = DamageDealer.PlayerAttackMonster(player, monster, true);
+                var response = new Dictionary<string, object>
                 { 
-                    { "error_message", error }
+                    { "player_attacked_monster_with_weapon", new Dictionary<string, PlayerAttackSummary>
+                        {
+                            { "summary", summary }
+                        } }
                 };
+
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
                 await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
             }
+            else
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        }
+
+        async private Task ReplyWithErrorMessage(WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket, string pError)
+        {
+            var response = new Dictionary<string, string>
+            { 
+                { "error_message", pError }
+            };
+            var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
+            await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
         }
     }
 }

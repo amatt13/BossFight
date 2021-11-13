@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using BossFight.Extentions;
 using Newtonsoft.Json;
 
 namespace BossFight.Models
@@ -7,11 +8,15 @@ namespace BossFight.Models
     public class WeaponType : PersistableBase, IPersist<WeaponType>
     {
         [JsonIgnore]
-        public override string TableName { get; set; } =  "WeaponType";
+        public override string TableName { get; set; } =  nameof(WeaponType);
+
         [JsonIgnore]
         public override string IdColumn { get; set; } = nameof(WeaponTypeId);
 
-        public int WeaponTypeId { get; private set; }
+        [PersistProperty(true)]
+        public int? WeaponTypeId { get; private set; }
+        
+        [PersistProperty]
         public string WeaponTypename { get; private set; }
 
         public WeaponType() { }

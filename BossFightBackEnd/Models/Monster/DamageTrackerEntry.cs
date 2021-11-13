@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace BossFight.Models
 {
     public class DamageTrackerEntry
@@ -24,22 +22,22 @@ namespace BossFight.Models
 
         public int GetDuration()
         {
-            return this._duration;
+            return _duration;
         }
 
         public int GetPlayerId()
         {
-            return this._player_id;
+            return _player_id;
         }
 
         public string GetPlayerName()
         {
-            return this._player_name;
+            return _player_name;
         }
 
         public int GetDamage()
         {
-            return this._damage;
+            return _damage;
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BossFight.CustemExceptions;
+using BossFight.Extentions;
 using BossFight.Models.Loot;
 using Newtonsoft.Json;
 
@@ -18,8 +19,8 @@ namespace BossFight.Models
         public override string IdColumn { get; set; } = nameof(PlayerId);
 
         // Persisted on Player table
-        [PersistPropertyAttribute]
-        public int PlayerId { get; set; }
+        [PersistPropertyAttribute(true)]
+        public int? PlayerId { get; set; }
 
         [PersistPropertyAttribute]
         public int Gold { get; set; }
@@ -32,13 +33,20 @@ namespace BossFight.Models
 
         [PersistPropertyAttribute]
         public int CurentPlayerClassId { get; set; }
+
+        [PersistPropertyAttribute]
+        public string UserName { get; set; }
+
+        [PersistPropertyAttribute]
+        [JsonIgnore]
+        public string Password { get; set; }
         
         // From other tables
         public PlayerPlayerClass PlayerPlayerClass { get; set; }
         public IEnumerable<PlayerPlayerClass> UnlockedPlayerPlayerClassList { get; set; }
-        public List<int> LootList { get; set; }  //TODO change to real loot list (combinded list -> see PlayerWeapon.cs)
+        public List<int?> LootList { get; set; }  //TODO change to real loot list (combinded list -> see PlayerWeapon.cs)
         public Weapon Weapon { get; set; }
-        public List<int> AutoSellList { get; set; }
+        public List<int?> AutoSellList { get; set; }
         public int Level { get => PlayerPlayerClass.Level; }
         public int BonusMagicDmg { get; set; }
         public int BonusMagicDmgDuration { get; set; }
@@ -70,10 +78,12 @@ namespace BossFight.Models
                 player.Mana = reader.GetInt(nameof(Mana));
                 player.CurentPlayerClassId = reader.GetInt(nameof(CurentPlayerClassId));
                 player.WeaponId = reader.GetInt(nameof(WeaponId));
+                player.UserName = reader.GetString(nameof(UserName));
+                player.Password = reader.GetString(nameof(Password));
                 
-                player.PlayerPlayerClass = new PlayerPlayerClass{Active = true}.FindOne(player.PlayerId);
+                player.PlayerPlayerClass = new PlayerPlayerClass{ Active = true, PlayerId = player.PlayerId }.FindAll().First();
                 player.PlayerPlayerClass.Player = player;
-                player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{}.FindAll(player.PlayerId);
+                player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{ PlayerId = player.PlayerId }.FindAll();
                 player.Weapon = new Weapon().FindOne(player.WeaponId);
 
                 player.PlayerWeaponList = new PlayerWeapon{ PlayerId =  player.PlayerId}.FindAll();
@@ -83,6 +93,23 @@ namespace BossFight.Models
             }
 
             return result;
+        }
+
+        public int CalckWeaponAttackDamage(MonsterInstance pTargetMonster, PlayerAttackSummary pPlayerAttackSummary)
+        {
+            var isCrit = pTargetMonster.AttackOnMonsterIsCrit(GetAttackCritChance());
+            var dmg = Weapon.AttackPower + GetAttackBonus();
+            if (BonusMagicDmgDuration > 0) 
+                BonusMagicDmgDuration -= 1;
+
+            if (isCrit)
+            {
+                dmg = (int)Math.Ceiling(1.25 * dmg);
+                pPlayerAttackSummary.PlayerCrit = true;
+            }
+
+            pPlayerAttackSummary.PlayerTotalDamage = dmg;
+            return dmg;
         }
 
         public void SubtractHealth(int pDamageToReceive)
@@ -143,7 +170,7 @@ namespace BossFight.Models
         public void EquipWeapon(int pWeaponId)
         {
             WeaponId = pWeaponId;
-            Persist(this.PlayerId);
+            Persist();
         }
 
         public bool HasEnoughManaForAbility(Ability pAbility)
@@ -173,14 +200,6 @@ namespace BossFight.Models
             var critChance = Weapon.SpellCritChance;
             critChance += PlayerPlayerClass.CritChance;
             return critChance;
-        }
-
-        public bool PlayerAttackIsCrit(int pBonusCritChance = 0)
-        {
-            var critChance = GetAttackCritChance();
-            critChance += pBonusCritChance;
-            var roll = _random.Next(0, 101);
-            return roll <= critChance;
         }
 
         public bool PlayerSpellIsCrit(int pBonusCritChance = 0)
@@ -226,41 +245,7 @@ namespace BossFight.Models
             return durationSubtracted;
         }
 
-        public AttackMessage AttackMonsterWithWeapon(MonsterTemplate pTargetMonster, Weapon pPlayerWeapon, bool pRetaliate = true)
-        {
-            var bonusCritChance = 0;
-            if (pTargetMonster.EasierToCritDuration > 0)
-            {
-                bonusCritChance = pTargetMonster.EasierToCritPercentage;
-                pTargetMonster.EasierToCritPercentage -= 1;
-            }
-            var isCrit = PlayerAttackIsCrit(bonusCritChance);
-            var damageDealt = pTargetMonster.ReceiveDamageFromPlayer(this, pPlayerWeapon, isCrit);
-            var Tup1 = pTargetMonster.ReceiveDamageFromDamageOverTimeEffects();
-            int totalDamageOverTime = Tup1.Item1;
-            List<string> playersThatDealtDamageOverTime = Tup1.Item2;
-            var xpEarned = GenralHelperFunctions.CalculateExperienceFromDamageDealtToMonster(damageDealt, pTargetMonster);
-            GainXp(xpEarned, pTargetMonster.Level);
-            var attackMessage = new AttackMessage(this, pTargetMonster);
-            attackMessage.PlayerCrit = isCrit;
-            attackMessage.WeaponAttackMessage = $"{ pPlayerWeapon.AttackMessage } and dealt **{ damageDealt } **damage!";
-            attackMessage.PlayerXpEarned = xpEarned;
-            if (pTargetMonster.IsAlive() && pRetaliate)
-            {
-                attackMessage.MonsterRetaliateMessage = pTargetMonster.DealDamageToPlayer(this);
-            }
-            if (SubtractBonusMagicDmgDuration(1))
-            {
-                attackMessage.PlayerExtraDamageFromBuffs = true;
-            }
-            if (playersThatDealtDamageOverTime.Any())
-            {
-                attackMessage.MonsterAffectedByDots = $"Monster took an additional { totalDamageOverTime } damage from various spell effects by { String.Join(", ", from p in playersThatDealtDamageOverTime select p) }";
-            }
-            return attackMessage;
-        }
-
-        public void AddLoot(int pLootToAdd)
+        public void AddLoot(int? pLootToAdd)
         {
             if (LootIsInAutoSellList(pLootToAdd))
             {
@@ -276,7 +261,7 @@ namespace BossFight.Models
 
         public void AddLoot(LootItem pLootToAdd)
         {
-            int lootId = pLootToAdd.LootId;
+            var lootId = pLootToAdd.LootId;
             AddLoot(lootId);
         }
 
@@ -287,7 +272,7 @@ namespace BossFight.Models
             return $"You sold '{ pLootToSell.LootName }' for { sellPrice } gold";
         }
 
-        public bool LootIsInAutoSellList(int pLootId)
+        public bool LootIsInAutoSellList(int? pLootId)
         {
             return AutoSellList.Contains(pLootId);
         }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using BossFight.Extentions;
 using MySqlConnector;
 using Newtonsoft.Json;
 
@@ -8,12 +9,15 @@ namespace BossFight.Models
     public class PlayerClassWeaponProficiency : PersistableBase, IPersist<PlayerClassWeaponProficiency>
     {
         [JsonIgnore]
-        public override string TableName { get; set; } = "PlayerClassWeaponProficiency";
+        public override string TableName { get; set; } = nameof(PlayerClassWeaponProficiency);
         [JsonIgnore]
         public override string IdColumn { get; set; } = nameof(PlayerClassId);
 
         // Persisted on PlayerClassWeaponProficiency table
-        public int PlayerClassId { get; set; }
+        [PersistPropertyAttribute]
+        public int? PlayerClassId { get; set; }
+
+        [PersistPropertyAttribute]
         public int WeaponTypeId { get; set; }
 
         // From other tables

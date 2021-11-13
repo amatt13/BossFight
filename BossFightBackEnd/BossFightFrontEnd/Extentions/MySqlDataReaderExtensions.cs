@@ -1,7 +1,7 @@
 using System;
 using MySqlConnector;
 
-namespace BossFight.Models
+namespace BossFight.Extentions
 {
     public static class MySqlDataReaderExtensions
     {

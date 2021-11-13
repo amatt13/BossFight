@@ -12,7 +12,7 @@
 		height: 20px;
 	}
 	progress::-webkit-progress-bar {
-		background-color: #eee;
+		background-color: hsl(256, 15%, 14%);
 		border-radius: 2px;
 		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
 	}
@@ -22,9 +22,9 @@
 		background-size: 35px 20px, 100% 100%, 100% 100%;
 	}
 	
-		progress.mana-progress::-webkit-progress-value 
+	progress.mana-progress::-webkit-progress-value 
 	{
-		background-color: midnightblue;
+		background-color: steelblue;
 	}
 
 	Body
@@ -53,6 +53,23 @@
 		background-color: #DEF;
 	}
 
+	.btn-primary {
+		background-color: hsl(256, 13%, 28%);
+		color: hsl(256, 15%, 14%);
+	}
+
+	input {
+		background-color: hsl(318, 11%, 35%);
+	}
+
+	textarea {
+		background-color: hsl(318, 11%, 35%);
+	}
+
+	select {
+		background-color: hsl(318, 11%, 35%);
+	}
+
 	* {
 		font-family: myFirstFont;
 		font-size: 18px;
@@ -60,14 +77,23 @@
 	</style>
 	<title>Boss Fight</title>
 </head>
-<body style="background-color:	hsl(235, 22%, 20%); ">
+<body style="background-color:	hsl(235, 22%, 20%);">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> <!-- allow jquery -->
-	<div class="text-center">
-		<h1 class="display-4" style="font-size: 60px;">
-			Boss Fight
-		</h1>
+	<!-- Login controls -->
+	<div style="float: right;  display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px;">
+		<label style="grid-column: 1; grid-row: 1;">User name: </label>
+		<label style="grid-column: 1; grid-row: 2;">Password: </label>
+		<input id="input_user_name" style="grid-column: 2; grid-row: 1;"/>
+		<input id="input_password" style="grid-column: 2; grid-row: 2;"/>
+		<button type="button" class="btn btn-primary btn-md" style="grid-column: 1/3; grid-row: 3;" onclick="AttackMonster()">
+			Login
+		</button>
 	</div>
-	<div class="row" style="width: 100%; display: flex; lign-items:flex-end;">
+	<!-- Title -->
+	<h1 class="display-4" style="font-size: 60px; margin-top: 0px;">
+		Boss Fight
+	</h1>
+	<div class="row" style="width: 100%; display: flex;">
 		<!-- Canvas/Left column -->
 		<div class="column" style="float:left; flex: 24%; border: solid; color: hsl(256, 13%, 28%);">
 			<canvas id="mainCanvas">
@@ -118,6 +144,12 @@
 						Login "Test User2"
 					</button>
 				</div>
+				<div style="grid-column: 1; grid-row: 10;">
+					<button type="button" class="btn btn-primary btn-md" onclick="AttackMonster()">
+						Attack Monster
+					</button>
+				</div>
+				<!-- Player inventory -->
 				<div style="grid-column: 2; grid-row: 1/20;">
 					<select id="player_inventory" size="1" style="flex-grow:1; float:left; width: 95%;"></select>
 				</div>

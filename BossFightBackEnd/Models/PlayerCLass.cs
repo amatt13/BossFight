@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BossFight.BossFightEnums;
 using BossFight.CustemExceptions;
+using BossFight.Extentions;
 using Newtonsoft.Json;
 
 namespace BossFight.Models
@@ -15,17 +16,40 @@ namespace BossFight.Models
         public override string IdColumn { get; set; } = nameof(PlayerClassId);
 
         // Persisted on PlayerClass table
-        public int PlayerClassId { get; set; }
+        [PersistPropertyAttribute(true)]
+        public int? PlayerClassId { get; set; }
+
+        [PersistPropertyAttribute]
         public string Name { get; set; }
+
+        [PersistPropertyAttribute]
         public double HpScale { get; set; }
+
+        [PersistPropertyAttribute]
         public double ManaScale { get; set; }
+
+        [PersistPropertyAttribute]
         public int PurchasePrice { get; set; }
+
+        [PersistPropertyAttribute]
         public int CritChance { get; set; }
+
+        [PersistPropertyAttribute]
         public int HpRegenRate { get; set; }
+
+        [PersistPropertyAttribute]
         public int ManaRegenRate { get; set; }
+
+        [PersistPropertyAttribute]
         public int AttackPowerBonus { get; set; }
+        
+        [PersistPropertyAttribute]
         public int SpellPowerBonus { get; set; }
+
+        [PersistPropertyAttribute]
         public int BaseHealth { get; set; }
+
+        [PersistPropertyAttribute]
         public int BaseMana { get; set; }
 
         // From other tables

@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using BossFight.Extentions;
 using BossFight.Models;
 using MySqlConnector;
 
@@ -23,7 +24,7 @@ namespace BossFight.Controllers
                     player owns weapon (and it is not equipped)
                     player owns at least two coppies of weapon and it is equipped
                 */
-                var sql = @$"SELECT
+                cmd.CommandText = @$"SELECT
 CASE 
 	WHEN p.WeaponId != pw.WeaponId 
 		THEN TRUE
@@ -37,19 +38,9 @@ JOIN { nameof(Player) } p
 WHERE pw.PlayerId = @player_id
 AND pw.WeaponId = @weapon_id
 GROUP BY pw.WeaponId";
-                cmd.CommandText = sql;
-                cmd.Parameters.Add(new MySqlParameter
-                {
-                    ParameterName = "@player_id",
-                    DbType = DbType.Int32,
-                    Value = playerId.ToString(),
-                });
-                cmd.Parameters.Add(new MySqlParameter
-                {
-                    ParameterName = "@weapon_id",
-                    DbType = DbType.Int32,
-                    Value = weaponID.ToString(),
-                });
+
+                cmd.Parameters.AddParameter(playerId, "@player_id");
+                cmd.Parameters.AddParameter(weaponID, "@weapon_id");
                 var reader = cmd.ExecuteReader();
                 reader.Read();
                 playerCanSellWeapon = reader.GetBooleanNullable("CanSell").GetValueOrDefault(false);
@@ -83,7 +74,7 @@ GROUP BY pw.WeaponId";
                 return true if:
                     player owns weapon (and it is not equipped)
                 */
-                var sql = @$"SELECT
+                cmd.CommandText = @$"SELECT
 CASE 
 	WHEN p.WeaponId != pw.WeaponId 
 		THEN TRUE
@@ -95,19 +86,9 @@ JOIN { nameof(Player) } p
 WHERE pw.PlayerId = @player_id
 AND pw.WeaponId = @weapon_id
 GROUP BY pw.WeaponId";
-                cmd.CommandText = sql;
-                cmd.Parameters.Add(new MySqlParameter
-                {
-                    ParameterName = "@player_id",
-                    DbType = DbType.Int32,
-                    Value = playerId.ToString(),
-                });
-                cmd.Parameters.Add(new MySqlParameter
-                {
-                    ParameterName = "@weapon_id",
-                    DbType = DbType.Int32,
-                    Value = weaponID.ToString(),
-                });
+
+                cmd.Parameters.AddParameter(playerId, "@player_id");
+                cmd.Parameters.AddParameter(weaponID, "@weapon_id");
                 var reader = cmd.ExecuteReader();
                 reader.Read();
                 playerCanEquipWeapon = reader.GetBooleanNullable("CanEquip").GetValueOrDefault(false);
@@ -124,6 +105,47 @@ GROUP BY pw.WeaponId";
                 pError = $"player ({ pPlayerId }) or weapon id ({ pWeaponId }) is not a valid id";
 
             return playerCanEquipWeapon;
+        }
+
+        public static bool PlayerCanAttackMonsterWithEquippedWeapon(string pPlayerId, out string pError)
+        {
+            var playerCanAttackMonsterWithEquippedWeapon = false;
+            var parsed = int.TryParse(pPlayerId, out int playerId);
+
+            if (parsed)
+            {
+                using var connection = GlobalConnection.GetNewOpenConnection();
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = $@"SELECT 
+	p.Hp > 0 AND p.{ nameof(Player.WeaponId) } IS NOT NULL AND mi.{ nameof(MonsterInstance.MonsterInstanceId) } IS NOT NULL AND mi.Hp > 0 as ""can attack"",
+	CASE 
+		WHEN p.Hp <= 0
+			THEN 'Not enough health'
+		WHEN p.WeaponId IS NULL
+			THEN 'No weapon equpped'
+		WHEN mi.MonsterInstanceId IS NULL
+			THEN 'No active monster to attack'
+		WHEN mi.Hp <= 0
+			THEN 'Monster is already dead'
+	END AS error
+FROM Player p 
+LEFT JOIN MonsterInstance mi 
+	ON mi.Active = TRUE 
+WHERE p.PlayerId = @{ nameof(playerId) }";
+                
+                cmd.Parameters.AddParameter(playerId, nameof(playerId));
+                var reader = cmd.ExecuteReader();
+                reader.Read();
+                playerCanAttackMonsterWithEquippedWeapon = reader.GetBooleanNullable("can attack").GetValueOrDefault(false);
+                pError = reader.IsDBNull("error") ? String.Empty : reader.GetString("error");
+                reader.Close();
+                connection.Close();
+            }
+            else
+                pError = $"player ({ pPlayerId }) is not a valid id";
+
+            return playerCanAttackMonsterWithEquippedWeapon;
         }
     }
 }

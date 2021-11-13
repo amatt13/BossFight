@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BossFight.Extentions;
 using MySqlConnector;
 using Newtonsoft.Json;
 
@@ -14,8 +15,8 @@ namespace BossFight.Models
         public override string IdColumn { get; set; } = nameof(PlayerWeaponId);
 
         // Persisted on PlayerWeapon table
-        [PersistPropertyAttribute]
-        public int PlayerWeaponId { get; set; }
+        [PersistPropertyAttribute(true)]
+        public int? PlayerWeaponId { get; set; }
 
         [PersistPropertyAttribute]
         public int? PlayerId { get; set; }
@@ -26,8 +27,10 @@ namespace BossFight.Models
         // From other tables
         [JsonIgnore]
         public Player Player { get; set; }  // player that owns the weapon
+
         [JsonIgnore]
         public Weapon Weapon { get; set; }
+
         public string WeaponName { get => Weapon.LootName; }
 
         public PlayerWeapon () { }
@@ -78,8 +81,8 @@ namespace BossFight.Models
         {
             Player.Gold += Weapon.GetSellPrice();
             Player.PlayerWeaponList = Player.PlayerWeaponList.Remove(x => x.PlayerWeaponId == this.PlayerWeaponId);
-            Player.Persist(Player.PlayerId);
-            Delete(PlayerWeaponId);
+            Player.Persist();
+            Delete(PlayerWeaponId.Value);
         }
     }
 }

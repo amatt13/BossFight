@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using BossFight.Extentions;
 using MySqlConnector;
 using Newtonsoft.Json;
 
@@ -8,20 +9,27 @@ namespace BossFight.Models
     public class PlayerClassRequirement : PersistableBase, IPersist<PlayerClassRequirement>
     {
         [JsonIgnore]
-        public override string TableName { get; set; } = "PlayerClassRequirement";
+        public override string TableName { get; set; } = nameof(PlayerClassRequirement);
         [JsonIgnore]
         public override string IdColumn { get; set; } = nameof(PlayerClassId);
 
         // Persisted on PlayerClassRequirement table
-        public int PlayerClassId { get; set; }  // "owner"
+        [PersistPropertyAttribute]
+        public int? PlayerClassId { get; set; }  // "owner"
+
+        [PersistPropertyAttribute]
         public int RequiredPlayerClassId { get; set; }  // Nedded class
+
+        [PersistPropertyAttribute]
         public int LevelRequirement {get; set;}
 
         // From other tables
         [JsonIgnore]
         public PlayerClass PlayerClass { get; set; }
+
         [JsonIgnore]
         public PlayerClass RequiredPlayerClass { get; set; }
+        
         public string RequiredPlayerClassName { get => RequiredPlayerClass.Name; }
 
         public PlayerClassRequirement () { }

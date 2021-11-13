@@ -1,17 +1,14 @@
 using System;
 using System.Linq;
-using BossFight.Models.DB;
-using MySqlConnector;
 
 namespace BossFight.Models
 {
     public abstract class Target : PersistableBase
-    {
+    {       
+        [PersistPropertyAttribute]
         public int Hp { get; set; }
-        public string Name { get; set; }
-        public override string TableName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public override string IdColumn { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public virtual string Name { get; set; }
 
         public Target(int pHP = 1, string pName = "No name")
         {
@@ -39,7 +36,7 @@ namespace BossFight.Models
             return Hp >= GetMaxHp();
         }
 
-        public virtual object PossessiveName()
+        public string PossessiveName()
         {
             if (Name.Last() == 's')
             {

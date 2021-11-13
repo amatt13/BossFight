@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BossFight.Models
+namespace BossFight.Extentions
 {
     public static class IEnumerableExtensions
     {

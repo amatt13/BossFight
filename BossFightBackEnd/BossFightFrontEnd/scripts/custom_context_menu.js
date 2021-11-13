@@ -66,7 +66,6 @@ async function EquipWeapon(weapon_id_to_equip) {
 		})
 	};
 	const json_obj = JSON.stringify(obj);
-	LogToTextLog("Sending equip text");
 	socket.send(json_obj);
 }
 
@@ -79,6 +78,5 @@ async function SellWeapon(weapon_id_to_equip) {
 		})
 	};
 	const json_obj = JSON.stringify(obj);
-	LogToTextLog("Sending sell text");
 	socket.send(json_obj);
 }

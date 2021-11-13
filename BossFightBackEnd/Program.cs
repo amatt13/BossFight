@@ -1,5 +1,4 @@
 using System;
-using BossFight.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
