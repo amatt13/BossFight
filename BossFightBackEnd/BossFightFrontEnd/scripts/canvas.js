@@ -1,14 +1,20 @@
-function init() {
-	window.requestAnimationFrame(ts_draw);
-}
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+var monsterImage = new Image();
+monsterImage.src = "images/sprites/monsters/goblin.png";
+let initialMonsterImageX = 30, initialMMonsterImageY = -1;
+
+monsterImage.addEventListener("load", () => {
+	initialMMonsterImageY += monsterImage.height;
+	ctx.drawImage(monsterImage, initialMonsterImageX, initialMMonsterImageY);
+});
 
 function ts_draw() {
 	Draw()
 	window.requestAnimationFrame(ts_draw);
 }
 
-init();
-
+window.requestAnimationFrame(ts_draw);
 
 function ReSizeCanvas() {
 	if (canvas.width != Math.floor(window.innerWidth * 0.25) || canvas.height != Math.floor(window.innerHeight * 0.90)) {
@@ -20,14 +26,21 @@ function ReSizeCanvas() {
 	}
 }
 
+function ResetFont() {
+	ctx.font = "30px myFirstFont";
+}
+
 function Draw() {
 	ReSizeCanvas();  // MUST be the first thing that happens
 	ctx.fillStyle = "hsl(349, 19%, 45%)"
-	ctx.font = "30px myFirstFont";
+	ResetFont();
 	ctx.globalCompositeOperation = 'destination-over';
 	ctx.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
 	AnimateMonster();
 	DrawMonsterStatus();
+	if (_enable_damage_to_show) {
+		DrawDamage();
+	}
 }
 
 let monsterImageX = initialMonsterImageX, monsterImageY = initialMMonsterImageY;
@@ -68,6 +81,21 @@ function DrawMonsterStatus() {
 	var monster_name_y = monsterImageY + monsterImage.height + 30;
 	var monster_name_x = monsterImageX;
 	ctx.fillText(`${ _monster1.monster_name } lvl <${ _monster1.level }>`, monster_name_x, monster_name_y);
+}
+
+let _damage_to_show;
+let _enable_damage_to_show = false;
+function DrawDamage() {
+	var monster_name_y = monsterImageY + monsterImage.height - 100;
+	var monster_name_x = monsterImageX;
+	ctx.font = "60px myFirstFont";
+	ctx.fillText(`${ _damage_to_show }!`, monster_name_x, monster_name_y);
+}
+
+function CanvasShowDamageAnimation(damage) {
+	_damage_to_show = damage;
+	_enable_damage_to_show = true;  
+	setInterval(() => {_enable_damage_to_show = false;}, 3000); // set to 5000 for crit
 }
 
 // function DebuffsString()

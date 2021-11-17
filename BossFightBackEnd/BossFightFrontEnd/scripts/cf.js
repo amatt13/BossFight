@@ -1,15 +1,4 @@
-const canvas = document.getElementById('mainCanvas');
-const ctx = canvas.getContext('2d');
-var monsterImage = new Image();
-monsterImage.src = "images/sprites/monsters/goblin.png";
-let initialMonsterImageX = 30, initialMMonsterImageY = -1;
-
-monsterImage.addEventListener("load", () => {
-	initialMMonsterImageY += monsterImage.height;
-	ctx.drawImage(monsterImage, initialMonsterImageX, initialMMonsterImageY);
-});
-
-
+//let socket = new WebSocket("ws://185.126.108.48:5000/ws");
 let socket = new WebSocket("ws://localhost:5000/ws");
 
 socket.onopen = function (e) {
@@ -102,20 +91,20 @@ function LogToTextLog(pText, blink = false) {
 	}
 }
 
-function ReadPlayerMessage(json_dict) {
-	var weapon_dict = json_dict["Weapon"];
+function ReadPlayerMessage(playerDict_dict) {
+	var weapon_dict = playerDict_dict["Weapon"];
 	var weapon = CreateWeaponFromWeaponDict(weapon_dict);
 
-	var player_player_class_dict = json_dict["PlayerPlayerClass"];
-	var player_player_class = new PlayerPlayerClass(player_player_class_dict["XP"], player_player_class_dict["Level"], player_player_class_dict["MaxHp"], player_player_class_dict["MaxMana"], player_player_class_dict["PlayerClassName"],);
+	var player_player_class_dict = playerDict_dict["PlayerPlayerClass"];
+	var player_player_class = new PlayerPlayerClass(player_player_class_dict["XP"], player_player_class_dict["Level"], player_player_class_dict["MaxHp"], player_player_class_dict["MaxMana"], player_player_class_dict["PlayerClassName"]);
 
 	var player_weapon_list = [];
-	var player_weapon_dict = json_dict["PlayerWeaponList"];
+	var player_weapon_dict = playerDict_dict["PlayerWeaponList"];
 	player_weapon_dict.forEach(pw => {
 		player_weapon_list.push(new PlayerWeapon(pw["WeaponId"], pw["WeaponName"]))
 	});
 
-	_player = new Player(json_dict["PlayerId"], json_dict["Name"], json_dict["Hp"], json_dict["Mana"], json_dict["Gold"], weapon, player_player_class, player_weapon_list, json_dict["UserName"]);
+	_player = new Player(playerDict_dict["PlayerId"], playerDict_dict["Name"], playerDict_dict["Hp"], playerDict_dict["Mana"], playerDict_dict["Gold"], weapon, player_player_class, player_weapon_list, playerDict_dict["UserName"]);
 	UpdateUiPlayerStats(_player);
 }
 
@@ -127,8 +116,7 @@ function CreateWeaponFromWeaponDict(weapon_dict) {
 }
 
 function UpdateUiActiveMonster(monster_dict) {
-	_monster1 = new Monster(monster_dict["Hp"], monster_dict["MaxHp"], monster_dict["Level"], monster_dict["Name"], monster_dict["IsBossMonster"], monster_dict["MonsterInstanceId"], monster_dict["BlindDuration"],
-		monster_dict["EaserToCritDuration"], monster_dict["EaserToCritPercentage"], monster_dict["LowerAttackDuration"], monster_dict["LowerAttackPercentage"], monster_dict["StunDuration"], monster_dict["AttackStrength"])
+	_monster1 = CreateMonsterFromDict(monster_dict);
 }
 
 function UpdateUiPlayerStats(player) {
@@ -186,19 +174,22 @@ function UpdateUiPlayerSoldWeapon(json_dict) {
 	RepopulatePlayerInventory();
 }
 
-function UpdateUiPlayerEquippedWeapon(json_dict) {
-	var weapon_dict = json_dict["Weapon"];
+function UpdateUiPlayerEquippedWeapon(weapon_dict) {
 	var weapon = CreateWeaponFromWeaponDict(weapon_dict);
 	_player.weapon = weapon;
 	document.getElementById("player_equipped_weapon_name").innerHTML = _player.weapon.loot_name;
 	BlinkDiv("player_equipped_weapon_name");
 }
 
-function UpdateUiPlayerAttackedMonsterWithWeapon(json_dict) {
-	var summary_dict = json_dict["summary"];
+function UpdateUiPlayerAttackedMonsterWithWeapon(summary_dict) {
 	var monster_dict = summary_dict["Monster"];
-	_monster1 = new Monster(monster_dict["Hp"], monster_dict["MaxHp"], monster_dict["Level"], monster_dict["Name"], monster_dict["IsBossMonster"], monster_dict["MonsterInstanceId"], monster_dict["BlindDuration"],
-		monster_dict["EaserToCritDuration"], monster_dict["EaserToCritPercentage"], monster_dict["LowerAttackDuration"], monster_dict["LowerAttackPercentage"], monster_dict["StunDuration"], monster_dict["AttackStrength"])
+	UpdateUiActiveMonster(monster_dict);
+	var player_dict = summary_dict["Player"];
+	ReadPlayerMessage(player_dict);
+	BlinkDiv("player_xp");
+	var monster_message = summary_dict["MonsterRetaliateMessage"];
+	LogToTextLog(monster_message);
+	CanvasShowDamageAnimation(summary_dict["PlayerTotalDamage"]);
 }
 
 function BlinkDiv(div_id, color = 'yellow') {
@@ -208,6 +199,11 @@ function BlinkDiv(div_id, color = 'yellow') {
 	var t = setTimeout(function () {
 		element.style.backgroundColor = origcolor;
 	}, (1 * 1000));
+}
+
+function CreateMonsterFromDict(monster_dict) {
+	return new Monster(monster_dict["Hp"], monster_dict["MaxHp"], monster_dict["Level"], monster_dict["Name"], monster_dict["IsBossMonster"], monster_dict["MonsterInstanceId"], monster_dict["BlindDuration"],
+	monster_dict["EaserToCritDuration"], monster_dict["EaserToCritPercentage"], monster_dict["LowerAttackDuration"], monster_dict["LowerAttackPercentage"], monster_dict["StunDuration"], monster_dict["AttackStrength"])
 }
 
 class Player {

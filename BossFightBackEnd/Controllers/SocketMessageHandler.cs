@@ -29,7 +29,8 @@ namespace BossFight.Controllers
             await (Task)this.GetType().GetMethod(handler).Invoke(this, new object[] { dataJsonDictionary, pWebSocketReceiveResult, pWebSocket });
         }
 
-        // no data
+        // takes: no data
+        // returns: monster
         public async Task FetchActiveMonster(Dictionary<string, object> _, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var monster = new MonsterInstance{ Active = true }.FindAll().First();
@@ -42,7 +43,8 @@ namespace BossFight.Controllers
             await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
         }
 
-        // player_id: "int"
+        // takes: player_id: "int"
+        // returns: player
         public async Task FetchPlayer(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var player = new Player().FindOne(Convert.ToInt32(pJsonParameters["player_id"]));
@@ -55,7 +57,8 @@ namespace BossFight.Controllers
             await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
         }
 
-        // player_id: "int", weapon_id: "int"
+        // takes: player_id: "int", weapon_id: "int"
+        // returns: dict => gold, weapons
         public async Task SellWeapon(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             if (RequestValidator.PlayerCanSellWeapon(pJsonParameters["player_id"].ToString(), pJsonParameters["weapon_id"].ToString(), out string error))
@@ -80,7 +83,8 @@ namespace BossFight.Controllers
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
-        // player_id: "int", weapon_id: "int
+        // takes: player_id: "int", weapon_id: "int
+        // returns: weapon
         public async Task EquipWeapon(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             if (RequestValidator.PlayerCanEquipWeapon(pJsonParameters["player_id"].ToString(), pJsonParameters["weapon_id"].ToString(), out string error))
@@ -91,10 +95,7 @@ namespace BossFight.Controllers
                 
                 var response = new Dictionary<string, object>
                 { 
-                    { "update_player_equipped_weapon", new Dictionary<string, Weapon>
-                        {
-                            { "Weapon", player.PlayerWeaponList.First(pw => pw.WeaponId == weaponId).Weapon }
-                        } }
+                    { "update_player_equipped_weapon", player.PlayerWeaponList.First(pw => pw.WeaponId == weaponId).Weapon }
                 };
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
                 await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
@@ -103,7 +104,8 @@ namespace BossFight.Controllers
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
-        // player_id: "int"
+        // takes: player_id: "int"
+        // returns: PlayerAttackSummary
         public async Task PlayerAttackMonsterWithEquippedWeapon(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             if (RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(pJsonParameters["player_id"].ToString(), out string error))
@@ -111,12 +113,9 @@ namespace BossFight.Controllers
                 var player = new Player().FindOne(Convert.ToInt32(pJsonParameters["player_id"]));
                 var monster = new MonsterInstance { Active = true }.FindAll().First();
                 var summary = DamageDealer.PlayerAttackMonster(player, monster, true);
-                var response = new Dictionary<string, object>
+                var response = new Dictionary<string, PlayerAttackSummary>
                 { 
-                    { "player_attacked_monster_with_weapon", new Dictionary<string, PlayerAttackSummary>
-                        {
-                            { "summary", summary }
-                        } }
+                    { "player_attacked_monster_with_weapon", summary }
                 };
 
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));

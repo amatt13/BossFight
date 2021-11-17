@@ -16,9 +16,7 @@ namespace BossFight
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddTransient<AppDb>(_ => new AppDb(Configuration["ConnectionStrings:DefaultConnection"]));
             GlobalConnection.ConnString = Configuration["ConnectionStrings:DefaultConnection"];
-            //GlobalConnection.AppDb = new AppDb(Configuration["ConnectionStrings:DefaultConnection"]);
             services.AddControllers();
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {

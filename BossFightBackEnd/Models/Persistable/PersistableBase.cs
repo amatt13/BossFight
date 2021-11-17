@@ -99,9 +99,9 @@ namespace BossFight.Models
                 var setString = "SET ";
                 setString += String.Join(",\n ", propsToPersist  // don't persist IdCoulm if it already has a value
                                                                 .Where(prop => !((prop.GetCustomAttributes(true).First(x => x is PersistPropertyAttribute) as PersistPropertyAttribute).IsIdProperty && prop.GetValue(this) != null))
-                                                                .Select(p => $"{ p.Name } = { p.GetValue(this) }"));  //TODO use parameters instead?
+                                                                .Select(p => $"{ p.Name } = { p.GetValue(this).ToDbString() }"));  //TODO use parameters instead?
                 cmd.CommandText = $"{ updateTableString }\n{ setString }\n{ whereString }\nLIMIT 1";
-                cmd.Parameters.AddParameter(id, nameof(id));
+                cmd.Parameters.AddParameter(id, "@id");
                 cmd.ExecuteNonQuery();
                 connection.Close();
             }
