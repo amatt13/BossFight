@@ -1,34 +1,20 @@
 const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
 var monsterImage = new Image();
+var playerImage = document.getElementById("playerSprite");
 monsterImage.src = "images/sprites/monsters/goblin.png";
-let initialMonsterImageX = 30, initialMMonsterImageY = -1;
+let initialMonsterImageX = 30, initialMonsterImageY = -1;
 
 monsterImage.addEventListener("load", () => {
-	initialMMonsterImageY += monsterImage.height;
-	ctx.drawImage(monsterImage, initialMonsterImageX, initialMMonsterImageY);
+	initialMonsterImageY += monsterImage.height;
+	ctx.drawImage(monsterImage, initialMonsterImageX, initialMonsterImageY);
 });
 
-function ts_draw() {
-	Draw()
-	window.requestAnimationFrame(ts_draw);
-}
+playerImage.addEventListener("load", () => {
+	ctx.drawImage(playerImage, canvas.width-playerImage.width, initialMonsterImageY);
+});
 
-window.requestAnimationFrame(ts_draw);
-
-function ReSizeCanvas() {
-	if (canvas.width != Math.floor(window.innerWidth * 0.25) || canvas.height != Math.floor(window.innerHeight * 0.90)) {
-		canvas.width = Math.floor(window.innerWidth * 0.25);
-		canvas.height = Math.floor(window.innerHeight * 0.90);
-		initialMMonsterImageY = canvas.height / 2;
-		monsterImageX = initialMonsterImageX, monsterImageY = initialMMonsterImageY;
-		monsterImageMoveForward = true, monsterImageMoveDown = false;
-	}
-}
-
-function ResetFont() {
-	ctx.font = "30px myFirstFont";
-}
+window.requestAnimationFrame(Draw);
 
 function Draw() {
 	ReSizeCanvas();  // MUST be the first thing that happens
@@ -38,16 +24,33 @@ function Draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
 	AnimateMonster();
 	DrawMonsterStatus();
+	AnimatePlayer();
 	if (_enable_damage_to_show) {
 		DrawDamage();
 	}
+
+	window.requestAnimationFrame(Draw);
 }
 
-let monsterImageX = initialMonsterImageX, monsterImageY = initialMMonsterImageY;
+function ReSizeCanvas() {
+	if (canvas.width != Math.floor(window.innerWidth * 0.33) || canvas.height != Math.floor(window.innerHeight * 0.90)) {
+		canvas.width = Math.floor(window.innerWidth * 0.33);
+		canvas.height = Math.floor(window.innerHeight * 0.90);
+		initialMonsterImageY = canvas.height / 2;
+		monsterImageX = initialMonsterImageX, monsterImageY = initialMonsterImageY;
+		monsterImageMoveForward = true, monsterImageMoveDown = false;
+	}
+}
+
+function ResetFont() {
+	ctx.font = "30px myFirstFont";
+}
+
+let monsterImageX = initialMonsterImageX, monsterImageY = initialMonsterImageY;
 let monsterImageMoveForward = true, monsterImageMoveDown = false;
 function AnimateMonster() {
-	if (initialMMonsterImageY == -1)
-		initialMMonsterImageY = canvas.height / 2;
+	if (initialMonsterImageY == -1)
+		initialMonsterImageY = canvas.height / 2;
 
 	if (monsterImageX >= initialMonsterImageX + 150) {
 		monsterImageMoveForward = false;
@@ -56,17 +59,28 @@ function AnimateMonster() {
 		monsterImageMoveForward = true;
 	}
 
-	if (monsterImageY <= initialMMonsterImageY - 50) {
+	if (monsterImageY <= initialMonsterImageY - 50) {
 		monsterImageMoveDown = true;
 	}
-	else if (monsterImageY >= initialMMonsterImageY) {
+	else if (monsterImageY >= initialMonsterImageY) {
 		monsterImageMoveDown = false;
 	}
 
 	monsterImageX = monsterImageMoveForward ? monsterImageX + 0.5 : monsterImageX - 0.5;
 	monsterImageY = monsterImageMoveDown ? monsterImageY + 0.5 : monsterImageY - 0.5;
 
-	ctx.drawImage(monsterImage, monsterImageX, monsterImageY);
+	montserBonusSize = _monster1?.level;
+	if (montserBonusSize === undefined) {
+		montserBonusSize = 0;
+	}
+	else {
+		montserBonusSize *= 3;
+	}
+	ctx.drawImage(monsterImage, monsterImageX, monsterImageY, 75 + montserBonusSize, 75 + montserBonusSize);
+}
+
+function AnimatePlayer() {
+	ctx.drawImage(playerImage, canvas.width-playerImage.width, initialMonsterImageY, 100, 100);
 }
 
 function DrawMonsterStatus() {

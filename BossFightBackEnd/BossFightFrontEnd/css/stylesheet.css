@@ -2,3 +2,124 @@
 	font-family: myFirstFont;
 	src: url("./RPGSystem.ttf");
 }
+
+progress[value] {
+	/* Reset the default appearance */
+	-webkit-appearance: none;
+	appearance: none;
+	height: 20px;
+}
+progress::-webkit-progress-bar {
+	background-color: hsl(256, 15%, 14%);
+	border-radius: 2px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+}
+progress::-webkit-progress-value {
+	background-color: crimson;
+	border-radius: 2px; 
+	background-size: 35px 20px, 100% 100%, 100% 100%;
+}
+
+progress.mana-progress::-webkit-progress-value 
+{
+	background-color: steelblue;
+}
+
+Body
+{
+	color:hsl(349, 19%, 45%);
+}
+.custom-menu {
+	display: none;
+	z-index: 1000;
+	position: absolute;
+	overflow: hidden;
+	border: 1px solid #CCC;
+	white-space: nowrap;
+	font-family: sans-serif;
+	background: #FFF;
+	color: #333;
+	border-radius: 5px;
+}
+
+.custom-menu li {
+	padding: 8px 12px;
+	cursor: pointer;
+}
+
+.custom-menu li:hover {
+	background-color: #DEF;
+}
+
+.btn-primary {
+	background-color: hsl(256, 13%, 28%);
+	color: hsl(256, 15%, 14%);
+}
+
+.buy-button {
+	margin-left: 15px;
+	margin-bottom: 10px;
+}
+
+.buy-label {
+	margin-left: 5px;
+}
+
+input {
+	background-color: hsl(318, 11%, 35%);
+}
+
+textarea {
+	background-color: hsl(318, 11%, 35%);
+}
+
+select {
+	background-color: hsl(318, 11%, 35%);
+}
+
+.modal-dialog {
+	background-color: hsl(235, 22%, 20%);
+	color: hsl(349, 19%, 45%);
+	border-radius: 5px;
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+	width:85%;
+	display: none;
+	overflow: auto;
+	z-index: 99;
+	position: absolute;
+	top: 50px;
+	left: 0; 
+	bottom: 50px; 
+	right: 0;
+	margin-left: auto;
+  	margin-right: auto;
+  	vertical-align: middle;
+}
+
+.shop-background {
+	background-color: black;
+	display: none;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	z-index: 95;
+	left: 0;
+	top: 0;
+	opacity: 60%;
+}
+
+.btn-shop {
+	z-index: 99;
+	position: relative;
+}
+
+.shop-column-divider {
+	width: 100%; 
+	display: flex; 
+	padding-top: 5px;
+}
+
+* {
+	font-family: myFirstFont;
+	font-size: 18px;
+}

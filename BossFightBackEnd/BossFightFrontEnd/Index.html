@@ -4,77 +4,6 @@
 	<link rel="stylesheet" href="css/stylesheet.css" type="text/css" charset="utf-8" />
 	<meta charset="utf-8">
 	<meta http-equiv="content_security_policy" content="script-src 'self'; script-src-elem 'self'">
-	<style>		
-	progress[value] {
-		/* Reset the default appearance */
-		-webkit-appearance: none;
-		appearance: none;
-		height: 20px;
-	}
-	progress::-webkit-progress-bar {
-		background-color: hsl(256, 15%, 14%);
-		border-radius: 2px;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
-	}
-	progress::-webkit-progress-value {
-		background-color: crimson;
-		border-radius: 2px; 
-		background-size: 35px 20px, 100% 100%, 100% 100%;
-	}
-	
-	progress.mana-progress::-webkit-progress-value 
-	{
-		background-color: steelblue;
-	}
-
-	Body
-	{
-		color:hsl(349, 19%, 45%);
-	}
-	.custom-menu {
-		display: none;
-		z-index: 1000;
-		position: absolute;
-		overflow: hidden;
-		border: 1px solid #CCC;
-		white-space: nowrap;
-		font-family: sans-serif;
-		background: #FFF;
-		color: #333;
-		border-radius: 5px;
-	}
-
-	.custom-menu li {
-		padding: 8px 12px;
-		cursor: pointer;
-	}
-
-	.custom-menu li:hover {
-		background-color: #DEF;
-	}
-
-	.btn-primary {
-		background-color: hsl(256, 13%, 28%);
-		color: hsl(256, 15%, 14%);
-	}
-
-	input {
-		background-color: hsl(318, 11%, 35%);
-	}
-
-	textarea {
-		background-color: hsl(318, 11%, 35%);
-	}
-
-	select {
-		background-color: hsl(318, 11%, 35%);
-	}
-
-	* {
-		font-family: myFirstFont;
-		font-size: 18px;
-	}
-	</style>
 	<title>Boss Fight</title>
 </head>
 <body style="background-color:	hsl(235, 22%, 20%);">
@@ -85,7 +14,7 @@
 		<label style="grid-column: 1; grid-row: 2;">Password: </label>
 		<input id="input_user_name" style="grid-column: 2; grid-row: 1;"/>
 		<input id="input_password" style="grid-column: 2; grid-row: 2;"/>
-		<button type="button" class="btn btn-primary btn-md" style="grid-column: 1/3; grid-row: 3;" onclick="AttackMonster()">
+		<button type="button" class="btn-primary" style="grid-column: 1/3; grid-row: 3;" onclick="AttackMonster()">
 			Login
 		</button>
 	</div>
@@ -137,21 +66,22 @@
 					<label id="player_equipped_weapon_name"></label>
 				</div>
 				<div style="grid-column: 1; grid-row: 9;">
-					<button type="button" class="btn btn-primary btn-md" onclick="LoginTestUser()">
+					<button type="button" class="btn-primary" onclick="LoginTestUser()">
 						Login "Test User"
 					</button>
-					<button type="button" class="btn btn-primary btn-md" onclick="LoginTestUser2()">
+					<button type="button" class="btn-primary" onclick="LoginTestUser2()">
 						Login "Test User2"
 					</button>
 				</div>
 				<div style="grid-column: 1; grid-row: 10;">
-					<button type="button" class="btn btn-primary btn-md" onclick="AttackMonster()">
+					<button type="button" class="btn-primary" onclick="AttackMonster()">
 						Attack Monster
 					</button>
 				</div>
 				<!-- Player inventory -->
 				<div style="grid-column: 2; grid-row: 1/20;">
 					<select id="player_inventory" size="1" style="flex-grow:1; float:left; width: 95%;"></select>
+					<button id="openShopButton" type="button" class="btn-primary" style="flex-grow:1; float:left;">Open shop</button>
 				</div>
 			</div>
 		</div>
@@ -178,11 +108,51 @@
 </html>
 
 
-<ul class='custom-menu' style="list-style-type: none; padding: 0; margin: 0;">
+<ul class='custom-menu' style="list-style-type: none; padding: 0; margin: 0; color: hsl(235, 22%, 20%);">
 	<li id=custom_menu_equip data-action = "equip" data-equip_id=none>Equip weapon</li>
 	<li id=custom_menu_sell data-action = "sell" data-sell_id=none>Sell weapon</li>
 </ul>
 
+<div id="dialogBackground" class="shop-background"></div>
+<div id="shopDialog" class="modal-dialog">
+	<form method="dialog">
+		<div class="row shop-column-divider">
+			<!-- weapons -->
+			<div class="column" style="float:left; padding-left: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: hsl(256, 13%, 28%); margin-left: 5px; margin-right: 5px;">
+				<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color:hsl(349, 19%, 45%); padding-top: 15px;">
+					<label style="grid-column: 1; grid-row: 1; text-align: center;  font-size: xx-large;">Weapons</label>
+					<div id="testWeaponContainer1" style="grid-column: 1; grid-row: 2;">
+						<button class="buy-button btn-primary" id="test1">Buy</button>
+						<label class="buy-label">Weapon 1</label>
+					</div>
+					<div id="testWeaponContainer2" style="grid-column: 1; grid-row: 3;">
+						<button  class="buy-button btn-primary">Buy</button>
+						<label class="buy-label">Weapon 2</label>
+					</div>
+				</div>
+			</div>
+			<!-- classes -->
+			<div class="column" style="float:right; padding-right: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: hsl(256, 13%, 28%); margin-left: 5px; margin-right: 5px;">
+				<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color:hsl(349, 19%, 45%); padding-top: 15px;">
+					<label style="grid-column: 1; grid-row: 1; text-align: center; font-size: xx-large;">Classes</label>
+					<div id="testClassContainer1" style="grid-column: 1; grid-row: 2;">
+						<button class="buy-button btn-primary" onclick="return;">Buy</button>
+						<label class="buy-label">Class 1</label>
+					</div>
+					<div id="testClassContainer2" style="grid-column: 1; grid-row: 3;">
+						<button class="buy-button btn-primary">Buy</button>
+						<label class="buy-label">Class 2</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<menu style="position: absolute; bottom: 0; right: 100px;">
+			<button id="closeShopButton" value="default" class="btn-primary btn-shop">Close shop</button>
+		</menu>
+	</form>
+</div>
+
 <script type="text/javascript" src="scripts/cf.js"></script>
 <script type="text/javascript" src="scripts/canvas.js"></script>
 <script type="text/javascript" src="scripts/custom_context_menu.js"></script>
+<script type="text/javascript" src="scripts/shop_dialog.js"></script>
