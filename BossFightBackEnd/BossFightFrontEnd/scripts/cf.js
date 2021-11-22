@@ -48,7 +48,7 @@ async function FetchActiveMonster() {
 	socket.send(json_obj);
 }
 
-// TEST Get WebSocket button
+// TEST WebSocket button
 async function LoginTestUser() {
 	const obj = {
 		request_key: "FetchPlayer",
@@ -60,7 +60,7 @@ async function LoginTestUser() {
 	socket.send(json_obj);
 }
 
-// TEST Get WebSocket button
+// TEST WebSocket button2
 async function LoginTestUser2() {
 	const obj = {
 		request_key: "FetchPlayer",
@@ -83,6 +83,17 @@ async function AttackMonster() {
 	socket.send(json_obj);
 }
 
+async function SendSignInRequest(pUserName, pPassword) {
+	const obj = {
+		request_key: "SignIn",
+		request_data: JSON.stringify({
+			userName: pUserName,
+			password: pPassword
+		})
+	};
+	const json_obj = JSON.stringify(obj);
+	socket.send(json_obj);
+}
 
 function LogToTextLog(pText, blink = false) {
 	document.getElementById("text_log").innerHTML += pText + '\n'

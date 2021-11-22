@@ -95,6 +95,19 @@ namespace BossFight.Models
             return result;
         }
 
+        public override string AdditionalSearchCriteria(PersistableBase pSearchObject, bool pStartWithAnd = true)
+        {
+            var p = pSearchObject as Player;
+            var additionalSearchCriteriaText = String.Empty;
+            if (p.UserName.HasText())
+                additionalSearchCriteriaText += $" AND { nameof(UserName) } = { p.UserName.ToDbString() }\n";
+
+            if (p.Password.HasText())
+                additionalSearchCriteriaText += $" AND { nameof(Password) } = { p.Password.ToDbString() }\n";
+
+            return pStartWithAnd ? additionalSearchCriteriaText : additionalSearchCriteriaText.Substring(4, additionalSearchCriteriaText.Length- 4);
+        }
+
         public int CalckWeaponAttackDamage(MonsterInstance pTargetMonster, PlayerAttackSummary pPlayerAttackSummary)
         {
             var isCrit = pTargetMonster.AttackOnMonsterIsCrit(GetAttackCritChance());

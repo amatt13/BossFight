@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using BossFight.Extentions;
 using BossFight.Models;
@@ -146,6 +147,63 @@ WHERE p.PlayerId = @{ nameof(playerId) }";
                 pError = $"player ({ pPlayerId }) is not a valid id";
 
             return playerCanAttackMonsterWithEquippedWeapon;
+        }
+
+        public static bool ValidateUserLoginCredentials(string pUserName, string pPassword, out string pError)
+        {
+            var errors = new List<String>();
+
+            if (String.IsNullOrWhiteSpace(pUserName))
+                errors.Add("Username was empty");
+
+            if (String.IsNullOrWhiteSpace(pPassword))
+                errors.Add("Password was empty");
+
+            if (pUserName.Length > 100)
+                errors.Add("Username was too long");
+
+            if (pPassword.Length > 100)
+                errors.Add("Password was too long");
+
+            if (errors.Count == 0)
+            {
+                using var connection = GlobalConnection.GetNewOpenConnection();
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = $@"SELECT COUNT(*) as PlayersWithMatchingCredentials
+FROM Player p
+WHERE p.UserName = @userName
+AND p.Password = @password";
+                cmd.Parameters.AddParameter(pUserName.ToDbString(), "@userName");
+                cmd.Parameters.AddParameter(pPassword.ToDbString(), "@password");
+
+                var test = cmd.ToSqlString();
+
+                var reader = cmd.ExecuteReader();
+                reader.Read();
+                var playersWithMatchingCredentials = reader.GetIntNullable("PlayersWithMatchingCredentials").GetValueOrDefault(0);
+
+                SELECT COUNT(*) as PlayersWithMatchingCredentials
+                FROM Player p
+                WHERE p.UserName = 'Test'
+                AND p.Password = 'B'
+
+                reader.Close();
+                connection.Close();
+
+                if (playersWithMatchingCredentials == 0)
+                {
+                    errors.Add("Invalid user name/password combination");
+                }
+                else if (playersWithMatchingCredentials >= 2)
+                {
+                    // should never happen. Constraint in DB that makes it impossible to have multiple users with the same username.
+                    throw new Exception($"playersWithMatchingCredentials >= 2. un: '{pUserName}' pw: '{pPassword}'");
+                }
+            }
+
+            pError = String.Join("\n", errors);
+            return errors.Count == 0;
         }
     }
 }

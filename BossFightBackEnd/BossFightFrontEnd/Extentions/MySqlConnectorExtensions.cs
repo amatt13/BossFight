@@ -4,7 +4,7 @@ using MySqlConnector;
 
 namespace BossFight.Extentions
 {
-    public static class MySqlParameterCollectionExtensions
+    public static class MySqlConnectorExtensions
     {
         public static void AddParameter(this MySqlParameterCollection pMySqlParameterCollection, object pParameterValue, string pParameterName)
         {
@@ -56,6 +56,16 @@ namespace BossFight.Extentions
                     DbType = dbType,
                     Value = pParameterValue?.ToString(),
                 });
+        }
+
+        public static string ToSqlString(this MySqlCommand pCommand)
+        {
+            var sql = pCommand.CommandText;
+            foreach (MySqlParameter param in pCommand.Parameters)
+            {
+                sql = sql.Replace(param.ParameterName, param.Value.ToString());
+            }
+            return sql;
         }
     }
 }

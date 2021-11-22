@@ -43,5 +43,10 @@ namespace BossFight.Extentions
         {
             return pBool ? "True" : "False";
         }
+
+        public static bool HasText(this string pString)
+        {
+            return !String.IsNullOrWhiteSpace(pString);
+        }
     }
 }

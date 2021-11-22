@@ -125,6 +125,30 @@ namespace BossFight.Controllers
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
+        // takes: userName: "string", password: "string"
+        // returns: player
+        public async Task SignIn(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            var userName = (string)pJsonParameters["userName"];
+            var password = (string)pJsonParameters["password"];
+
+            if (RequestValidator.ValidateUserLoginCredentials(userName, password, out string error))
+            {
+                userName = userName.Trim();
+                password = password.Trim();
+                var player = new Player{ UserName = userName, Password = password }.FindAll().First();
+                var response = new Dictionary<string, Player>
+                { 
+                    { "update_player", player }
+                };
+                string output = JsonConvert.SerializeObject(response);
+                var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
+                await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+            }
+            else
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        }
+
         async private Task ReplyWithErrorMessage(WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket, string pError)
         {
             var response = new Dictionary<string, string>
