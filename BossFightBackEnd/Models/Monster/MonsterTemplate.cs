@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using BossFight.BossFightEnums;
 using BossFight.Extentions;
+using MySqlConnector;
 
 namespace BossFight.Models
 {
@@ -38,12 +39,17 @@ namespace BossFight.Models
             return (MonsterTemplate)_findOne(id);
         }
 
+        public MonsterTemplate FindOneForParent(int id, MySqlConnection pConnection)
+        {
+            return (MonsterTemplate)_findOneForParent(id, pConnection);
+        }
+
         public IEnumerable<MonsterTemplate> FindAll(int? id)
         {
             return _findAll(id).Cast<MonsterTemplate>();
         }
 
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
             var result = new List<PersistableBase>();
 

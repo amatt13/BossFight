@@ -5,6 +5,7 @@ using BossFight.BossFightEnums;
 using BossFight.Extentions;
 using BossFight.Models.DB;
 using BossFight.Models.Loot;
+using MySqlConnector;
 using Newtonsoft.Json;
 
 namespace BossFight.Models
@@ -64,12 +65,17 @@ namespace BossFight.Models
             return (Weapon)_findOne(id);
         }
 
+        public Weapon FindOneForParent(int id, MySqlConnection pConnection)
+        {
+            return (Weapon)_findOneForParent(id, pConnection);
+        }
+
         public IEnumerable<Weapon> FindAll(int? id = null)
         {
             return _findAll(id).Cast<Weapon>();
         }
 
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
             var result = new List<PersistableBase>();
 

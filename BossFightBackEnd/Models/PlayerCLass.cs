@@ -4,6 +4,7 @@ using System.Linq;
 using BossFight.BossFightEnums;
 using BossFight.CustemExceptions;
 using BossFight.Extentions;
+using MySqlConnector;
 using Newtonsoft.Json;
 
 namespace BossFight.Models
@@ -59,7 +60,7 @@ namespace BossFight.Models
         
         public PlayerClass() { }
 
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
             var result = new List<PersistableBase>();
 

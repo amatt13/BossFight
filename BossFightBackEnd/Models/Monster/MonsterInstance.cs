@@ -100,11 +100,11 @@ namespace BossFight.Models
             return (MonsterInstance)_findOne(id);
         }
 
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader)
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
             var result = new List<PersistableBase>();
 
-            while (reader.Read())
+            while (!reader.IsClosed && reader.Read())
             {   
                 var monsterInstance = new MonsterInstance();
                 monsterInstance.MonsterInstanceId = reader.GetInt(nameof(MonsterInstanceId));
@@ -118,10 +118,11 @@ namespace BossFight.Models
                 monsterInstance.LowerAttackPercentage = reader.GetFloat(nameof(LowerAttackPercentage));
                 monsterInstance.EasierToCritDuration = reader.GetInt(nameof(EasierToCritDuration));
                 monsterInstance.EasierToCritPercentage = reader.GetInt(nameof(EasierToCritPercentage));
+                reader.Close();
 
-                monsterInstance.MonsterTemplate = new MonsterTemplate().FindOne(monsterInstance.MonsterTemplateId);
+                monsterInstance.MonsterTemplate = new MonsterTemplate().FindOneForParent(monsterInstance.MonsterTemplateId, pConnection);
 
-                monsterInstance.MonsterDamageTrackerList = new MonsterDamageTracker{ MonsterInstanceId =  monsterInstance.MonsterInstanceId}.FindAll();
+                monsterInstance.MonsterDamageTrackerList = new MonsterDamageTracker{ MonsterInstanceId =  monsterInstance.MonsterInstanceId}.FindAllForParent(pConnection);
                 monsterInstance.MonsterDamageTrackerList.ForEach(mdt => mdt.MonsterInstance = monsterInstance);
                 result.Add(monsterInstance);
             }
@@ -266,6 +267,7 @@ namespace BossFight.Models
             if (monsterDamageTrackerItem != null)
             {
                 monsterDamageTrackerItem.DamageReceivedFromPlayer += pDamage;
+                monsterDamageTrackerItem.Persist();
             }
             else
             {

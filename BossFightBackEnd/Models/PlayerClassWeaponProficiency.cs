@@ -40,7 +40,7 @@ namespace BossFight.Models
             return (PlayerClassWeaponProficiency)_findOne(id);
         }
 
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader)
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
             var result = new List<PersistableBase>();
 

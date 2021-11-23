@@ -42,12 +42,17 @@ namespace BossFight.Models
             return _findAll(id).Cast<PlayerWeapon>();
         }
 
+        public IEnumerable<PlayerWeapon> FindAllForParent(MySqlConnection pConnection, int? id = null)
+        {
+            return _findAllForParent(id, pConnection).Cast<PlayerWeapon>();
+        }
+
         public PlayerWeapon FindOne(int id)
         {
             return (PlayerWeapon)_findOne(id);
         }
 
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader)
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
             var result = new List<PersistableBase>();
 

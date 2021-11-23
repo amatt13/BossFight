@@ -47,7 +47,7 @@ namespace BossFight.Models
             return (PlayerClassRequirement)_findOne(id);
         }
 
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader)
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
             var result = new List<PersistableBase>();
 

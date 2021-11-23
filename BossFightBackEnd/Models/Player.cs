@@ -4,6 +4,7 @@ using System.Linq;
 using BossFight.CustemExceptions;
 using BossFight.Extentions;
 using BossFight.Models.Loot;
+using MySqlConnector;
 using Newtonsoft.Json;
 
 namespace BossFight.Models
@@ -64,11 +65,11 @@ namespace BossFight.Models
             return _findAll(id).Cast<Player>();
         }
 
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader)
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader, MySqlConnection pConnection)
         {
             var result = new List<PersistableBase>();
 
-            while (reader.Read())
+            while (!reader.IsClosed && reader.Read())
             {
                 var player = new Player();
                 player.PlayerId = reader.GetInt(nameof(PlayerId));
@@ -80,13 +81,14 @@ namespace BossFight.Models
                 player.WeaponId = reader.GetInt(nameof(WeaponId));
                 player.UserName = reader.GetString(nameof(UserName));
                 player.Password = reader.GetString(nameof(Password));
+                reader.Close();
                 
-                player.PlayerPlayerClass = new PlayerPlayerClass{ Active = true, PlayerId = player.PlayerId }.FindAll().First();
+                player.PlayerPlayerClass = new PlayerPlayerClass{ Active = true, PlayerId = player.PlayerId }.FindAllForParent(pConnection).First();
                 player.PlayerPlayerClass.Player = player;
-                player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{ PlayerId = player.PlayerId }.FindAll();
-                player.Weapon = new Weapon().FindOne(player.WeaponId);
+                player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{ PlayerId = player.PlayerId }.FindAllForParent(pConnection);
+                player.Weapon = new Weapon().FindOneForParent(player.WeaponId, pConnection);
 
-                player.PlayerWeaponList = new PlayerWeapon{ PlayerId =  player.PlayerId}.FindAll();
+                player.PlayerWeaponList = new PlayerWeapon{ PlayerId =  player.PlayerId}.FindAllForParent(pConnection);
                 foreach(var x in player.PlayerWeaponList) { x.Player = player; }
 
                 result.Add(player);

@@ -24,7 +24,7 @@
 	</h1>
 	<div class="row" style="width: 100%; display: flex;">
 		<!-- Canvas/Left column -->
-		<div class="column" style="float:left; flex: 24%; border: solid; color: hsl(256, 13%, 28%);">
+		<div class="column" style="float:left; flex: 24%; border: solid; color: hsl(256, 13%, 28%); flex: 0 1 auto;">
 			<canvas id="mainCanvas">
 			</canvas>
 		</div>
@@ -87,14 +87,12 @@
 		</div>
 		<!-- Right column -->
 		<div class="column" style="float:right; flex: 10%; border: solid; color: hsl(256, 13%, 28%);">
-			<div style="color:hsl(349, 19%, 45%); display: grid; grid-template-columns: repeat(1, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; padding-top: 15px;">
-				<div style="grid-column: 1; grid-row: 1;">
-					<label">Log: </label>
-				</div>
-				<div style="grid-column: 1; grid-row: 2;">
-					<textarea id="text_log" style="width: 95%; height: 750px; resize: none;" placeholder="log..." readonly=true></textarea>
-				</div>
-					<div style="grid-column: 1; grid-row: 3;">
+			<div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color:hsl(349, 19%, 45%); padding-top: 15px; margin-right: 5px; margin-left: 5px;">
+				<label style="grid-column: 1; grid-row: 1;">Log: </label>
+				<textarea id="text_log" style="height: 600px; resize: none; grid-column: 1/-1; grid-row: 2;" placeholder="log..." readonly=true></textarea>
+				<button id="sendChatMessageButton" type="button" class="btn-primary" style="grid-row: 3; grid-column: 1">Send</button>
+				<input id="chatMessageContentInput" type="text" style="grid-row: 3; grid-column: 2/-1"></input>
+				<div style="grid-column: 1/-1; grid-row: 4;">
 					<div style="background-color: hsl(235, 22%, 20%); width: 30px; height: 30px; float: left; border: solid; color: white; border-width: 1px;"></div>
 					<div style="background-color: hsl(256, 13%, 28%); width: 30px; height: 30px; float: left; border: solid; color: white; border-width: 1px;"></div>
 					<div style="background-color: hsl(256, 15%, 14%); width: 30px; height: 30px; float: left; border: solid; color: white; border-width: 1px;"></div>
@@ -157,3 +155,4 @@
 <script type="text/javascript" src="scripts/custom_context_menu.js"></script>
 <script type="text/javascript" src="scripts/shop_dialog.js"></script>
 <script type="text/javascript" src="scripts/sign_in.js"></script>
+<script type="text/javascript" src="scripts/chat.js"></script>

@@ -50,21 +50,28 @@ namespace BossFight.Models
             return _findAll(id).Cast<MonsterDamageTracker>();
         }
 
+        public IEnumerable<MonsterDamageTracker> FindAllForParent(MySqlConnection pConnection, int? id = null)
+        {
+            return _findAllForParent(id, pConnection).Cast<MonsterDamageTracker>();
+        }
+
         public MonsterDamageTracker FindOne(int id)
         {
             return (MonsterDamageTracker)_findOne(id);
         }
 
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader)
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
             var result = new List<PersistableBase>();
 
-            while (reader.Read())
+            while (!reader.IsClosed && reader.Read())
             {   
                 var monsterDamageTracker = new MonsterDamageTracker();
                 monsterDamageTracker.MonsterDamageTrackerId = reader.GetInt(nameof(MonsterDamageTrackerId));
                 monsterDamageTracker.PlayerId = reader.GetInt(nameof(PlayerId));
                 monsterDamageTracker.MonsterInstanceId = reader.GetInt(nameof(MonsterInstanceId));
+                monsterDamageTracker.DamageReceivedFromPlayer = reader.GetInt(nameof(DamageReceivedFromPlayer));
+                reader.Close();
 
                 monsterDamageTracker.Player = new Player().FindOne(monsterDamageTracker.PlayerId);
                 result.Add(monsterDamageTracker);

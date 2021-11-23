@@ -20,6 +20,8 @@ socket.onmessage = function (event) {
 		UpdateUiPlayerEquippedWeapon(json_dict["update_player_equipped_weapon"])
 	else if ("player_attacked_monster_with_weapon" in json_dict)
 		UpdateUiPlayerAttackedMonsterWithWeapon(json_dict["player_attacked_monster_with_weapon"])
+	else if ("receive_chat_message" in json_dict)
+		LogToTextLog(json_dict["receive_chat_message"]);
 	else if ("error_message" in json_dict)
 		LogToTextLog(json_dict["error_message"], true)
 };

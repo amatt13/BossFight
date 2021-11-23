@@ -21,13 +21,8 @@ namespace BossFight.Controllers
     [Route("[controller]")]
     public class WebSocketController : ControllerBase
     {
-        //public AppDb Db { get; }
-
-        //public WebSocketController(AppDb db)
         public WebSocketController()
-        {
-            //Db = db;
-        }
+        { }
 
         [HttpGet("/ws")]
         public async Task GetWebsocketMessage()
@@ -35,6 +30,8 @@ namespace BossFight.Controllers
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using WebSocket webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+                if (!WebSocketConnections.GetInstance().ConnectionExists(webSocket))
+                    WebSocketConnections.GetInstance().AddNewConnection(webSocket);
                 await ReadMessage(HttpContext, webSocket);
             }
             else

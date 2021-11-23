@@ -89,7 +89,12 @@ namespace BossFight.Models
             return _findAll(id).Cast<PlayerPlayerClass>();
         }
 
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader)
+        public IEnumerable<PlayerPlayerClass> FindAllForParent(MySqlConnection pConnection, int? id = null)
+        {
+            return _findAllForParent(id, pConnection).Cast<PlayerPlayerClass>();
+        }
+
+        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
             var result = new List<PersistableBase>();
 

@@ -27,7 +27,7 @@ namespace BossFight.Models
         public PersistableBase()
         { }
 
-        protected virtual IEnumerable<PersistableBase> _findAll(int? id)
+        protected IEnumerable<PersistableBase> _findAll(int? id)
         {
             using var connection = GlobalConnection.GetNewOpenConnection();
             using var cmd = connection.CreateCommand();
@@ -49,8 +49,34 @@ namespace BossFight.Models
             cmd.CommandText = selectString + whereString;
             cmd.Parameters.AddParameter(id, nameof(id));
             var reader = cmd.ExecuteReader();
-            var result = BuildObjectFromReader(reader);
+            var result = BuildObjectFromReader(reader, connection);
             connection.Close();
+            return result;
+        }
+
+        protected IEnumerable<PersistableBase> _findAllForParent(int? id, MySqlConnection pConnection)
+        {
+            using var cmd = pConnection.CreateCommand();
+
+            var selectString = $"SELECT * FROM `{ TableName }`\n";
+            var whereString = "";
+            if (id.HasValue)
+            {
+                whereString = $"WHERE `{ IdColumn }` = @id \n";
+                whereString += AdditionalSearchCriteria(this);
+            }
+            else
+            {
+                var additionalSearchCriteriaString = AdditionalSearchCriteria(this, pStartWithAnd: false);
+                if (!String.IsNullOrEmpty(additionalSearchCriteriaString))
+                    whereString += $"WHERE { additionalSearchCriteriaString }";
+            }
+
+            cmd.CommandText = selectString + whereString;
+            cmd.Parameters.AddParameter(id, nameof(id));
+            var reader = cmd.ExecuteReader();
+            var result = BuildObjectFromReader(reader, pConnection);
+            reader.Close();
             return result;
         }
 
@@ -63,6 +89,15 @@ namespace BossFight.Models
             return fetched;
         }
 
+        protected virtual PersistableBase _findOneForParent(int? id, MySqlConnection pConnection)
+        {
+            PersistableBase fetched = null;
+            var result = _findAllForParent(id, pConnection);
+            if (result.Any())
+                fetched = result.First();
+            return fetched;
+        }
+
         public virtual string AdditionalSearchCriteria(PersistableBase pSearchObject, bool pStartWithAnd = true)
         {
             var additionalSearchCriteriaText = String.Empty;
@@ -70,7 +105,7 @@ namespace BossFight.Models
             return pStartWithAnd ? additionalSearchCriteriaText : additionalSearchCriteriaText.Substring(4, additionalSearchCriteriaText.Length - 4);
         }
 
-        public abstract IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader);
+        public abstract IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader, MySqlConnection pConnection);
 
         public virtual void Persist()
         {

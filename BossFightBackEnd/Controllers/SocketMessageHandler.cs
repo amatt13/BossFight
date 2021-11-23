@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BossFight.Models;
 using BossFight.Models.DB;
+using Ganss.XSS;
 using Newtonsoft.Json;
 
 namespace BossFight.Controllers
@@ -144,6 +145,29 @@ namespace BossFight.Controllers
                 string output = JsonConvert.SerializeObject(response);
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
                 await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+            }
+            else
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        }
+
+        // takes: message: "string"
+        // receive an message from the client. This message must then be sent to all connection
+        public async Task SendChatMessage(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            var message = (string)pJsonParameters["message"];
+            if (RequestValidator.ValidateChatMessage(message, out string error))
+            {
+                var sanitized = new HtmlSanitizer().Sanitize(message);
+                var response = new Dictionary<string, string>
+                { 
+                    { "receive_chat_message", sanitized }
+                };
+                string output = JsonConvert.SerializeObject(response);
+                var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
+                foreach(var ws in WebSocketConnections.GetInstance().GetAllConnections())
+                {
+                    await ws.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                }
             }
             else
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);

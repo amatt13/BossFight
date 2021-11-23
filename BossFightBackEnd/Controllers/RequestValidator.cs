@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using BossFight.Extentions;
 using BossFight.Models;
+using Ganss.XSS;
 using MySqlConnector;
 
 namespace BossFight.Controllers
@@ -182,12 +183,6 @@ AND p.Password = @password";
                 var reader = cmd.ExecuteReader();
                 reader.Read();
                 var playersWithMatchingCredentials = reader.GetIntNullable("PlayersWithMatchingCredentials").GetValueOrDefault(0);
-
-                SELECT COUNT(*) as PlayersWithMatchingCredentials
-                FROM Player p
-                WHERE p.UserName = 'Test'
-                AND p.Password = 'B'
-
                 reader.Close();
                 connection.Close();
 
@@ -204,6 +199,27 @@ AND p.Password = @password";
 
             pError = String.Join("\n", errors);
             return errors.Count == 0;
+        }
+
+        public static bool ValidateChatMessage(string pMessage, out string pError)
+        {
+            pError = String.Empty;
+
+            if (pMessage.HasText())
+            {
+                try
+                {
+                    new HtmlSanitizer().Sanitize(pMessage);                     
+                }
+                catch (Exception e)
+                {
+                    pError = $"Failed to sanitize message:\n{ e }";
+                }
+            }
+            else
+                pError = "Chat meesage was empty";
+
+            return String.IsNullOrEmpty(pError);
         }
     }
 }
