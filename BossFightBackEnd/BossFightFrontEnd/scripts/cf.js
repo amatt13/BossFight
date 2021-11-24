@@ -1,4 +1,4 @@
-//let socket = new WebSocket("ws://185.126.108.48:5000/ws");
+//let socket = new WebSocket("ws://185.126.108.48:5000/ws"); et eller andet med window.location
 let socket = new WebSocket("ws://localhost:5000/ws");
 
 socket.onopen = function (e) {
