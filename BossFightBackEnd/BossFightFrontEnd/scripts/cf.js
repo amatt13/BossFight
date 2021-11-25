@@ -7,7 +7,6 @@ else {
 	//let socket = new WebSocket("ws://192.168.0.185:5000/ws"); // PI
 }
     
-
 socket.onopen = function (e) {
 	LogToTextLog("[open] Connection established")
 	FetchActiveMonster();
