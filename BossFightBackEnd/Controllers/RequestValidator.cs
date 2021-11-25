@@ -173,10 +173,10 @@ WHERE p.PlayerId = @{ nameof(playerId) }";
 
                 cmd.CommandText = $@"SELECT COUNT(*) as PlayersWithMatchingCredentials
 FROM Player p
-WHERE p.UserName = @userName
-AND p.Password = @password";
-                cmd.Parameters.AddParameter(pUserName.ToDbString(), "@userName");
-                cmd.Parameters.AddParameter(pPassword.ToDbString(), "@password");
+WHERE p.UserName = {pUserName.ToDbString()}
+AND p.Password = {pPassword.ToDbString()}";
+                //cmd.Parameters.AddParameter(pUserName.ToDbString(), "@userName", 30);
+                //cmd.Parameters.AddParameter(pPassword.ToDbString(), "@password", 100);
 
                 var test = cmd.ToSqlString();
 

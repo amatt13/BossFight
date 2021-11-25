@@ -6,8 +6,11 @@
 progress[value] {
 	/* Reset the default appearance */
 	-webkit-appearance: none;
+	-moz-appearance: none;
 	appearance: none;
 	height: 20px;
+	background-color: hsl(256, 15%, 14%);
+	border-width: 0px;
 }
 progress::-webkit-progress-bar {
 	background-color: hsl(256, 15%, 14%);
@@ -21,6 +24,20 @@ progress::-webkit-progress-value {
 }
 
 progress.mana-progress::-webkit-progress-value 
+{
+	background-color: steelblue;
+}
+
+progress::-moz-progress-bar {
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+	background-size: 35px 20px, 100% 100%, 100% 100%;
+}
+
+progress::-moz-progress-bar {
+	background-color: crimson;
+}
+
+progress.mana-progress::-moz-progress-bar 
 {
 	background-color: steelblue;
 }
@@ -54,6 +71,43 @@ Body
 .btn-primary {
 	background-color: hsl(256, 13%, 28%);
 	color: hsl(256, 15%, 14%);
+}
+
+
+input:-webkit-autofill{
+    -webkit-box-shadow: 0 0 0 30px hsl(318, 11%, 35%) inset !important;
+}
+
+@supports (-moz-appearance:none)  {
+	.btn-primary {
+		/* box-shadow: 5px 5px 5px black; */
+		border-width: 0.5px;
+		border-top-color: gray;
+		border-left-color: gray;
+		border-right-color: black;
+		border-bottom-color: black;
+	}
+	input {
+		border-width: 0.5px;
+		border-top-color: gray;
+		border-left-color: gray;
+		border-right-color: black;
+		border-bottom-color: black;
+	}
+	select {
+		border-width: 0.5px;
+		border-top-color: gray;
+		border-left-color: gray;
+		border-right-color: black;
+		border-bottom-color: black;
+	}
+	textarea {
+		border-width: 0.5px;
+		border-top-color: gray;
+		border-left-color: gray;
+		border-right-color: black;
+		border-bottom-color: black;
+	}
 }
 
 .buy-button {
@@ -94,29 +148,6 @@ select {
 	margin-left: auto;
   	margin-right: auto;
   	vertical-align: middle;
-}
-
-.shop-background {
-	background-color: black;
-	display: none;
-	width: 100%;
-	height: 100%;
-	position: fixed;
-	z-index: 95;
-	left: 0;
-	top: 0;
-	opacity: 60%;
-}
-
-.btn-shop {
-	z-index: 99;
-	position: relative;
-}
-
-.shop-column-divider {
-	width: 100%; 
-	display: flex; 
-	padding-top: 5px;
 }
 
 * {

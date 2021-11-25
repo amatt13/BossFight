@@ -6,7 +6,7 @@ namespace BossFight.Extentions
 {
     public static class MySqlConnectorExtensions
     {
-        public static void AddParameter(this MySqlParameterCollection pMySqlParameterCollection, object pParameterValue, string pParameterName)
+        public static void AddParameter(this MySqlParameterCollection pMySqlParameterCollection, object pParameterValue, string pParameterName, int? pSize = null)
         {
             DbType dbType;
             switch (pParameterValue)
@@ -33,7 +33,7 @@ namespace BossFight.Extentions
                     dbType = DbType.Guid;
                     break;
                 case string s:
-                    dbType = DbType.String;
+                    dbType = DbType.StringFixedLength;
                     break;
                 case uint ui:
                     dbType = DbType.UInt32;
@@ -50,12 +50,17 @@ namespace BossFight.Extentions
             if (!pParameterName.StartsWith("@"))
                 pParameterName = '@' + pParameterName;
 
-            pMySqlParameterCollection.Add(new MySqlParameter
-                {
-                    ParameterName = pParameterName,
-                    DbType = dbType,
-                    Value = pParameterValue?.ToString(),
-                });
+            var sqlParam = new MySqlParameter
+            {
+                ParameterName = pParameterName,
+                DbType = dbType,
+                Value = pParameterValue?.ToString(),
+            };
+
+            if (pSize.HasValue)
+                sqlParam.Size = pSize.Value;
+
+            pMySqlParameterCollection.Add(sqlParam);
         }
 
         public static string ToSqlString(this MySqlCommand pCommand)

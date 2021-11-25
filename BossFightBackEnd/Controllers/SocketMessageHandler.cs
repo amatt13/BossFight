@@ -164,7 +164,7 @@ namespace BossFight.Controllers
                 };
                 string output = JsonConvert.SerializeObject(response);
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
-                foreach(var ws in WebSocketConnections.GetInstance().GetAllConnections())
+                foreach(var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
                 {
                     await ws.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
                 }

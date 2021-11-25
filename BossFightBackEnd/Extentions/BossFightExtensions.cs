@@ -27,7 +27,7 @@ namespace BossFight.Extentions
 
         public static string ToDbString(this String pString)
         {
-            return pString != null ? $"'{ pString.Replace("'", @"\'") }'" : null;
+            return pString != null ? $"\"{ pString.Replace("'", @"\'") }\"" : null;
         }
 
         public static string ToDbString(this bool? pBool)

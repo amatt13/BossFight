@@ -56,8 +56,14 @@ namespace BossFight.Controllers
                 
                 //await new SocketMessageHandler(Db).HandleMessage(jsonDictionary, result, pWebSocket);
                 await new SocketMessageHandler().HandleMessage(jsonDictionary, result, pWebSocket);
-                
-                result = await pWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                try
+                {
+                    result = await pWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);   
+                }
+                catch (WebSocketException e)
+                {
+                    Console.WriteLine(e.Message);
+                } 
             }
         }
 

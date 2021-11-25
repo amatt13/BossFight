@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.WebSockets;
 
 namespace BossFight 
@@ -54,11 +55,27 @@ namespace BossFight
             }
         }
 
+        public List<WebSocket> GetAllOpenConnections()
+        {
+            lock (_lock)
+            {
+                return _connections.Where(c => c.State == WebSocketState.Open).ToList();
+            }
+        }
+
         public int GetConnectionsCount()
         {
             lock (_lock)
             {
                 return _connections.Count;
+            }
+        }
+
+        public int GetOpenConnectionsCount()
+        {
+            lock (_lock)
+            {
+                return _connections.Where(c => c.State == WebSocketState.Open).Count();
             }
         }
     }

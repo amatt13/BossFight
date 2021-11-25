@@ -1,5 +1,12 @@
-//let socket = new WebSocket("ws://185.126.108.48:5000/ws");
-let socket = new WebSocket("ws://localhost:5000/ws");
+let socket = undefined; 
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+	socket = new WebSocket("ws://localhost:5000/ws");  // test
+}
+else {
+	socket = new WebSocket("ws://185.126.108.48:5000/ws"); // Windows
+	//let socket = new WebSocket("ws://192.168.0.185:5000/ws"); // PI
+}
+    
 
 socket.onopen = function (e) {
 	LogToTextLog("[open] Connection established")

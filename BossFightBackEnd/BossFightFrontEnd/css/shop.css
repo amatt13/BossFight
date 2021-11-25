@@ -1,0 +1,22 @@
+.shop-background {
+	background-color: black;
+	display: none;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	z-index: 95;
+	left: 0;
+	top: 0;
+	opacity: 60%;
+}
+
+.btn-shop {
+	z-index: 99;
+	position: relative;
+}
+
+.shop-column-divider {
+	width: 100%; 
+	display: flex; 
+	padding-top: 5px;
+}
