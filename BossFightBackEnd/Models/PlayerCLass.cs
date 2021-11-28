@@ -92,7 +92,7 @@ namespace BossFight.Models
             return result;
         }
 
-        public PlayerClass FindOne(int id)
+        public PlayerClass FindOne(int? id = null)
         {
             return (PlayerClass)_findOne(id);
         }

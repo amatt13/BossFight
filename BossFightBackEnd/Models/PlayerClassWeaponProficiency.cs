@@ -35,7 +35,7 @@ namespace BossFight.Models
             return _findAll(id).Cast<PlayerClassWeaponProficiency>();
         }
 
-        public PlayerClassWeaponProficiency FindOne(int id)
+        public PlayerClassWeaponProficiency FindOne(int? id = null)
         {
             return (PlayerClassWeaponProficiency)_findOne(id);
         }

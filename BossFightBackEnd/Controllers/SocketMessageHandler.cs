@@ -75,7 +75,8 @@ namespace BossFight.Controllers
                         {
                             { "gold", player.Gold },
                             { "weapons", player.PlayerWeaponList }
-                        } }
+                        }
+                    }
                 };
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
                 await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
@@ -121,9 +122,35 @@ namespace BossFight.Controllers
 
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
                 await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                
+                if (summary.PlayerKilledMonster)
+                    await NewMonster(monster, player); // test Messagetype og "endOfMEssage"
             }
             else
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        }
+
+        private async Task NewMonster(MonsterInstance pMonster, Player pPLayer)
+        {
+            var newMonsterInstance = MonsterSpawner.SpawnNewMonster();
+            if (newMonsterInstance != null)
+            {
+                var monsterWasKilledMessage = $"{ (pMonster.IsBossMonster ? "BOSS KILL\n" : String.Empty) }{ pPLayer.Name } killed { pMonster.Name }!";
+                var monsterDamageInfo = "Player - Damage dealt\n" + String.Join("\n", pMonster.MonsterDamageTrackerList.OrderBy(x => x.DamageReceivedFromPlayer).Select(x => $"{ x.Player.Name } { x.DamageReceivedFromPlayer }"));
+                var newMonsterMessage = new Dictionary<string, object>
+                {
+                    { "new_monster", new Dictionary<string, object>
+                        {
+                            { "newMonsterInstance", newMonsterInstance },
+                            { "monsterWasKilledMessage", monsterWasKilledMessage },
+                            { "monsterDamageInfo", monsterDamageInfo }
+                        }
+                    }
+                };
+                var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(newMonsterMessage)));
+                foreach(var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
+                    await ws.SendAsync(byteArray, WebSocketMessageType.Text, true, CancellationToken.None);
+            }
         }
 
         // takes: userName: "string", password: "string"
@@ -165,9 +192,7 @@ namespace BossFight.Controllers
                 string output = JsonConvert.SerializeObject(response);
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
                 foreach(var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
-                {
                     await ws.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
-                }
             }
             else
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);

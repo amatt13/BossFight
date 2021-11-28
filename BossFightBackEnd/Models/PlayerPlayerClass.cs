@@ -77,9 +77,11 @@ namespace BossFight.Models
 
         public string PlayerClassName { get => PlayerClass.Name; }
 
+        public int XpNeededToNextLevel { get => GenralHelperFunctions.XpNeededToNextLevel(this); }
+
         public PlayerPlayerClass() { }
 
-        public PlayerPlayerClass FindOne(int id)
+        public PlayerPlayerClass FindOne(int? id = null)
         {
             return (PlayerPlayerClass)_findOne(id);
         }

@@ -47,7 +47,7 @@ namespace BossFight.Models
             return _findAllForParent(id, pConnection).Cast<PlayerWeapon>();
         }
 
-        public PlayerWeapon FindOne(int id)
+        public PlayerWeapon FindOne(int? id = null)
         {
             return (PlayerWeapon)_findOne(id);
         }

@@ -28,7 +28,7 @@ namespace BossFight.Models.DB
             return _findAll(id).Cast<PersistableImplementationTemplate>();
         }
 
-        public PersistableImplementationTemplate FindOne(int id)
+        public PersistableImplementationTemplate FindOne(int? id = null)
         {
             return (PersistableImplementationTemplate)_findOne(id);
         }

@@ -15,8 +15,6 @@ namespace BossFight.Models
         private const int TIER_DIVIDER = 5;
         private const float MONSTER_CRIT_MODIFIER = 1.5f;
 
-        public event EventHandler<MonsterKilledEventArgs>  MonsterWasKilled;
-
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(MonsterInstance);
         [JsonIgnore]
@@ -80,13 +78,19 @@ namespace BossFight.Models
             set { _maxHp = value; }
         }
 
-        public bool IsBossMonster { get { return MonsterTemplate.BossMonster; } }
+        public bool IsBossMonster { get { return MonsterTemplate.BossMonster.GetValueOrDefault(false); } }
 
         public override string Name { get => MonsterTemplate?.Name; }
         
         public double AttackStrength { get => Level / 2; }
 
         public MonsterInstance () { }
+
+        public MonsterInstance (MonsterTemplate pMonsterTempalte) 
+        {
+            MonsterTemplate = pMonsterTempalte;
+            MonsterTemplateId = pMonsterTempalte.MonsterTemplateId.Value;
+        }
 
         #region PersistableBase implementation
 
@@ -95,7 +99,7 @@ namespace BossFight.Models
             return _findAll(id).Cast<MonsterInstance>();
         }
 
-        public MonsterInstance FindOne(int id)
+        public MonsterInstance FindOne(int? id = null)
         {
             return (MonsterInstance)_findOne(id);
         }
@@ -263,32 +267,22 @@ namespace BossFight.Models
 
         public void SubtractHealth(int pDamage, Player pAttackingPlayer)
         {
-            var monsterDamageTrackerItem = MonsterDamageTrackerList.FirstOrDefault(mdt => mdt.PlayerId == pAttackingPlayer.PlayerId);
-            if (monsterDamageTrackerItem != null)
+            if (IsAlive())
             {
-                monsterDamageTrackerItem.DamageReceivedFromPlayer += pDamage;
-                monsterDamageTrackerItem.Persist();
-            }
-            else
-            {
-                var item = new MonsterDamageTracker(pAttackingPlayer, this, pDamage);
-                item.Persist();
-                MonsterDamageTrackerList.Append(item);
-            }
-                
-            Hp -= pDamage;
-            if (IsDead())
-            {
-                var args = new MonsterKilledEventArgs(this, pAttackingPlayer);
-                OnMonsterKilled(args);
-            }
-        }
-
-        protected virtual void OnMonsterKilled(MonsterKilledEventArgs e)
-        {
-            if (MonsterWasKilled != null)
-            {
-                MonsterWasKilled(this, e);
+                var monsterDamageTrackerItem = MonsterDamageTrackerList.FirstOrDefault(mdt => mdt.PlayerId == pAttackingPlayer.PlayerId);
+                if (monsterDamageTrackerItem != null)
+                {
+                    monsterDamageTrackerItem.DamageReceivedFromPlayer += pDamage;
+                    monsterDamageTrackerItem.Persist();
+                }
+                else
+                {
+                    monsterDamageTrackerItem = new MonsterDamageTracker(pAttackingPlayer, this, pDamage);
+                    monsterDamageTrackerItem.Persist();
+                    MonsterDamageTrackerList.Append(monsterDamageTrackerItem);
+                }
+                    
+                Hp -= pDamage;
             }
         }
 

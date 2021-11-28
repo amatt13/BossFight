@@ -42,7 +42,7 @@ namespace BossFight.Models
             return _findAll(id).Cast<PlayerClassRequirement>();
         }
 
-        public PlayerClassRequirement FindOne(int id)
+        public PlayerClassRequirement FindOne(int? id = null)
         {
             return (PlayerClassRequirement)_findOne(id);
         }

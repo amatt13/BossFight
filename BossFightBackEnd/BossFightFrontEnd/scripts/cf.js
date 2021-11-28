@@ -28,6 +28,9 @@ socket.onmessage = function (event) {
 		UpdateUiPlayerAttackedMonsterWithWeapon(json_dict["player_attacked_monster_with_weapon"])
 	else if ("receive_chat_message" in json_dict)
 		LogToTextLog(json_dict["receive_chat_message"]);
+	else if ("new_monster") {
+		NewMonster(json_dict["new_monster"]);
+	}
 	else if ("error_message" in json_dict)
 		LogToTextLog(json_dict["error_message"], true)
 };
@@ -81,14 +84,25 @@ async function LoginTestUser2() {
 }
 
 async function AttackMonster() {
-	const obj = {
-		request_key: "PlayerAttackMonsterWithEquippedWeapon",
-		request_data: JSON.stringify({
-			player_id: _player.player_id
-		})
-	};
-	const json_obj = JSON.stringify(obj);
-	socket.send(json_obj);
+	if (_player != undefined) {
+		if (_player.IsAlive()) {
+			const obj = {
+				request_key: "PlayerAttackMonsterWithEquippedWeapon",
+				request_data: JSON.stringify({
+					player_id: _player.player_id
+				})
+			};
+			const json_obj = JSON.stringify(obj);
+			socket.send(json_obj);
+		}
+		else {
+			BlinkDiv("player_hp")
+			LogToTextLog("Can't attack when you are knocked out", true);
+		}
+	}
+	else {
+		LogToTextLog("You are not logged in", true)
+	}
 }
 
 async function SendSignInRequest(pUserName, pPassword) {
@@ -115,7 +129,7 @@ function ReadPlayerMessage(playerDict_dict) {
 	var weapon = CreateWeaponFromWeaponDict(weapon_dict);
 
 	var player_player_class_dict = playerDict_dict["PlayerPlayerClass"];
-	var player_player_class = new PlayerPlayerClass(player_player_class_dict["XP"], player_player_class_dict["Level"], player_player_class_dict["MaxHp"], player_player_class_dict["MaxMana"], player_player_class_dict["PlayerClassName"]);
+	var player_player_class = new PlayerPlayerClass(player_player_class_dict["XP"], player_player_class_dict["Level"], player_player_class_dict["MaxHp"], player_player_class_dict["MaxMana"], player_player_class_dict["PlayerClassName"], player_player_class_dict["XpNeededToNextLevel"]);
 
 	var player_weapon_list = [];
 	var player_weapon_dict = playerDict_dict["PlayerWeaponList"];
@@ -136,12 +150,14 @@ function CreateWeaponFromWeaponDict(weapon_dict) {
 
 function UpdateUiActiveMonster(monster_dict) {
 	_monster1 = CreateMonsterFromDict(monster_dict);
+	document.getElementById("monsterSprite").src = `./images/sprites/monsters/${_monster1.monster_name[0].toLowerCase() + _monster1.monster_name.substr(1, _monster1.monster_name.length-1).replaceAll(" ", "")}.png`
 }
 
 function UpdateUiPlayerStats(player) {
 	document.getElementById("player_name").innerHTML = player.name;
 	document.getElementById("player_level_and_class").innerHTML = `${player.player_player_class.level} ${player.player_player_class.player_class_name}`;
 	document.getElementById("player_xp").innerHTML = player.player_player_class.xp;
+	document.getElementById("player_xp_to_next_level").innerHTML = `(${player.player_player_class.xp_to_next_level} to next level)`
 	document.getElementById("player_hp").innerHTML = `${player.hp}/${player.player_player_class.max_hp}`;
 	document.getElementById("player_mana").innerHTML = `${player.mana}/${player.player_player_class.max_mana}`;
 	document.getElementById("player_gold").innerHTML = _player.gold;
@@ -207,7 +223,9 @@ function UpdateUiPlayerAttackedMonsterWithWeapon(summary_dict) {
 	ReadPlayerMessage(player_dict);
 	BlinkDiv("player_xp");
 	var monster_message = summary_dict["MonsterRetaliateMessage"];
-	LogToTextLog(monster_message);
+	if (monster_message != undefined && monster_message.length > 0) {
+		LogToTextLog(monster_message);
+	}
 	CanvasShowDamageAnimation(summary_dict["PlayerTotalDamage"]);
 }
 
@@ -225,6 +243,16 @@ function CreateMonsterFromDict(monster_dict) {
 	monster_dict["EaserToCritDuration"], monster_dict["EaserToCritPercentage"], monster_dict["LowerAttackDuration"], monster_dict["LowerAttackPercentage"], monster_dict["StunDuration"], monster_dict["AttackStrength"])
 }
 
+function NewMonster(new_monster_dict) {
+	const monsterWasKilledMessage = new_monster_dict["monsterWasKilledMessage"];
+	const monsterDamageInfo = new_monster_dict["monsterDamageInfo"];
+	LogToTextLog(monsterWasKilledMessage);
+	LogToTextLog(monsterDamageInfo);
+
+	let newMonsterInstance_dict = new_monster_dict["newMonsterInstance"];
+	UpdateUiActiveMonster(newMonsterInstance_dict)
+}
+
 class Player {
 	constructor(player_id, name, hp, mana, gold, weapon, player_player_class, player_weapon_list, user_name) {
 		this.player_id = player_id
@@ -237,6 +265,10 @@ class Player {
 		this.player_player_class = player_player_class;
 		this.player_weapon_list = player_weapon_list
 		this.user_name = user_name;
+	}
+
+	IsAlive() {
+		return this.hp != undefined && this.hp > 0;
 	}
 }
 
@@ -258,12 +290,13 @@ class Weapon {
 }
 
 class PlayerPlayerClass {
-	constructor(xp, level, max_hp, max_mana, player_class_name) {
+	constructor(xp, level, max_hp, max_mana, player_class_name, xp_to_next_level) {
 		this.xp = xp;
 		this.level = level;
 		this.max_hp = max_hp;
 		this.max_mana = max_mana;
 		this.player_class_name = player_class_name;
+		this.xp_to_next_level = xp_to_next_level;
 	}
 }
 

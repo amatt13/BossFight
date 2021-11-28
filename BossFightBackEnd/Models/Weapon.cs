@@ -60,7 +60,7 @@ namespace BossFight.Models
             SpellCritChance = pSpellCritChance;
         }
 
-        public Weapon FindOne(int id)
+        public Weapon FindOne(int? id = null)
         {
             return (Weapon)_findOne(id);
         }

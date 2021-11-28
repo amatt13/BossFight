@@ -43,7 +43,7 @@ namespace BossFight.Models
             return result;
         }
 
-        public WeaponType FindOne(int id)
+        public WeaponType FindOne(int? id = null)
         {
             return (WeaponType)_findOne(id);
         }

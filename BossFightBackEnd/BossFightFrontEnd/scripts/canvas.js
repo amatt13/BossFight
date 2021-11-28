@@ -1,12 +1,11 @@
 const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
-var monsterImage = new Image();
 var playerImage = document.getElementById("playerSprite");
-monsterImage.src = "images/sprites/monsters/goblin.png";
+var monsterImage = document.getElementById("monsterSprite");
 let initialMonsterImageX = 30, initialMonsterImageY = -1;
 
 monsterImage.addEventListener("load", () => {
-	initialMonsterImageY += monsterImage.height;
+	initialMonsterImageY = canvas.height / 2;
 	ctx.drawImage(monsterImage, initialMonsterImageX, initialMonsterImageY);
 });
 
@@ -84,17 +83,22 @@ function AnimatePlayer() {
 }
 
 function DrawMonsterStatus() {
+	let monster_hp = _monster1.hp ?? 0;
+	let monster_max_hp = _monster1.max_hp ?? 0;
 	ctx.fillText('Health:', 10, 30);
-	ctx.fillText(`${ _monster1.hp }/${ _monster1.max_hp }`, 100, 30);
+	ctx.fillText(`${ monster_hp }/${ monster_max_hp }`, 100, 30);
 
+	var monster_strenfth = _monster1.attack_strength ?? "0";
 	ctx.fillText('Attack strength:', 10, 60);
-	ctx.fillText(_monster1.attack_strength, 200, 60);
+	ctx.fillText(monster_strenfth, 200, 60);
 
 	ctx.fillText('Debuffs:', 10, 90);
 
-	var monster_name_y = monsterImageY + monsterImage.height + 30;
+	var monster_name_y = monsterImageY + monsterImage.height + 60;
 	var monster_name_x = monsterImageX;
-	ctx.fillText(`${ _monster1.monster_name } lvl <${ _monster1.level }>`, monster_name_x, monster_name_y);
+	let monster_name = _monster1.monster_name ?? "?";
+	let monsterlevel = _monster1.level ?? "?";
+	ctx.fillText(`${ monster_name } lvl <${ monsterlevel }>`, monster_name_x, monster_name_y);
 }
 
 let _damage_to_show;

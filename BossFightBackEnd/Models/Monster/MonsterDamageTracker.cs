@@ -9,7 +9,9 @@ namespace BossFight.Models
 {
     public class MonsterDamageTracker : PersistableBase, IPersist<MonsterDamageTracker>
     {
+        [JsonIgnore]
         public override string TableName { get; set; } = nameof(MonsterDamageTracker);
+        [JsonIgnore]
         public override string IdColumn { get; set; } = nameof(MonsterDamageTrackerId);
 
         // Persisted on MonsterDamageTracker table
@@ -55,7 +57,7 @@ namespace BossFight.Models
             return _findAllForParent(id, pConnection).Cast<MonsterDamageTracker>();
         }
 
-        public MonsterDamageTracker FindOne(int id)
+        public MonsterDamageTracker FindOne(int? id = null)
         {
             return (MonsterDamageTracker)_findOne(id);
         }

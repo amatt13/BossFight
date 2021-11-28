@@ -11,6 +11,7 @@ namespace BossFight.Models
         public int PlayerXpEarned { get; set; }
         public string MonsterAffectedByDots { get; set; }
         public string MonsterRetaliateMessage { get; set; }
+        public bool PlayerKilledMonster { get; set; }
 
         public PlayerAttackSummary(Player pPlayer, MonsterInstance pMonster)
         {

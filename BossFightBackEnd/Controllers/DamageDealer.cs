@@ -61,7 +61,11 @@ namespace BossFight.Controllers
             pPlayer.GainXp(xpEarned, pTargetMonster.Level);
 
             if (pTargetMonster.IsAlive() && pRetaliate)
+            {
                 MonsterAttackPlayer(pTargetMonster, pPlayer, playerAttackSummary);
+            }
+            else if (pTargetMonster.IsDead())
+                playerAttackSummary.PlayerKilledMonster = true;
 
             pTargetMonster.Persist();
             pPlayer.Persist();
