@@ -20,13 +20,13 @@ namespace BossFight.Controllers
         public static string REQUEST_DATA = "request_data";
 
         public SocketMessageHandler() { }
-        
+
         public async Task HandleMessage(Dictionary<string, object> pJsonObject, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var handler = pJsonObject[REQUEST_KEY].ToString();
             var data = pJsonObject[REQUEST_DATA];
             var dataJsonDictionary = JsonConvert.DeserializeObject<Dictionary<String, Object>>(data.ToString());
-            
+
             await (Task)this.GetType().GetMethod(handler).Invoke(this, new object[] { dataJsonDictionary, pWebSocketReceiveResult, pWebSocket });
         }
 
@@ -34,9 +34,9 @@ namespace BossFight.Controllers
         // returns: monster
         public async Task FetchActiveMonster(Dictionary<string, object> _, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
-            var monster = new MonsterInstance{ Active = true }.FindAll().First();
+            var monster = new MonsterInstance { Active = true }.FindAll().First();
             var response = new Dictionary<string, MonsterInstance>
-                { 
+                {
                     { "fetch_active_monster", monster }
                 };
             string output = JsonConvert.SerializeObject(response);
@@ -50,7 +50,7 @@ namespace BossFight.Controllers
         {
             var player = new Player().FindOne(Convert.ToInt32(pJsonParameters["player_id"]));
             var response = new Dictionary<string, Player>
-                { 
+                {
                     { "update_player", player }
                 };
             string output = JsonConvert.SerializeObject(response);
@@ -68,9 +68,9 @@ namespace BossFight.Controllers
                 var weaponId = Convert.ToInt32(pJsonParameters["weapon_id"]);
                 var weaponToSell = player.PlayerWeaponList.First(pw => pw.WeaponId == weaponId);
                 weaponToSell.Sell();
-                
+
                 var response = new Dictionary<string, object>
-                { 
+                {
                     { "update_player_sold_weapon", new Dictionary<string, object>
                         {
                             { "gold", player.Gold },
@@ -94,9 +94,9 @@ namespace BossFight.Controllers
                 var player = new Player().FindOne(Convert.ToInt32(pJsonParameters["player_id"]));
                 var weaponId = Convert.ToInt32(pJsonParameters["weapon_id"]);
                 player.EquipWeapon(weaponId);
-                
+
                 var response = new Dictionary<string, object>
-                { 
+                {
                     { "update_player_equipped_weapon", player.PlayerWeaponList.First(pw => pw.WeaponId == weaponId).Weapon }
                 };
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
@@ -116,15 +116,31 @@ namespace BossFight.Controllers
                 var monster = new MonsterInstance { Active = true }.FindAll().First();
                 var summary = DamageDealer.PlayerAttackMonster(player, monster, true);
                 var response = new Dictionary<string, PlayerAttackSummary>
-                { 
+                {
                     { "player_attacked_monster_with_weapon", summary }
                 };
 
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
                 await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
-                
+
                 if (summary.PlayerKilledMonster)
-                    await NewMonster(monster, player); // test Messagetype og "endOfMEssage"
+                {
+                    await NewMonster(monster, player);
+                }
+                else
+                {
+                    // monster is still alive. Update everyone with the new monster
+                    var monsterUpdate = new Dictionary<string, MonsterInstance>
+                    {
+                        { "fetch_active_monster", monster }
+                    };
+                    string output = JsonConvert.SerializeObject(monsterUpdate);
+                    var monsterUpdateByteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
+                    // send to everyone but the current connection. They just got an update with player_attacked_monster_with_weapon
+                    var otherConnections = WebSocketConnections.GetInstance().GetAllOpenConnections().Where(con => con != pWebSocket);
+                    foreach (var ws in otherConnections)
+                        await ws.SendAsync(monsterUpdateByteArray, WebSocketMessageType.Text, true, CancellationToken.None);
+                }
             }
             else
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
@@ -148,7 +164,7 @@ namespace BossFight.Controllers
                     }
                 };
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(newMonsterMessage)));
-                foreach(var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
+                foreach (var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
                     await ws.SendAsync(byteArray, WebSocketMessageType.Text, true, CancellationToken.None);
             }
         }
@@ -164,9 +180,9 @@ namespace BossFight.Controllers
             {
                 userName = userName.Trim();
                 password = password.Trim();
-                var player = new Player{ UserName = userName, Password = password }.FindAll().First();
+                var player = new Player { UserName = userName, Password = password }.FindAll().First();
                 var response = new Dictionary<string, Player>
-                { 
+                {
                     { "update_player", player }
                 };
                 string output = JsonConvert.SerializeObject(response);
@@ -186,12 +202,12 @@ namespace BossFight.Controllers
             {
                 var sanitized = new HtmlSanitizer().Sanitize(message);
                 var response = new Dictionary<string, string>
-                { 
+                {
                     { "receive_chat_message", sanitized }
                 };
                 string output = JsonConvert.SerializeObject(response);
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
-                foreach(var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
+                foreach (var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
                     await ws.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
             }
             else
@@ -201,7 +217,7 @@ namespace BossFight.Controllers
         async private Task ReplyWithErrorMessage(WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket, string pError)
         {
             var response = new Dictionary<string, string>
-            { 
+            {
                 { "error_message", pError }
             };
             var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
