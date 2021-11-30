@@ -176,7 +176,7 @@ function UpdateUiPlayerStats(player) {
 	progress_player_mana.value = player.mana;
 
 	// set player sprite
-	document.getElementById("playerSprite").src = `./images/sprites/player_classes/${player.player_player_class.player_class_name}.png`
+	document.getElementById("playerSprite").src = `./images/sprites/player_classes/${player.player_player_class.player_class_name.toLowerCase()}.png`
 }
 
 function RepopulatePlayerInventory() {
