@@ -56,7 +56,7 @@ namespace BossFight.Controllers
             MonsterReceiveDamge(pTargetMonster, playerAttack, pPlayer);
             MonsterReceiveDOTDamage(pTargetMonster);
             
-            var xpEarned = GenralHelperFunctions.CalculateExperienceFromDamageDealtToMonster(playerAttack, pTargetMonster);
+            var xpEarned = ExperienceCalculator.CalculateExperienceFromDamageDealtToMonster(playerAttack, pTargetMonster);
             playerAttackSummary.PlayerXpEarned = xpEarned;
             pPlayer.GainXp(xpEarned, pTargetMonster.Level);
 

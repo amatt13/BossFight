@@ -77,7 +77,7 @@ namespace BossFight.Models
 
         public string PlayerClassName { get => PlayerClass.Name; }
 
-        public int XpNeededToNextLevel { get => GenralHelperFunctions.XpNeededToNextLevel(this); }
+        public int XpNeededToNextLevel { get => ExperienceCalculator.XpNeededToNextLevel(this); }
 
         public PlayerPlayerClass() { }
 

@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using BossFight.Models;
 
 namespace BossFight
 {
-    public static class GenralHelperFunctions
+    public static class ExperienceCalculator
     {
         // return a negative value if above required amount
         public static int XpNeededToNextLevel(PlayerPlayerClass pPlayerClass)
@@ -63,29 +62,5 @@ namespace BossFight
             }
             return (int)Math.Ceiling(result);
         }
-
-        public static string UpdatePlayersHealthAndManaHelper(List<Player> pPlayers, string pTimestamp, int pMinutesBetweenTicks, Action<Player, int> pRegenFunc)
-        {
-            var previousTimestamp = DateTime.Parse(pTimestamp);
-            var now = DateTime.Now;
-            var minutesDiff = Math.Floor((now - previousTimestamp).TotalSeconds / 60);
-            var ticks = (int)Math.Floor(minutesDiff / pMinutesBetweenTicks);
-            foreach (var p in pPlayers)
-                pRegenFunc(p, ticks);
-
-            var minutesToRemove = minutesDiff % pMinutesBetweenTicks;
-            now = now.AddMinutes(minutesToRemove);
-            return now.ToString("%Y-%m-%d:%H:%M:00");
-        }
-
-        // public static void RegenPlayerHealth(Player p, int timesToRegen = 1)
-        // {
-        //     p.RegenHealth(timesToRegen);
-        // }
-
-        // public static void RegenPlayerMana(Player p, int timesToRegen = 1)
-        // {
-        //     p.RegenMana(timesToRegen);
-        // }
     }
 }

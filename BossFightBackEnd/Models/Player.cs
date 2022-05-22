@@ -182,9 +182,9 @@ namespace BossFight.Models
 
         public void GainXp(int pGainedXp, int? pMonsterLevel = null)
         {
-            pGainedXp = GenralHelperFunctions.CalcXpPenalty(pGainedXp, GetLevel(), pMonsterLevel);
+            pGainedXp = ExperienceCalculator.CalcXpPenalty(pGainedXp, GetLevel(), pMonsterLevel);
             PlayerPlayerClass.XP += pGainedXp;
-            var xpNeededToNextLevel = GenralHelperFunctions.XpNeededToNextLevel(PlayerPlayerClass);
+            var xpNeededToNextLevel = ExperienceCalculator.XpNeededToNextLevel(PlayerPlayerClass);
             if (xpNeededToNextLevel <= 0)
             {
                 PlayerPlayerClass.LevelUp();
