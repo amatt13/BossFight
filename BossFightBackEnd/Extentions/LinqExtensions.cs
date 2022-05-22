@@ -6,7 +6,9 @@ namespace BossFight.Extentions
 {
     public static class IEnumerableExtensions
     {
-        // Removes the FIRST occurrence
+        /// <summary>
+        /// Removes the FIRST occurrence
+        /// </summary>
         public static IEnumerable<T> Remove<T>(this IEnumerable<T> source, Func<T, bool> pred)
         {
             var result = source;

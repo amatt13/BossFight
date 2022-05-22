@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BossFight.Extentions;
@@ -14,6 +15,7 @@ namespace BossFight.Models.DB
         public override string IdColumn { get; set; } = nameof(PersistableImplementationTemplateId);
 
         // Persisted on PersistableImplementationTemplate table
+        [PersistPropertyAttribute(true)]
         public int? PersistableImplementationTemplateId { get; set; }
 
         // From other tables
@@ -26,6 +28,11 @@ namespace BossFight.Models.DB
         public IEnumerable<PersistableImplementationTemplate> FindAll(int? id = null)
         {
             return _findAll(id).Cast<PersistableImplementationTemplate>();
+        }
+
+        public IEnumerable<PersistableImplementationTemplate> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
+        {
+            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<PersistableImplementationTemplate>();
         }
 
         public PersistableImplementationTemplate FindOne(int? id = null)

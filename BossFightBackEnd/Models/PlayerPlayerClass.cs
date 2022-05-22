@@ -86,6 +86,11 @@ namespace BossFight.Models
             return (PlayerPlayerClass)_findOne(id);
         }
 
+        public IEnumerable<PlayerPlayerClass> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
+        {
+            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<PlayerPlayerClass>();
+        }
+
         public IEnumerable<PlayerPlayerClass> FindAll(int? id = null)
         {
             return _findAll(id).Cast<PlayerPlayerClass>();
@@ -126,7 +131,7 @@ namespace BossFight.Models
             if (ppc.PlayerId.HasValue)
                 additionalSearchCriteriaText += $" AND { nameof(PlayerId) } = { ppc.PlayerId.Value }\n";
 
-            return pStartWithAnd ? additionalSearchCriteriaText : additionalSearchCriteriaText.Substring(4, additionalSearchCriteriaText.Length- 4);
+            return TrimAdditionalSearchCriteriaText(additionalSearchCriteriaText, pStartWithAnd);
         }
 
         public void LevelUp()

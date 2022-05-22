@@ -27,7 +27,15 @@ namespace BossFight.Controllers
             var data = pJsonObject[REQUEST_DATA];
             var dataJsonDictionary = JsonConvert.DeserializeObject<Dictionary<String, Object>>(data.ToString());
 
-            await (Task)this.GetType().GetMethod(handler).Invoke(this, new object[] { dataJsonDictionary, pWebSocketReceiveResult, pWebSocket });
+            var methodToCall = this.GetType().GetMethod(handler);
+            if (methodToCall != null)
+            {
+                await (Task)methodToCall.Invoke(this, new object[] { dataJsonDictionary, pWebSocketReceiveResult, pWebSocket });
+            }
+            else
+            {
+                throw new ArgumentException($"Method '{ handler }' does not exist!\n");
+            }
         }
 
         // takes: no data
@@ -193,22 +201,50 @@ namespace BossFight.Controllers
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
-        // takes: message: "string"
+        // takes: message: "string", player_id: "int"
         // receive an message from the client. This message must then be sent to all connection
         public async Task SendChatMessage(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var message = (string)pJsonParameters["message"];
-            if (RequestValidator.ValidateChatMessage(message, out string error))
+            var playerId = Convert.ToInt32(pJsonParameters["player_id"]); //TODO validate valid player
+            if (RequestValidator.ValidateChatMessage(message, playerId, out string error))
             {
                 var sanitized = new HtmlSanitizer().Sanitize(message);
-                var response = new Dictionary<string, string>
+                var doubleEscaped = sanitized.Replace(@"\", @"\\");
+                var player = new Player().FindOne(playerId);
+                var chatMessage = new ChatMessage{ MessageContent = doubleEscaped, Timestamp = DateTime.Now, Player = player };
+                chatMessage.Persist();
+                chatMessage.MessageContent = sanitized;
+
+                var response = new Dictionary<string, ChatMessage>
                 {
-                    { "receive_chat_message", sanitized }
+                    { "receive_chat_message", chatMessage }
                 };
                 string output = JsonConvert.SerializeObject(response);
                 var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
                 foreach (var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
                     await ws.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+            }
+            else
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        }
+
+        // takes: messages_to_fetch: "int"
+        // returns: list of ChatMessage
+        public async Task FetchMostRecentMessages(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            var messagesToFetch = Convert.ToInt32(pJsonParameters["messages_to_fetch"]);
+
+            if (RequestValidator.ValidateMaxMessageRequestNumberNotExceeded(messagesToFetch, out string error))
+            {
+                var chatMessages = new ChatMessage{}.FindTop((UInt32)messagesToFetch, nameof(ChatMessage.Timestamp));
+                var response = new Dictionary<string, IEnumerable<ChatMessage>>
+                {
+                    { "receive_multiple_chat_message", chatMessages }
+                };
+                string output = JsonConvert.SerializeObject(response);
+                var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
+                await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
             }
             else
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);

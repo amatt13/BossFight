@@ -57,6 +57,11 @@ namespace BossFight.Models
             return _findAllForParent(id, pConnection).Cast<MonsterDamageTracker>();
         }
 
+        public IEnumerable<MonsterDamageTracker> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
+        {
+            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<MonsterDamageTracker>();
+        }
+
         public MonsterDamageTracker FindOne(int? id = null)
         {
             return (MonsterDamageTracker)_findOne(id);
@@ -89,7 +94,7 @@ namespace BossFight.Models
             if (mdt.MonsterInstanceId.HasValue)
                 additionalSearchCriteriaText += $" AND { nameof(MonsterDamageTracker.MonsterInstanceId) } = { mdt.MonsterInstanceId.Value }";
 
-            return pStartWithAnd ? additionalSearchCriteriaText : additionalSearchCriteriaText.Substring(4, additionalSearchCriteriaText.Length- 4);
+            return TrimAdditionalSearchCriteriaText(additionalSearchCriteriaText, pStartWithAnd);
         }
 
 

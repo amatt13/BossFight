@@ -42,6 +42,11 @@ namespace BossFight.Models
             return _findAll(id).Cast<PlayerClassRequirement>();
         }
 
+        public IEnumerable<PlayerClassRequirement> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
+        {
+            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<PlayerClassRequirement>();
+        }
+
         public PlayerClassRequirement FindOne(int? id = null)
         {
             return (PlayerClassRequirement)_findOne(id);

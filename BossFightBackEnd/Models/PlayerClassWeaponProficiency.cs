@@ -35,6 +35,11 @@ namespace BossFight.Models
             return _findAll(id).Cast<PlayerClassWeaponProficiency>();
         }
 
+        public IEnumerable<PlayerClassWeaponProficiency> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
+        {
+            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<PlayerClassWeaponProficiency>();
+        }
+
         public PlayerClassWeaponProficiency FindOne(int? id = null)
         {
             return (PlayerClassWeaponProficiency)_findOne(id);

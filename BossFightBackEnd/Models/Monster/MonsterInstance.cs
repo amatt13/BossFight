@@ -21,7 +21,6 @@ namespace BossFight.Models
         public override string IdColumn { get; set; } = nameof(MonsterInstanceId);
 
         // Persisted on MonsterActive table
-
         [PersistProperty(true)]
         public int? MonsterInstanceId { get; set;  }
 
@@ -99,6 +98,11 @@ namespace BossFight.Models
             return _findAll(id).Cast<MonsterInstance>();
         }
 
+        public IEnumerable<MonsterInstance> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
+        {
+            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<MonsterInstance>();
+        }
+
         public MonsterInstance FindOne(int? id = null)
         {
             return (MonsterInstance)_findOne(id);
@@ -141,7 +145,7 @@ namespace BossFight.Models
             if (mi.Active.HasValue)
                 additionalSearchCriteriaText += $" AND Active = { (mi.Active.Value ? "TRUE" : "FALSE") }\n";
 
-            return pStartWithAnd ? additionalSearchCriteriaText : additionalSearchCriteriaText.Substring(4, additionalSearchCriteriaText.Length- 4);
+            return TrimAdditionalSearchCriteriaText(additionalSearchCriteriaText, pStartWithAnd);
         }
 
         #endregion PersistableBase implementation

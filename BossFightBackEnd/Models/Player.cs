@@ -60,9 +60,19 @@ namespace BossFight.Models
             return (Player)_findOne(id);
         }
 
+        public IEnumerable<Player> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
+        {
+            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<Player>();
+        }
+
         public IEnumerable<Player> FindAll(int? id = null)
         {
             return _findAll(id).Cast<Player>();
+        }
+
+        public Player FindOneForParent(int id, MySqlConnection pConnection)
+        {
+            return (Player)_findOneForParent(id, pConnection);
         }
 
         public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader, MySqlConnection pConnection)
@@ -81,8 +91,13 @@ namespace BossFight.Models
                 player.WeaponId = reader.GetInt(nameof(WeaponId));
                 player.UserName = reader.GetString(nameof(UserName));
                 player.Password = reader.GetString(nameof(Password));
-                reader.Close();
-                
+
+                result.Add(player);
+            }
+            reader.Close();
+
+            foreach (Player player in result)
+            {
                 player.PlayerPlayerClass = new PlayerPlayerClass{ Active = true, PlayerId = player.PlayerId }.FindAllForParent(pConnection).First();
                 player.PlayerPlayerClass.Player = player;
                 player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{ PlayerId = player.PlayerId }.FindAllForParent(pConnection);
@@ -90,8 +105,6 @@ namespace BossFight.Models
 
                 player.PlayerWeaponList = new PlayerWeapon{ PlayerId =  player.PlayerId}.FindAllForParent(pConnection);
                 foreach(var x in player.PlayerWeaponList) { x.Player = player; }
-
-                result.Add(player);
             }
 
             return result;
@@ -107,7 +120,7 @@ namespace BossFight.Models
             if (p.Password.HasText())
                 additionalSearchCriteriaText += $" AND { nameof(Password) } = { p.Password.ToDbString() }\n";
 
-            return pStartWithAnd ? additionalSearchCriteriaText : additionalSearchCriteriaText.Substring(4, additionalSearchCriteriaText.Length- 4);
+            return TrimAdditionalSearchCriteriaText(additionalSearchCriteriaText, pStartWithAnd);
         }
 
         public int CalckWeaponAttackDamage(MonsterInstance pTargetMonster, PlayerAttackSummary pPlayerAttackSummary)

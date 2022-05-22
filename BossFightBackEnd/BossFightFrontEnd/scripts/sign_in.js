@@ -4,7 +4,7 @@ signInButton.addEventListener("click", function() {
     SignInButtonClicked();
 })
 
-function SignInButtonClicked() {
+async function SignInButtonClicked() {
     errorOccured = false;
 
     const userNameInput = document.getElementById("inputUserName");
@@ -24,6 +24,6 @@ function SignInButtonClicked() {
 
     if (!errorOccured)
     {
-        SendSignInRequest(userNameText, passwordText);
+        await SendSignInRequest(userNameText, passwordText);
     }
 }

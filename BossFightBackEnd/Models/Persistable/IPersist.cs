@@ -7,5 +7,6 @@ namespace BossFight.Models
     {
         T FindOne(int? id = null);
         IEnumerable<T> FindAll(int? id = null);
+        IEnumerable<T> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true);
     }
 }

@@ -71,6 +71,9 @@ Body
 .btn-primary {
 	background-color: hsl(256, 13%, 28%);
 	color: hsl(256, 15%, 14%);
+	height: 25px;
+	text-align: center;
+	padding-bottom: 7px;
 }
 
 
@@ -148,6 +151,32 @@ select {
 	margin-left: auto;
   	margin-right: auto;
   	vertical-align: middle;
+}
+
+.log-tab {
+	float:left;width:100%;
+	width:33.33333%;
+	resize: none; 
+	grid-column: 1/-1; 
+	grid-row: 3;
+	border-bottom:6px solid #ccc;
+}
+
+.border-red {
+	border-color:#f44336;
+}
+
+hover-light-grey:hover{
+	color:#000;
+	background-color:#f1f1f1;
+}
+
+.log {
+	height: 
+	600px; 
+	resize: none; 
+	grid-column: 1/-1; 
+	grid-row: 4;
 }
 
 * {

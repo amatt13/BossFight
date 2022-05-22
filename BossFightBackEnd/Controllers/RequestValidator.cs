@@ -201,23 +201,66 @@ AND p.Password = {pPassword.ToDbString()}";
             return errors.Count == 0;
         }
 
-        public static bool ValidateChatMessage(string pMessage, out string pError)
+        public static bool ValidateChatMessage(string pMessage, int playerId, out string pError)
         {
             pError = String.Empty;
 
             if (pMessage.HasText())
             {
-                try
+                if (pMessage.Length > 500)
                 {
-                    new HtmlSanitizer().Sanitize(pMessage);                     
+                    pError = $"Message too long. Max 500 characters are allowed.";
                 }
-                catch (Exception e)
+                else
                 {
-                    pError = $"Failed to sanitize message:\n{ e }";
+                    try
+                    {
+                        new HtmlSanitizer().Sanitize(pMessage);                     
+                    }
+                    catch (Exception e)
+                    {
+                        pError = $"Failed to sanitize message:\n{ e }";
+                    }
+                    using var connection = GlobalConnection.GetNewOpenConnection();
+                    using var cmd = connection.CreateCommand();
+
+                    cmd.CommandText = $@"SELECT TRUE as PlayerFound
+    FROM Player p
+    WHERE p.PlayerId = @player_id";
+                    cmd.Parameters.AddParameter(playerId.ToDbString(), "@player_id");
+                    
+                    var reader = cmd.ExecuteReader();
+                    reader.Read();
+                    var playersWithMatchingCredentials = reader.GetBooleanNullable("PlayerFound").GetValueOrDefault(false);
+                    reader.Close();
+                    connection.Close();
+
+                    if (!playersWithMatchingCredentials)
+                    {
+                        pError = "Could not find player";
+                    }
                 }
             }
             else
                 pError = "Chat meesage was empty";
+
+            return String.IsNullOrEmpty(pError);
+        }
+
+        public static bool ValidateMaxMessageRequestNumberNotExceeded(int? pRequestedMessages, out string pError)
+        {
+            pError = String.Empty;
+            var maxMessages = 100;
+            var requested = pRequestedMessages.GetValueOrDefault(0);
+
+            if (requested > maxMessages)
+            {
+                pError = $"Too many messages was requestd ({requested}). Maximum allowed is {maxMessages}";
+            }
+            else if (requested <= 0)
+            {
+                pError = $"Must request 1 or more messages. Requested was {requested}.";
+            }
 
             return String.IsNullOrEmpty(pError);
         }

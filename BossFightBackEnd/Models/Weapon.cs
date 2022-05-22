@@ -70,6 +70,11 @@ namespace BossFight.Models
             return (Weapon)_findOneForParent(id, pConnection);
         }
 
+        public IEnumerable<Weapon> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
+        {
+            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<Weapon>();
+        }
+
         public IEnumerable<Weapon> FindAll(int? id = null)
         {
             return _findAll(id).Cast<Weapon>();

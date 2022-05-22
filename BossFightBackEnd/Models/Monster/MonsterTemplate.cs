@@ -43,6 +43,11 @@ namespace BossFight.Models
             return (MonsterTemplate)_findOne(id);
         }
 
+        public IEnumerable<MonsterTemplate> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
+        {
+            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<MonsterTemplate>();
+        }
+
         public MonsterTemplate FindOneForParent(int id, MySqlConnection pConnection)
         {
             return (MonsterTemplate)_findOneForParent(id, pConnection);

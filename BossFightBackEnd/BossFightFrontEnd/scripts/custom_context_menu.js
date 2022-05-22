@@ -55,28 +55,3 @@ $(".custom-menu li").click(function(){
     // Hide it AFTER the action was triggered
     $(".custom-menu").hide(100);
   });
-
-
-async function EquipWeapon(weapon_id_to_equip) {
-	const obj = { 
-		request_key: "EquipWeapon", 
-		request_data: JSON.stringify({
-			player_id: _player.player_id,
-            weapon_id: weapon_id_to_equip
-		})
-	};
-	const json_obj = JSON.stringify(obj);
-	socket.send(json_obj);
-}
-
-async function SellWeapon(weapon_id_to_equip) {
-	const obj = { 
-		request_key: "SellWeapon", 
-		request_data: JSON.stringify({
-			player_id: _player.player_id,
-            weapon_id: weapon_id_to_equip
-		})
-	};
-	const json_obj = JSON.stringify(obj);
-	socket.send(json_obj);
-}

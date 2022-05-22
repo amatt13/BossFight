@@ -1,8 +1,9 @@
-using System.Data;
-using MySqlConnector;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Reflection;
+using MySqlConnector;
 using BossFight.Extentions;
 
 namespace BossFight.Models
@@ -27,13 +28,19 @@ namespace BossFight.Models
         public PersistableBase()
         { }
 
+        protected virtual string BuildSelectStatement()
+        {
+            var select = $"SELECT *\nFROM `{ TableName }`\n";
+            return select;
+        }
+
         protected IEnumerable<PersistableBase> _findAll(int? id)
         {
             using var connection = GlobalConnection.GetNewOpenConnection();
             using var cmd = connection.CreateCommand();
 
-            var selectString = $"SELECT * FROM `{ TableName }`\n";
-            var whereString = "";
+            var selectString = BuildSelectStatement();
+            var whereString = String.Empty;
             if (id.HasValue)
             {
                 whereString = $"WHERE `{ IdColumn }` = @id \n";
@@ -46,8 +53,30 @@ namespace BossFight.Models
                     whereString += $"WHERE { additionalSearchCriteriaString }";
             }
 
-            cmd.CommandText = selectString + whereString;
+            cmd.CommandText = $"{ selectString }\n{ whereString }";
             cmd.Parameters.AddParameter(id, nameof(id));
+            var reader = cmd.ExecuteReader();
+            var result = BuildObjectFromReader(reader, connection);
+            connection.Close();
+            return result;
+        }
+
+        protected IEnumerable<PersistableBase> _findTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending)
+        {
+            using var connection = GlobalConnection.GetNewOpenConnection();
+            using var cmd = connection.CreateCommand();
+
+            var selectString = BuildSelectStatement();
+            var whereString = String.Empty;
+            var order = pOrderByDescending ? "DESC" : "ASC";
+            var orderByString = $"ORDER BY `{ pOrderByColumn }` { order }\n";
+            var limitString = $"LIMIT { pRowsToRetrieve }\n";
+            
+            var additionalSearchCriteriaString = AdditionalSearchCriteria(this, pStartWithAnd: false);
+            if (!String.IsNullOrEmpty(additionalSearchCriteriaString))
+                whereString += $"WHERE { additionalSearchCriteriaString }";
+
+            cmd.CommandText = $"{ selectString } { whereString } { orderByString } { limitString }";
             var reader = cmd.ExecuteReader();
             var result = BuildObjectFromReader(reader, connection);
             connection.Close();
@@ -102,13 +131,42 @@ namespace BossFight.Models
         {
             var additionalSearchCriteriaText = String.Empty;
 
-            return pStartWithAnd ? additionalSearchCriteriaText : additionalSearchCriteriaText.Substring(4, additionalSearchCriteriaText.Length - 4);
+            return TrimAdditionalSearchCriteriaText(additionalSearchCriteriaText, pStartWithAnd);
+        }
+
+        protected string TrimAdditionalSearchCriteriaText(string pAdditionalSearchCriteriaText, bool pStartWithAnd)
+        {
+            return pStartWithAnd || String.IsNullOrEmpty(pAdditionalSearchCriteriaText) ? pAdditionalSearchCriteriaText : pAdditionalSearchCriteriaText.Substring(4, pAdditionalSearchCriteriaText.Length- 4);
         }
 
         public abstract IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader, MySqlConnection pConnection);
 
+        public virtual void BeforePersist()
+        { }
+
+        private object GetValueFromProperyInfo(PropertyInfo pPropertyInfo)
+        {
+            object resultString = null;
+            if (pPropertyInfo.PropertyType == typeof(DateTime))
+            {
+                resultString = ((DateTime)pPropertyInfo.GetValue(this)).ToString("yyyy-MM-dd HH:mm:ss");
+                resultString = $"\"{ resultString }\"";
+            }
+            else if (pPropertyInfo.PropertyType == typeof(String))
+            {
+                resultString = pPropertyInfo.GetValue(this);
+                resultString = $"\"{ resultString }\"";
+            }
+            else
+                resultString = pPropertyInfo.GetValue(this);
+
+            return resultString;
+        }
+
         public virtual void Persist()
         {
+            BeforePersist();
+
             var id = (int?)GetType().GetProperty(IdColumn).GetValue(this);
             using var connection = GlobalConnection.GetNewOpenConnection();
 
@@ -120,7 +178,7 @@ namespace BossFight.Models
                 var propsToPersist = GetType().GetProperties().Where(prop => prop.IsDefined(typeof(PersistPropertyAttribute), true));
                 var insert = $"INSERT { TableName }";
                 var colums = String.Join(", ", propsToPersist.Where(prop => (prop.GetCustomAttributes(true).First(x => x is PersistPropertyAttribute) as PersistPropertyAttribute).IsIdProperty == false).Select(p => p.Name));
-                var values = String.Join(", ", propsToPersist.Where(prop => (prop.GetCustomAttributes(true).First(x => x is PersistPropertyAttribute) as PersistPropertyAttribute).IsIdProperty == false).Select(p => p.GetValue(this) ?? "NULL"));
+                var values = String.Join(", ", propsToPersist.Where(prop => (prop.GetCustomAttributes(true).First(x => x is PersistPropertyAttribute) as PersistPropertyAttribute).IsIdProperty == false).Select(p => GetValueFromProperyInfo(p) ?? "NULL"));
                 cmd.CommandText = $"{ insert }\n({ colums })\nVALUES\n({ values })\n";
                 cmd.ExecuteNonQuery();
                 connection.Close();

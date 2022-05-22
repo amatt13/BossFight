@@ -39,6 +39,9 @@ namespace BossFight
             });
 
             Console.WriteLine("Ready!");
+
+            var PlayerRegenerator = new PlayerRegenerator();
+            PlayerRegenerator.Run();
         }
     }
 }

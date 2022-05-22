@@ -42,7 +42,7 @@ namespace BossFight.Controllers
                     monsterDamage = pMonster.LowerAttackBecauseOfLowerAttackDebuff(monsterDamage);
                     
                 pPlayerToAttack.SubtractHealth(monsterDamage);
-                damageTexts.Add($"{ pMonster.Name } hit you for { monsterDamage } damage");
+                damageTexts.Add($"{ pMonster.Name } hits you for { monsterDamage } damage");
             }
 
             pPlayerAttackSummary.MonsterRetaliateMessage = String.Join("\n", damageTexts);

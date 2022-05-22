@@ -42,6 +42,11 @@ namespace BossFight.Models
             return _findAll(id).Cast<PlayerWeapon>();
         }
 
+        public IEnumerable<PlayerWeapon> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
+        {
+            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<PlayerWeapon>();
+        }
+
         public IEnumerable<PlayerWeapon> FindAllForParent(MySqlConnection pConnection, int? id = null)
         {
             return _findAllForParent(id, pConnection).Cast<PlayerWeapon>();
@@ -77,7 +82,7 @@ namespace BossFight.Models
             if (pw.PlayerId != null)
                 additionalSearchCriteriaText += $"AND { nameof(PlayerId) } = { pw.PlayerId }\n";
 
-            return pStartWithAnd ? additionalSearchCriteriaText : additionalSearchCriteriaText.Substring(4, additionalSearchCriteriaText.Length- 4);
+            return TrimAdditionalSearchCriteriaText(additionalSearchCriteriaText, pStartWithAnd);
         }
 
         #endregion PersistableBase implementation

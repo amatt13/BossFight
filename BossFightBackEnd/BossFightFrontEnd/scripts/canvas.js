@@ -32,9 +32,9 @@ function Draw() {
 }
 
 function ReSizeCanvas() {
-	if (canvas.width != Math.floor(window.innerWidth * 0.33) || canvas.height != Math.floor(window.innerHeight * 0.90)) {
+	if (canvas.width != Math.floor(window.innerWidth * 0.33) || canvas.height != Math.floor(window.innerHeight * 0.80)) {
 		canvas.width = Math.floor(window.innerWidth * 0.33);
-		canvas.height = Math.floor(window.innerHeight * 0.90);
+		canvas.height = Math.floor(window.innerHeight * 0.80);
 		initialMonsterImageY = canvas.height / 2;
 		monsterImageX = initialMonsterImageX, monsterImageY = initialMonsterImageY;
 		monsterImageMoveForward = true, monsterImageMoveDown = false;
