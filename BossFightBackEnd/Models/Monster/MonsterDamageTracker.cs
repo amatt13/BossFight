@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
-    public class MonsterDamageTracker : PersistableBase, IPersist<MonsterDamageTracker>
+    public class MonsterDamageTracker : PersistableBase<MonsterDamageTracker>, IPersist<MonsterDamageTracker>
     {
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(MonsterDamageTracker);
@@ -47,29 +47,9 @@ namespace BossFight.Models
 
         #region PersistableBase implementation
 
-        public IEnumerable<MonsterDamageTracker> FindAll(int? id = null)
+        public override IEnumerable<MonsterDamageTracker> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
-            return _findAll(id).Cast<MonsterDamageTracker>();
-        }
-
-        public IEnumerable<MonsterDamageTracker> FindAllForParent(MySqlConnection pConnection, int? id = null)
-        {
-            return _findAllForParent(id, pConnection).Cast<MonsterDamageTracker>();
-        }
-
-        public IEnumerable<MonsterDamageTracker> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
-        {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<MonsterDamageTracker>();
-        }
-
-        public MonsterDamageTracker FindOne(int? id = null)
-        {
-            return (MonsterDamageTracker)_findOne(id);
-        }
-
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
-        {
-            var result = new List<PersistableBase>();
+            var result = new List<MonsterDamageTracker>();
 
             while (!reader.IsClosed && reader.Read())
             {   
@@ -87,7 +67,7 @@ namespace BossFight.Models
             return result;
         }
 
-        public override string AdditionalSearchCriteria(PersistableBase pSearchObject, bool pStartWithAnd = true)
+        public override string AdditionalSearchCriteria(PersistableBase<MonsterDamageTracker> pSearchObject, bool pStartWithAnd = true)
         {
             var mdt = pSearchObject as MonsterDamageTracker;
             var additionalSearchCriteriaText = String.Empty;

@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
-    public class PlayerClassWeaponProficiency : PersistableBase, IPersist<PlayerClassWeaponProficiency>
+    public class PlayerClassWeaponProficiency : PersistableBase<PlayerClassWeaponProficiency>, IPersist<PlayerClassWeaponProficiency>
     {
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(PlayerClassWeaponProficiency);
@@ -30,24 +30,9 @@ namespace BossFight.Models
 
         #region PersistableBase implementation
 
-        public IEnumerable<PlayerClassWeaponProficiency> FindAll(int? id = null)
+        public override IEnumerable<PlayerClassWeaponProficiency> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
-            return _findAll(id).Cast<PlayerClassWeaponProficiency>();
-        }
-
-        public IEnumerable<PlayerClassWeaponProficiency> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
-        {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<PlayerClassWeaponProficiency>();
-        }
-
-        public PlayerClassWeaponProficiency FindOne(int? id = null)
-        {
-            return (PlayerClassWeaponProficiency)_findOne(id);
-        }
-
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
-        {
-            var result = new List<PersistableBase>();
+            var result = new List<PlayerClassWeaponProficiency>();
 
             while (reader.Read())
             {   

@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
-    public class PlayerWeapon : PersistableBase, IPersist<PlayerWeapon>
+    public class PlayerWeapon : PersistableBase<PlayerWeapon>, IPersist<PlayerWeapon>
     {
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(PlayerWeapon);
@@ -37,29 +37,9 @@ namespace BossFight.Models
 
         #region PersistableBase implementation
 
-        public IEnumerable<PlayerWeapon> FindAll(int? id = null)
+        public override IEnumerable<PlayerWeapon> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
-            return _findAll(id).Cast<PlayerWeapon>();
-        }
-
-        public IEnumerable<PlayerWeapon> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
-        {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<PlayerWeapon>();
-        }
-
-        public IEnumerable<PlayerWeapon> FindAllForParent(MySqlConnection pConnection, int? id = null)
-        {
-            return _findAllForParent(id, pConnection).Cast<PlayerWeapon>();
-        }
-
-        public PlayerWeapon FindOne(int? id = null)
-        {
-            return (PlayerWeapon)_findOne(id);
-        }
-
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
-        {
-            var result = new List<PersistableBase>();
+            var result = new List<PlayerWeapon>();
 
             while (reader.Read())
             {   
@@ -74,7 +54,7 @@ namespace BossFight.Models
             return result;
         }
 
-        public override string AdditionalSearchCriteria(PersistableBase pSearchObject, bool pStartWithAnd = true)
+        public override string AdditionalSearchCriteria(PersistableBase<PlayerWeapon> pSearchObject, bool pStartWithAnd = true)
         {
             var pw = pSearchObject as PlayerWeapon;
             var additionalSearchCriteriaText = String.Empty;

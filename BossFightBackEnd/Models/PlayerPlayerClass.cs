@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
-    public class PlayerPlayerClass : PersistableBase, IPersist<PlayerPlayerClass>
+    public class PlayerPlayerClass : PersistableBase<PlayerPlayerClass>, IPersist<PlayerPlayerClass>
     {
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(PlayerPlayerClass);
@@ -81,29 +81,9 @@ namespace BossFight.Models
 
         public PlayerPlayerClass() { }
 
-        public PlayerPlayerClass FindOne(int? id = null)
+        public override IEnumerable<PlayerPlayerClass> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
-            return (PlayerPlayerClass)_findOne(id);
-        }
-
-        public IEnumerable<PlayerPlayerClass> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
-        {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<PlayerPlayerClass>();
-        }
-
-        public IEnumerable<PlayerPlayerClass> FindAll(int? id = null)
-        {
-            return _findAll(id).Cast<PlayerPlayerClass>();
-        }
-
-        public IEnumerable<PlayerPlayerClass> FindAllForParent(MySqlConnection pConnection, int? id = null)
-        {
-            return _findAllForParent(id, pConnection).Cast<PlayerPlayerClass>();
-        }
-
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
-        {
-            var result = new List<PersistableBase>();
+            var result = new List<PlayerPlayerClass>();
 
             while (reader.Read())
             {
@@ -121,7 +101,7 @@ namespace BossFight.Models
             return result;
         }
 
-        public override string AdditionalSearchCriteria(PersistableBase pSearchObject, bool pStartWithAnd = true)
+        public override string AdditionalSearchCriteria(PersistableBase<PlayerPlayerClass> pSearchObject, bool pStartWithAnd = true)
         {
             var ppc = pSearchObject as PlayerPlayerClass;
             var additionalSearchCriteriaText = String.Empty;

@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace BossFight.Models
 {
-    public class MonsterTemplate : PersistableBase, IPersist<MonsterTemplate>
+    public class MonsterTemplate : PersistableBase<MonsterTemplate>, IPersist<MonsterTemplate>
     {
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(MonsterTemplate);
@@ -38,29 +38,9 @@ namespace BossFight.Models
 
         public MonsterTemplate () { }
 
-        public MonsterTemplate FindOne(int? id = null)
+        public override IEnumerable<MonsterTemplate> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
-            return (MonsterTemplate)_findOne(id);
-        }
-
-        public IEnumerable<MonsterTemplate> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
-        {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<MonsterTemplate>();
-        }
-
-        public MonsterTemplate FindOneForParent(int id, MySqlConnection pConnection)
-        {
-            return (MonsterTemplate)_findOneForParent(id, pConnection);
-        }
-
-        public IEnumerable<MonsterTemplate> FindAll(int? id)
-        {
-            return _findAll(id).Cast<MonsterTemplate>();
-        }
-
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
-        {
-            var result = new List<PersistableBase>();
+            var result = new List<MonsterTemplate>();
 
             while (reader.Read())
             {   
@@ -75,7 +55,7 @@ namespace BossFight.Models
             return result;
         }
 
-        public override string AdditionalSearchCriteria(PersistableBase pSearchObject, bool pStartWithAnd = true)
+        public override string AdditionalSearchCriteria(PersistableBase<MonsterTemplate> pSearchObject, bool pStartWithAnd = true)
         {
             var mt = pSearchObject as MonsterTemplate;
             var additionalSearchCriteriaText = String.Empty;

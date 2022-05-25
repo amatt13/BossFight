@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
-    public class PlayerClassRequirement : PersistableBase, IPersist<PlayerClassRequirement>
+    public class PlayerClassRequirement : PersistableBase<PlayerClassRequirement>
     {
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(PlayerClassRequirement);
@@ -36,25 +36,10 @@ namespace BossFight.Models
 
 
         #region PersistableBase implementation
-
-        public IEnumerable<PlayerClassRequirement> FindAll(int? id = null)
+        
+        public override IEnumerable<PlayerClassRequirement> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
-            return _findAll(id).Cast<PlayerClassRequirement>();
-        }
-
-        public IEnumerable<PlayerClassRequirement> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
-        {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<PlayerClassRequirement>();
-        }
-
-        public PlayerClassRequirement FindOne(int? id = null)
-        {
-            return (PlayerClassRequirement)_findOne(id);
-        }
-
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
-        {
-            var result = new List<PersistableBase>();
+            var result = new List<PlayerClassRequirement>();
 
             while (reader.Read())
             {   

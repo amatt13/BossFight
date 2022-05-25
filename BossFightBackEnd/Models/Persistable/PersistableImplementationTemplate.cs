@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace BossFight.Models.DB
 {
-    public class PersistableImplementationTemplate : PersistableBase, IPersist<PersistableImplementationTemplate>
+    public class PersistableImplementationTemplate : PersistableBase<PersistableImplementationTemplate>, IPersist<PersistableImplementationTemplate>
     {
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(PersistableImplementationTemplate);
@@ -25,30 +25,20 @@ namespace BossFight.Models.DB
 
         #region PersistableBase implementation
 
-        public IEnumerable<PersistableImplementationTemplate> FindAll(int? id = null)
+        public override IEnumerable<PersistableImplementationTemplate> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
-            return _findAll(id).Cast<PersistableImplementationTemplate>();
-        }
-
-        public IEnumerable<PersistableImplementationTemplate> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
-        {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<PersistableImplementationTemplate>();
-        }
-
-        public PersistableImplementationTemplate FindOne(int? id = null)
-        {
-            return (PersistableImplementationTemplate)_findOne(id);
-        }
-
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
-        {
-            var result = new List<PersistableBase>();
+            var result = new List<PersistableImplementationTemplate>();
 
             while (reader.Read())
             {   
                 var persistableImplementationTemplate = new PersistableImplementationTemplate();
                 persistableImplementationTemplate.PersistableImplementationTemplateId = reader.GetInt(nameof(PersistableImplementationTemplateId));
                 result.Add(persistableImplementationTemplate);
+            }
+
+            foreach (var PersistableBase in result)
+            {
+                //persistableBase.Player = new Player().FindOneForParent(persistableBase.PlayerId, pConnection);
             }
 
             return result;

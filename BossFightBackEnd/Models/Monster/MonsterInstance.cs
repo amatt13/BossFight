@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
-    public class MonsterInstance : Target, IPersist<MonsterInstance>
+    public class MonsterInstance : Target<MonsterInstance>, IPersist<MonsterInstance>
     {
         private static Random _random = new Random();
         private const int TIER_DIVIDER = 5;
@@ -93,24 +93,10 @@ namespace BossFight.Models
 
         #region PersistableBase implementation
 
-        public IEnumerable<MonsterInstance> FindAll(int? id = null)
-        {
-            return _findAll(id).Cast<MonsterInstance>();
-        }
 
-        public IEnumerable<MonsterInstance> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
+        public override IEnumerable<MonsterInstance> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<MonsterInstance>();
-        }
-
-        public MonsterInstance FindOne(int? id = null)
-        {
-            return (MonsterInstance)_findOne(id);
-        }
-
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
-        {
-            var result = new List<PersistableBase>();
+            var result = new List<MonsterInstance>();
 
             while (!reader.IsClosed && reader.Read())
             {   
@@ -130,7 +116,7 @@ namespace BossFight.Models
 
                 monsterInstance.MonsterTemplate = new MonsterTemplate().FindOneForParent(monsterInstance.MonsterTemplateId, pConnection);
 
-                monsterInstance.MonsterDamageTrackerList = new MonsterDamageTracker{ MonsterInstanceId =  monsterInstance.MonsterInstanceId}.FindAllForParent(pConnection);
+                monsterInstance.MonsterDamageTrackerList = new MonsterDamageTracker().FindAllForParent(monsterInstance.MonsterInstanceId, pConnection);
                 monsterInstance.MonsterDamageTrackerList.ForEach(mdt => mdt.MonsterInstance = monsterInstance);
                 result.Add(monsterInstance);
             }
@@ -138,7 +124,7 @@ namespace BossFight.Models
             return result;
         }
 
-        public override string AdditionalSearchCriteria(PersistableBase pSearchObject, bool pStartWithAnd = true)
+        public override string AdditionalSearchCriteria(PersistableBase<MonsterInstance> pSearchObject, bool pStartWithAnd = true)
         {
             var mi = pSearchObject as MonsterInstance;
             var additionalSearchCriteriaText = String.Empty;

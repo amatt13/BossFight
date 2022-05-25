@@ -10,13 +10,13 @@ using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
-    public class Weapon : LootItem, IPersist<Weapon>
+    public class Weapon : LootItem<Weapon>, IPersist<Weapon>
     {
         [JsonIgnore]
         public const float DEFAULTWEAPONDROPCHANCE = 1.0f;
 
         [JsonIgnore]
-        public override string TableName { get; set; } = "Weapon";
+        public override string TableName { get; set; } = nameof(Weapon);
 
         [JsonIgnore]
         public override string IdColumn { get; set; } = "WeaponId";
@@ -60,29 +60,9 @@ namespace BossFight.Models
             SpellCritChance = pSpellCritChance;
         }
 
-        public Weapon FindOne(int? id = null)
+        public override IEnumerable<Weapon> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
-            return (Weapon)_findOne(id);
-        }
-
-        public Weapon FindOneForParent(int id, MySqlConnection pConnection)
-        {
-            return (Weapon)_findOneForParent(id, pConnection);
-        }
-
-        public IEnumerable<Weapon> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
-        {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<Weapon>();
-        }
-
-        public IEnumerable<Weapon> FindAll(int? id = null)
-        {
-            return _findAll(id).Cast<Weapon>();
-        }
-
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
-        {
-            var result = new List<PersistableBase>();
+            var result = new List<Weapon>();
 
             while (reader.Read())
             {

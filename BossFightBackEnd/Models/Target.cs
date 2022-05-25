@@ -3,7 +3,11 @@ using System.Linq;
 
 namespace BossFight.Models
 {
-    public abstract class Target : PersistableBase
+    public interface iTarget
+    { }
+
+    public abstract class Target<T> : PersistableBase<T>, iTarget
+    where T: PersistableBase<T>
     {       
         [PersistPropertyAttribute]
         public int Hp { get; set; }

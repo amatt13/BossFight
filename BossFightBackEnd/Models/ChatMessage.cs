@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace BossFight.Models.DB
 {
-    public class ChatMessage : PersistableBase, IPersist<ChatMessage>
+    public class ChatMessage : PersistableBase<ChatMessage>, IPersist<ChatMessage>
     {
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(ChatMessage);
@@ -61,24 +61,9 @@ namespace BossFight.Models.DB
                 Timestamp = DateTime.Now;
         }
 
-        public IEnumerable<ChatMessage> FindAll(int? id = null)
+        public override IEnumerable<ChatMessage> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
-            return _findAll(id).Cast<ChatMessage>();
-        }
-
-        public IEnumerable<ChatMessage> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
-        {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<ChatMessage>();
-        }
-
-        public ChatMessage FindOne(int? id = null)
-        {
-            return (ChatMessage)_findOne(id);
-        }
-
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
-        {
-            var result = new List<PersistableBase>();
+            var result = new List<ChatMessage>();
 
             while (reader.Read())
             {   
@@ -101,7 +86,7 @@ namespace BossFight.Models.DB
             return result;
         }
 
-         public override string AdditionalSearchCriteria(PersistableBase pSearchObject, bool pStartWithAnd = true)
+        public override string AdditionalSearchCriteria(PersistableBase<ChatMessage> pSearchObject, bool pStartWithAnd = true)
         {
             var cm = pSearchObject as ChatMessage;
             var additionalSearchCriteriaText = String.Empty;

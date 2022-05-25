@@ -9,10 +9,10 @@ using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
-    public class PlayerClass : PersistableBase, IPersist<PlayerClass>
+    public class PlayerClass : PersistableBase<PlayerClass>, IPersist<PlayerClass>
     {
         [JsonIgnore]
-        public override string TableName { get; set; } = "PlayerClass";
+        public override string TableName { get; set; } = nameof(PlayerClass);
         [JsonIgnore]
         public override string IdColumn { get; set; } = nameof(PlayerClassId);
 
@@ -60,9 +60,9 @@ namespace BossFight.Models
         
         public PlayerClass() { }
 
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
+        public override IEnumerable<PlayerClass> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
-            var result = new List<PersistableBase>();
+            var result = new List<PlayerClass>();
 
             while (reader.Read())
             {
@@ -90,21 +90,6 @@ namespace BossFight.Models
             }
 
             return result;
-        }
-
-        public PlayerClass FindOne(int? id = null)
-        {
-            return (PlayerClass)_findOne(id);
-        }
-
-        public IEnumerable<PlayerClass> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
-        {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<PlayerClass>();
-        }
-
-        public IEnumerable<PlayerClass> FindAll(int? id = null)
-        {
-            return _findAll(id).Cast<PlayerClass>();
         }
 
         public override string ToString()

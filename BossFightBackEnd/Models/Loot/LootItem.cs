@@ -1,9 +1,17 @@
 using System;
-using BossFight.Models.DB;
 
 namespace BossFight.Models.Loot
 {
-    public abstract class LootItem : PersistableBase
+    public interface iLootItem
+    { 
+        int? LootId { get; set; }
+        string LootName { get; set; }
+
+        int GetSellPrice();
+    }
+
+    public abstract class LootItem<T> : PersistableBase<T>, iLootItem
+    where T: PersistableBase<T>
     {
         [PersistProperty(true)]
         public int? LootId { get; set; }

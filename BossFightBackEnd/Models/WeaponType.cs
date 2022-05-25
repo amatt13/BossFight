@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
-    public class WeaponType : PersistableBase, IPersist<WeaponType>
+    public class WeaponType : PersistableBase<WeaponType>, IPersist<WeaponType>
     {
         [JsonIgnore]
         public override string TableName { get; set; } =  nameof(WeaponType);
@@ -28,9 +28,9 @@ namespace BossFight.Models
             WeaponTypename = pWeaponTypename;
         }
 
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader, MySqlConnection pConnection)
+        public override IEnumerable<WeaponType> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader, MySqlConnection pConnection)
         {
-            var result = new List<PersistableBase>();
+            var result = new List<WeaponType>();
 
             while (reader.Read())
             {   
@@ -41,21 +41,6 @@ namespace BossFight.Models
             }
 
             return result;
-        }
-
-        public WeaponType FindOne(int? id = null)
-        {
-            return (WeaponType)_findOne(id);
-        }
-
-        public IEnumerable<WeaponType> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
-        {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<WeaponType>();
-        }
-
-        public IEnumerable<WeaponType> FindAll(int? id = null)
-        {
-            return _findAll(id).Cast<WeaponType>();
         }
     }
 }

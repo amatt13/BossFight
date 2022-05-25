@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace BossFight.Models
 {
-    public class Player : Target, IPersist<Player>
+    public class Player : Target<Player>
     {
         [JsonIgnore]
         private static Random _random = new Random();
@@ -55,29 +55,9 @@ namespace BossFight.Models
 
         public Player() { }
 
-        public Player FindOne(int? id = null)
+        public override IEnumerable<Player> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader, MySqlConnection pConnection)
         {
-            return (Player)_findOne(id);
-        }
-
-        public IEnumerable<Player> FindTop(uint pRowsToRetrieve, string pOrderByColumn, bool pOrderByDescending = true)
-        {
-            return _findTop(pRowsToRetrieve, pOrderByColumn, pOrderByDescending).Cast<Player>();
-        }
-
-        public IEnumerable<Player> FindAll(int? id = null)
-        {
-            return _findAll(id).Cast<Player>();
-        }
-
-        public Player FindOneForParent(int id, MySqlConnection pConnection)
-        {
-            return (Player)_findOneForParent(id, pConnection);
-        }
-
-        public override IEnumerable<PersistableBase> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader, MySqlConnection pConnection)
-        {
-            var result = new List<PersistableBase>();
+            var result = new List<Player>();
 
             while (!reader.IsClosed && reader.Read())
             {
@@ -96,21 +76,21 @@ namespace BossFight.Models
             }
             reader.Close();
 
-            foreach (Player player in result)
+            foreach (var player in result)
             {
-                player.PlayerPlayerClass = new PlayerPlayerClass{ Active = true, PlayerId = player.PlayerId }.FindAllForParent(pConnection).First();
+                player.PlayerPlayerClass = new PlayerPlayerClass{ Active = true, PlayerId = player.PlayerId }.FindAllForParent(null, pConnection).First();
                 player.PlayerPlayerClass.Player = player;
-                player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{ PlayerId = player.PlayerId }.FindAllForParent(pConnection);
+                player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{ PlayerId = player.PlayerId }.FindAllForParent(null, pConnection);
                 player.Weapon = new Weapon().FindOneForParent(player.WeaponId, pConnection);
 
-                player.PlayerWeaponList = new PlayerWeapon{ PlayerId =  player.PlayerId}.FindAllForParent(pConnection);
+                player.PlayerWeaponList = new PlayerWeapon{ PlayerId =  player.PlayerId}.FindAllForParent(null, pConnection);
                 foreach(var x in player.PlayerWeaponList) { x.Player = player; }
             }
 
             return result;
         }
 
-        public override string AdditionalSearchCriteria(PersistableBase pSearchObject, bool pStartWithAnd = true)
+        public override string AdditionalSearchCriteria(PersistableBase<Player> pSearchObject, bool pStartWithAnd = true)
         {
             var p = pSearchObject as Player;
             var additionalSearchCriteriaText = String.Empty;
@@ -287,13 +267,13 @@ namespace BossFight.Models
             }
         }
 
-        public void AddLoot(LootItem pLootToAdd)
+        public void AddLoot(iLootItem pLootToAdd)
         {
             var lootId = pLootToAdd.LootId;
             AddLoot(lootId);
         }
 
-        public string sellLoot(LootItem pLootToSell)
+        public string sellLoot(iLootItem pLootToSell)
         {
             LootList.Remove(pLootToSell.LootId);
             var sellPrice = pLootToSell.GetSellPrice();
@@ -310,36 +290,5 @@ namespace BossFight.Models
             Hp = GetMaxHp();
             Mana = GetMaxMana();
         }
-
-        // public void RegenHealth(int PTimesToRegen = 1)
-        // {
-        //     int hpToRegen;
-        //     if (IsKnockedOut())
-        //     {
-        //         hpToRegen = 1 * PTimesToRegen;
-        //     }
-        //     else
-        //         hpToRegen = PlayerPlayerClass.HpRegenRate * PTimesToRegen;
-
-        //     var newHp = Hp + hpToRegen;
-        //     if (newHp > GetMaxHp())
-        //     {
-        //         Hp = GetMaxHp();
-        //     }
-        //     else
-        //         Hp = newHp;
-        // }
-
-        // public void RegenMana(int pTimesToRegen = 1)
-        // {
-        //     var manaToRegen = PlayerPlayerClass.ManaRegenRate * pTimesToRegen;
-        //     var newMana = Mana + manaToRegen;
-        //     if (newMana > GetMaxMana())
-        //     {
-        //         Mana = GetMaxMana();
-        //     }
-        //     else
-        //         Mana = newMana;
-        // }
     }
 }

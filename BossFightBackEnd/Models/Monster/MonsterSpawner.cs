@@ -12,11 +12,11 @@ namespace BossFight
             MonsterInstance newMonster = null;
             lock(_spawnNewMonsterLock)
             {
-                var currentMonster = new MonsterInstance{ Active = true }.FindOne();
+                var currentMonster = new MonsterInstance{ Active = true }.FindOne(null);
                 // make sure the monster is dead before we spawn a new one
                 if (currentMonster != null && currentMonster.IsDead())
                 {
-                    var randomMonsterTemplate = new MonsterTemplate{ SearchRandomTopOne = true, Tier = 1, BossMonster = false }.FindOne();
+                    var randomMonsterTemplate = new MonsterTemplate{ SearchRandomTopOne = true, Tier = 1, BossMonster = false }.FindOne(null);
                     if (randomMonsterTemplate != null)
                     {
                         newMonster = new MonsterInstance(randomMonsterTemplate);

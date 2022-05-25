@@ -38,7 +38,7 @@ namespace BossFight.Models
             return $"{ ManaCost } mana - **{ MagicWord }**/**{ Name }**{ onlyTargetMonsterString } -> { Description }";
         }
 
-        public virtual string UseAbility(Player pCaster, Target pTarget, bool pDontUseCasterEffect = false)
+        public virtual string UseAbility(Player pCaster, iTarget pTarget, bool pDontUseCasterEffect = false)
         {
             UseAbilityText = "";
             Caster = pCaster;
@@ -61,7 +61,7 @@ namespace BossFight.Models
         { }
 
         // The effect that will be executed on the target
-        public virtual void TargetEffect(Target pTarget)
+        public virtual void TargetEffect(iTarget pTarget)
         { }
 
         public virtual void AffectsAllPlayersEffect(List<Player> allPlayers)
