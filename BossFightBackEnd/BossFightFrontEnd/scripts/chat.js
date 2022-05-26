@@ -75,7 +75,7 @@ function LogToCombatLog(pText, blink = false, colur = "yellow") {
 }
 
 function LogToChatLog(pText, blink = false) {
-	document.getElementById("chat_log").value += `<span>${pText}\n</span>`
+	document.getElementById("chat_log").value += pText + "\n"
 	if (blink) {
 		BlinkDiv("chat_log_hover");
 	}

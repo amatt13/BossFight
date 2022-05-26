@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using BossFight.BossFightEnums;
 using BossFight.Extentions;
 using BossFight.Models;
 using Ganss.XSS;
@@ -92,8 +94,10 @@ GROUP BY pw.WeaponId";
                 cmd.Parameters.AddParameter(playerId, "@player_id");
                 cmd.Parameters.AddParameter(weaponID, "@weapon_id");
                 var reader = cmd.ExecuteReader();
-                reader.Read();
-                playerCanEquipWeapon = reader.GetBooleanNullable("CanEquip").GetValueOrDefault(false);
+                if (reader.Read())
+                {
+                    playerCanEquipWeapon = reader.GetBooleanNullable("CanEquip").GetValueOrDefault(false);
+                }
                 reader.Close();
                 connection.Close();
                 if (playerCanEquipWeapon)
@@ -138,9 +142,15 @@ WHERE p.PlayerId = @{ nameof(playerId) }";
                 
                 cmd.Parameters.AddParameter(playerId, nameof(playerId));
                 var reader = cmd.ExecuteReader();
-                reader.Read();
-                playerCanAttackMonsterWithEquippedWeapon = reader.GetBooleanNullable("can attack").GetValueOrDefault(false);
-                pError = reader.IsDBNull("error") ? String.Empty : reader.GetString("error");
+                if (reader.Read())
+                {
+                    playerCanAttackMonsterWithEquippedWeapon = reader.GetBooleanNullable("can attack").GetValueOrDefault(false);
+                    pError = reader.IsDBNull("error") ? String.Empty : reader.GetString("error");
+                }
+                else
+                {
+                    pError = "Could not attack monster for an unkown reason (try reloading the site)";
+                }
                 reader.Close();
                 connection.Close();
             }
@@ -175,14 +185,13 @@ WHERE p.PlayerId = @{ nameof(playerId) }";
 FROM Player p
 WHERE p.UserName = {pUserName.ToDbString()}
 AND p.Password = {pPassword.ToDbString()}";
-                //cmd.Parameters.AddParameter(pUserName.ToDbString(), "@userName", 30);
-                //cmd.Parameters.AddParameter(pPassword.ToDbString(), "@password", 100);
-
-                var test = cmd.ToSqlString();
 
                 var reader = cmd.ExecuteReader();
-                reader.Read();
-                var playersWithMatchingCredentials = reader.GetIntNullable("PlayersWithMatchingCredentials").GetValueOrDefault(0);
+                var playersWithMatchingCredentials = 0;
+                if (reader.Read())
+                {
+                    playersWithMatchingCredentials = reader.GetIntNullable("PlayersWithMatchingCredentials").GetValueOrDefault(0);
+                }
                 reader.Close();
                 connection.Close();
 
@@ -201,7 +210,7 @@ AND p.Password = {pPassword.ToDbString()}";
             return errors.Count == 0;
         }
 
-        public static bool ValidateChatMessage(string pMessage, int playerId, out string pError)
+        public static bool ValidateChatMessage(string pMessage, int pPlayerId, out string pError)
         {
             pError = String.Empty;
 
@@ -221,21 +230,8 @@ AND p.Password = {pPassword.ToDbString()}";
                     {
                         pError = $"Failed to sanitize message:\n{ e }";
                     }
-                    using var connection = GlobalConnection.GetNewOpenConnection();
-                    using var cmd = connection.CreateCommand();
 
-                    cmd.CommandText = $@"SELECT TRUE as PlayerFound
-    FROM Player p
-    WHERE p.PlayerId = @player_id";
-                    cmd.Parameters.AddParameter(playerId.ToDbString(), "@player_id");
-                    
-                    var reader = cmd.ExecuteReader();
-                    reader.Read();
-                    var playersWithMatchingCredentials = reader.GetBooleanNullable("PlayerFound").GetValueOrDefault(false);
-                    reader.Close();
-                    connection.Close();
-
-                    if (!playersWithMatchingCredentials)
+                    if (!PlayerExists(pPlayerId))
                     {
                         pError = "Could not find player";
                     }
@@ -263,6 +259,71 @@ AND p.Password = {pPassword.ToDbString()}";
             }
 
             return String.IsNullOrEmpty(pError);
+        }
+
+        public static bool ValidateVoteForMonsterTier(int pPlayerId, int pMonsterInstanceId, int pVote, out string pError)
+        {
+            var errors = new List<String>();
+            
+            if (!PlayerExists(pPlayerId))
+            {
+                errors.Add("Could not find player");
+            }
+
+            if (!MonsterInstanceExists(pMonsterInstanceId))
+            {
+                errors.Add("Could not find monster");
+            }
+
+            if (!ValidEnumValue(MonsterTierVoteChoice.DECREASE_DIFFICULTY, pVote))
+            {
+                errors.Add("Invalid choice");
+            }
+
+            pError = String.Join(Environment.NewLine, errors);
+            return String.IsNullOrEmpty(pError);
+        }
+
+        public static bool AllValuesAreFilled(List<Tuple<object, string>> pValueList, out string  pError)
+        {
+            var allValuesAreFilled = true;
+            pError = String.Empty;
+            var fieldsWithMissingValues = pValueList.Where(vp => vp.Item1 == null || vp.Item1 is DBNull);
+            if (fieldsWithMissingValues.Any())
+            {
+                pError = String.Join(Environment.NewLine, fieldsWithMissingValues.Select(vp => $"Missing required value for '{ vp.Item2 }'"));
+                allValuesAreFilled = false;
+            }
+
+            return allValuesAreFilled;
+        }
+
+        private static bool PlayerExists(int pPlayerId)
+        {
+            var sql = $@"SELECT TRUE FROM { nameof(Player) } WHERE { nameof(Player.PlayerId) } = @{ nameof(Player.PlayerId) }";
+            var cmd = new MySqlCommand(sql);
+            cmd.Parameters.AddParameter(pPlayerId, nameof(Player.PlayerId));
+            var playerExists = GlobalConnection.SingleValue<bool>(cmd);
+
+            return playerExists;
+        }
+
+        private static bool MonsterInstanceExists(int pMonsterInstanceId)
+        {
+            var sql = $@"SELECT TRUE FROM { nameof(MonsterInstance) } WHERE { nameof(MonsterInstance.MonsterInstanceId) } = @{ nameof(MonsterInstance.MonsterInstanceId) }";
+            var cmd = new MySqlCommand(sql);
+            cmd.Parameters.AddParameter(pMonsterInstanceId, nameof(MonsterInstance.MonsterInstanceId));
+            var monsterInstanceExists = GlobalConnection.SingleValue<bool>(cmd);
+
+            return monsterInstanceExists;
+        }
+
+        /// <summary>
+        /// The pEnum does not matter and can be any one value from the Enum
+        /// </summary>
+        private static bool ValidEnumValue(Enum pEnum, int pValue)
+        {
+            return Enum.IsDefined(pEnum.GetType(), pValue);
         }
     }
 }

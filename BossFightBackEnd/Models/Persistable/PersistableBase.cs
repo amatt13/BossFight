@@ -150,6 +150,14 @@ namespace BossFight.Models
                 resultString = pPropertyInfo.GetValue(this);
                 resultString = $"\"{ resultString }\"";
             }
+            else if (pPropertyInfo.PropertyType.IsEnum)
+            {
+                resultString = (int)pPropertyInfo.GetValue(this);
+            }
+            else if (Nullable.GetUnderlyingType(pPropertyInfo.PropertyType) != null && Nullable.GetUnderlyingType(pPropertyInfo.PropertyType).IsEnum)
+            {
+                resultString = (int)pPropertyInfo.GetValue(this);
+            }
             else
                 resultString = pPropertyInfo.GetValue(this);
 

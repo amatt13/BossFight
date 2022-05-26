@@ -35,6 +35,7 @@ namespace BossFight.Models.DB
                 persistableImplementationTemplate.PersistableImplementationTemplateId = reader.GetInt(nameof(PersistableImplementationTemplateId));
                 result.Add(persistableImplementationTemplate);
             }
+            reader.Close();
 
             foreach (var PersistableBase in result)
             {

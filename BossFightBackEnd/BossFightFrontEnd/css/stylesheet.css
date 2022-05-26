@@ -179,6 +179,10 @@ hover-light-grey:hover{
 	grid-row: 4;
 }
 
+.highligtedButton {
+	border-color: goldenrod;
+}
+
 * {
 	font-family: myFirstFont;
 	font-size: 18px;

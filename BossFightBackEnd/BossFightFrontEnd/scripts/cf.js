@@ -17,7 +17,6 @@ function ReadPlayerMessage(playerDict_dict) {
 
 	_player = new Player(playerDict_dict["PlayerId"], playerDict_dict["Name"], playerDict_dict["Hp"], playerDict_dict["Mana"], playerDict_dict["Gold"], weapon, player_player_class, player_weapon_list, playerDict_dict["UserName"]);
 	UpdateUiPlayerStats(_player);
-	RequestMostRecentMessages()
 }
 
 function CreateWeaponFromWeaponDict(weapon_dict) {

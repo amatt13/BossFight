@@ -6,7 +6,7 @@ namespace BossFight.Extentions
     {
         public static string ToDbString(this object pObject)
         {
-            string result = null;
+            string result;
             if (pObject is String)
             {
                 result = (pObject as string).ToDbString();
@@ -18,6 +18,10 @@ namespace BossFight.Extentions
             else if (pObject is bool)
             {
                 result = ((bool)pObject).ToDbString();
+            }
+            else if (pObject.GetType().IsEnum)
+            {
+                result = ((int)pObject).ToDbString();
             }
             else
                 result = pObject.ToString();

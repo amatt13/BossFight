@@ -51,7 +51,7 @@ namespace BossFight.Models
         [PersistProperty]
         public int EasierToCritPercentage { get; set; }
 
-        // Form other tables
+        // From other tables
         [JsonIgnore]
         public Dictionary<int, DamageTrackerEntry> DamageOverTimeTracker { get; set; }  // key is player_id
 
@@ -61,7 +61,7 @@ namespace BossFight.Models
         public Dictionary<int, int> FrenzyStackTracker { get; set; }  // key is player_id, value is frenzy stack lvl/size
 
         [JsonIgnore]
-        MonsterTemplate MonsterTemplate { get; set; }
+        public MonsterTemplate MonsterTemplate { get; set; }
 
         // Calculated (not persisted) fields/properties
         private int? _maxHp;

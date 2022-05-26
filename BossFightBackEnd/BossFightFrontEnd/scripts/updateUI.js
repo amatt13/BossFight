@@ -1,6 +1,10 @@
 function UpdateUiActiveMonster(monster_dict) {
 	_monster1 = CreateMonsterFromDict(monster_dict);
 	document.getElementById("monsterSprite").src = `./images/sprites/monsters/${_monster1.monster_name[0].toLowerCase() + _monster1.monster_name.substr(1, _monster1.monster_name.length-1).replaceAll(" ", "")}.png`
+	var voteUpButton = document.getElementById("voteMonsterTierUpButton");
+	var voteDownButton = document.getElementById("voteMonsterTierDownButton");
+	voteUpButton.classList.remove("highligtedButton")
+	voteDownButton.classList.remove("highligtedButton")
 }
 
 function UpdateUiPlayerStats(player) {

@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <ThreadPoolMinThreads>500</ThreadPoolMinThreads>
   </PropertyGroup>
 
  <ItemGroup>
@@ -11,10 +14,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1" />
-    <PackageReference Include="MySqlConnector" Version="1.3.14" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="3.1" />
+    <PackageReference Include="MySqlConnector" Version="2.1.9" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.0" />
     <PackageReference Include="HtmlSanitizer" Version="6.0.453" />
   </ItemGroup>
-
-
 </Project>

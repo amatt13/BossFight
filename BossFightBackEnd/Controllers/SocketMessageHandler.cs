@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using BossFight.Models;
 using BossFight.Models.DB;
 using Ganss.XSS;
+using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 
 namespace BossFight.Controllers
@@ -248,6 +249,43 @@ namespace BossFight.Controllers
             }
             else
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        }
+
+        // takes: player_id: "int", monster_instance_id: "int", vote: "int"
+        public async Task VoteForMonsterTier(Dictionary<string, object> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            var requiredValues = CreateValueList(pJsonParameters, new List<string>{"player_id", "monster_instance_id", "vote"});
+
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
+            {
+                var playerId = Convert.ToInt32(pJsonParameters["player_id"]);
+                var monsterInstanceId = Convert.ToInt32(pJsonParameters["monster_instance_id"]);
+                var vote = Convert.ToInt32(pJsonParameters["vote"]);
+                if (RequestValidator.ValidateVoteForMonsterTier(playerId, monsterInstanceId, vote, out error))
+                {
+                    MonsterTierVoteUpdater.UpdatePlayersMonsterTierVote(playerId, monsterInstanceId, vote);
+                }
+            }
+            
+            if (!String.IsNullOrEmpty(error))
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        }
+
+        private List<Tuple<object, string>> CreateValueList(Dictionary<string, object> pDict, List<string> pRequiredValues)
+        {
+            var valuesList = new List<Tuple<object, string>>();
+            foreach(var key in pRequiredValues)
+            {
+                if (pDict.ContainsKey(key))
+                {
+                    valuesList.Add(new Tuple<object, string>(pDict[key], key));
+                }
+                else
+                {
+                    valuesList.Add(new Tuple<object, string>(null, key));
+                }
+            }
+            return valuesList;
         }
 
         async private Task ReplyWithErrorMessage(WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket, string pError)

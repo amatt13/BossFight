@@ -2,6 +2,8 @@ const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
 var playerImage = document.getElementById("playerSprite");
 var monsterImage = document.getElementById("monsterSprite");
+var voteUpButton = document.getElementById("voteMonsterTierUpButton");
+var voteDownButton = document.getElementById("voteMonsterTierDownButton");
 let initialMonsterImageX = 30, initialMonsterImageY = -1;
 
 monsterImage.addEventListener("load", () => {
@@ -11,6 +13,42 @@ monsterImage.addEventListener("load", () => {
 
 playerImage.addEventListener("load", () => {
 	ctx.drawImage(playerImage, canvas.width-playerImage.width, initialMonsterImageY);
+});
+
+function Vote(vote) {
+	if (_player != undefined) {
+		if (_monster1 != undefined) {
+			const obj = {
+				//TODO validate that the user is who they pretend to be (server-side)
+				request_key: "VoteForMonsterTier",
+				request_data: JSON.stringify({
+					"player_id": _player.player_id,
+					"monster_instance_id": _monster1.monster_instance_id,
+					"vote": vote
+				})
+			};
+			const json_obj = JSON.stringify(obj);
+			socket.send(json_obj);
+		}
+		else {
+			LogToGeneralLog("Can't vote without a active monster", true)
+		}
+    }
+    else {
+        LogToGeneralLog("You are not logged in", true)
+    }
+}
+
+voteUpButton.addEventListener("click", () => {
+	voteUpButton.classList.add("highligtedButton")
+	voteDownButton.classList.remove("highligtedButton")
+	Vote(1)
+});
+
+voteDownButton.addEventListener("click", () => {
+	voteDownButton.classList.add("highligtedButton")
+	voteUpButton.classList.remove("highligtedButton")
+	Vote(-1)
 });
 
 window.requestAnimationFrame(Draw);

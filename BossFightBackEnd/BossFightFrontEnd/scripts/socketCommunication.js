@@ -14,10 +14,10 @@ else {
 socket.onopen = function (e) {
 	LogToGeneralLog("[open] Connection established")
 	FetchActiveMonster()
+	RequestMostRecentMessages()
 };
 
 socket.onmessage = function (event) {
-	//LogToTextLog(`[message] Data received from server: ${event.data}`);
 	var json_dict = JSON.parse(event.data);
 
 	if ("fetch_active_monster" in json_dict)
@@ -34,11 +34,13 @@ socket.onmessage = function (event) {
         ReceiveChatMessage(json_dict["receive_chat_message"]);
     else if ("receive_multiple_chat_message" in json_dict)
         PopulateChatLogWithMultipleMessages(json_dict["receive_multiple_chat_message"]);
-	else if ("new_monster") {
+	else if ("new_monster" in json_dict)
 		NewMonster(json_dict["new_monster"]);
-	}
 	else if ("error_message" in json_dict)
 		LogToGeneralLog(json_dict["error_message"], true)
+	else
+		LogToGeneralLog(`Unkown message received '${json_dict}'`, true)
+	
 };
 
 socket.onclose = function (event) {

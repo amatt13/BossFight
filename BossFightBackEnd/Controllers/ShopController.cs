@@ -113,33 +113,33 @@ namespace BossFight.Controllers
             return resultText;
         }
 
-        public string BuyItem(string pThingToBuyId, string pClientId)
-        {
-            string replyMessage = String.Empty;
-            // replyMessage = buyWeapon(int(itemId), playerMessage)
-            try
-            {
-                replyMessage = BuyClass(pThingToBuyId, pClientId);
-            }
-            catch (Exception ae)
-            {
-                replyMessage = $"Failed to acquire class: { ae }";
-            }
-            catch
-            {
-                //TODO will now reach this place
-                // Should be split up anyways
-                try
-                {
-                    replyMessage = BuyWeapon(pThingToBuyId, pClientId);
-                }
-                catch
-                {
-                    replyMessage = $"no items found";
-                }
-            }
-            return replyMessage;
-        }
+        // public string BuyItem(string pThingToBuyId, string pClientId)
+        // {
+        //     string replyMessage = String.Empty;
+        //     // replyMessage = buyWeapon(int(itemId), playerMessage)
+        //     try
+        //     {
+        //         replyMessage = BuyClass(pThingToBuyId, pClientId);
+        //     }
+        //     catch (Exception ae)
+        //     {
+        //         replyMessage = $"Failed to acquire class: { ae }";
+        //     }
+        //     catch
+        //     {
+        //         //TODO will now reach this place
+        //         // Should be split up anyways
+        //         try
+        //         {
+        //             replyMessage = BuyWeapon(pThingToBuyId, pClientId);
+        //         }
+        //         catch
+        //         {
+        //             replyMessage = $"no items found";
+        //         }
+        //     }
+        //     return replyMessage;
+        // }
 
         public string SellItem(string pLootName, string pClientId)
         {
