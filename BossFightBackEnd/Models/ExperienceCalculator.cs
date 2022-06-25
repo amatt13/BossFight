@@ -41,23 +41,23 @@ namespace BossFight
                 var levelsBelow = pPlayerLevel - pMonsterLevel;
                 if (levelsBelow == 6)
                 {
-                    result = result * 0.81;
+                    result *= 0.81;
                 }
                 else if (levelsBelow == 7)
                 {
-                    result = result * 0.62;
+                    result *= 0.62;
                 }
                 else if (levelsBelow == 8)
                 {
-                    result = result * 0.43;
+                    result *= 0.43;
                 }
                 else if (levelsBelow == 9)
                 {
-                    result = result * 0.24;
+                    result *= 0.24;
                 }
                 else if (levelsBelow >= 10)
                 {
-                    result = result * 0.05;
+                    result *= 0.05;
                 }
             }
             return (int)Math.Ceiling(result);
