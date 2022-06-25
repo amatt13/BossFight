@@ -1,10 +1,10 @@
-function UpdateUiActiveMonster(monster_dict) {
+function UpdateUiActiveMonster(monster_dict, monster_is_new = false) {
 	_monster1 = CreateMonsterFromDict(monster_dict);
 	document.getElementById("monsterSprite").src = `./images/sprites/monsters/${_monster1.monster_name[0].toLowerCase() + _monster1.monster_name.substr(1, _monster1.monster_name.length-1).replaceAll(" ", "")}.png`
-	var voteUpButton = document.getElementById("voteMonsterTierUpButton");
-	var voteDownButton = document.getElementById("voteMonsterTierDownButton");
-	voteUpButton.classList.remove("highligtedButton")
-	voteDownButton.classList.remove("highligtedButton")
+	if (monster_is_new ) {
+		voteUpButton.classList.remove("highligtedButton")
+		voteDownButton.classList.remove("highligtedButton")
+	}
 }
 
 function UpdateUiPlayerStats(player) {
@@ -68,4 +68,25 @@ function UpdateUiPlayerAttackedMonsterWithWeapon(summary_dict) {
 		LogToCombatLog(monster_message);
 	}
 	CanvasShowDamageAnimation(summary_dict["PlayerTotalDamage"]);
+}
+
+function UpdateMonsterTierVoteBasedOnCurrentPlayerVote(vote_dict) {
+	const monster_instance_id = vote_dict["MonsterInstanceId"]
+	const vote =  vote_dict["Vote"]
+	if (monster_instance_id != undefined && vote != undefined)
+	{
+		voteUpButton.classList.remove("highligtedButton")
+		voteDownButton.classList.remove("highligtedButton")
+
+		switch (vote) {
+			case MonsterTierVoteChoice.DECREASE_DIFFICULTY:
+				voteDownButton.classList.add("highligtedButton")
+				break;
+			case MonsterTierVoteChoice.INCREASE_DIFFICULTY:
+				voteUpButton.classList.add("highligtedButton")
+				break;
+			default:
+				break;
+		}
+	}
 }

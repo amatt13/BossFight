@@ -81,5 +81,5 @@ function NewMonster(new_monster_dict) {
 	LogToGeneralLog(monsterDamageInfo);
 
 	let newMonsterInstance_dict = new_monster_dict["newMonsterInstance"];
-	UpdateUiActiveMonster(newMonsterInstance_dict)
+	UpdateUiActiveMonster(newMonsterInstance_dict, true)
 }

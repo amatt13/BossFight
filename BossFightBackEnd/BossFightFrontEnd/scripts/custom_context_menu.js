@@ -43,12 +43,14 @@ $(".custom-menu li").click(function(){
         
         // A case for each action. Your actions here
         case "equip": 
-            var equip_id = document.getElementById("custom_menu_equip").dataset.equip_id;
-            EquipWeapon(equip_id);
+            const equip_id = document.getElementById("custom_menu_equip").dataset.equip_id;
+            const equip_id_int = parseInt(equip_id)
+            EquipWeapon(equip_id_int);
             break;
         case "sell": 
-            var sell_id = document.getElementById("custom_menu_sell").dataset.sell_id;
-            SellWeapon(sell_id);
+            const sell_id = document.getElementById("custom_menu_sell").dataset.sell_id;
+            const sell_id_int = parseInt(sell_id)
+            SellWeapon(sell_id_int);
             break;
     }
   

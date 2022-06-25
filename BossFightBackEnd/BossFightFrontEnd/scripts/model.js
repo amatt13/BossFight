@@ -79,3 +79,11 @@ class ChatMessage {
 		this.timestamp = timestamp
 	}
 }
+
+
+class MonsterTierVoteChoice
+{
+	static DECREASE_DIFFICULTY = -1
+	static UNCHANGED = 0
+	static INCREASE_DIFFICULTY = 1
+}

@@ -1,9 +1,9 @@
 const canvas = document.getElementById('mainCanvas');
 const ctx = canvas.getContext('2d');
-var playerImage = document.getElementById("playerSprite");
-var monsterImage = document.getElementById("monsterSprite");
-var voteUpButton = document.getElementById("voteMonsterTierUpButton");
-var voteDownButton = document.getElementById("voteMonsterTierDownButton");
+let playerImage = document.getElementById("playerSprite");
+let monsterImage = document.getElementById("monsterSprite");
+const voteUpButton = document.getElementById("voteMonsterTierUpButton");
+const voteDownButton = document.getElementById("voteMonsterTierDownButton");
 let initialMonsterImageX = 30, initialMonsterImageY = -1;
 
 monsterImage.addEventListener("load", () => {

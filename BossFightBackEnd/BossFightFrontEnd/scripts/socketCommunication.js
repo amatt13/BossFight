@@ -1,15 +1,23 @@
 // everythin that involves the websocket should be placed here
 
 let socket = undefined; 
+let conn_string = "";
 
-if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-	socket = new WebSocket("ws://localhost:5000/ws");  // test
-}
-else {
-	socket = new WebSocket("ws://185.126.108.48:5000/ws"); // Windows (public IP)
-	//let socket = new WebSocket("ws://192.168.0.185:5000/ws"); // PI
-	//let socket = new WebSocket("ws://192.168.0.183:5000/ws"); // PI ????
-}
+// if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+// 	conn_string = "ws://localhost:5000/ws";  // test
+// 	console.log("localhost");
+// }
+// else {
+// 	console.log("remote host");
+	//conn_string = "ws://185.126.108.48:5000/ws"; // Windows (public IP)
+	// conn_string = "ws://192.168.0.185:5000/ws"; // PI
+	conn_string = "ws://192.168.0.183:5000/ws"; // PI ????
+//}
+
+
+
+
+socket = new WebSocket(conn_string);
     
 socket.onopen = function (e) {
 	LogToGeneralLog("[open] Connection established")
@@ -36,6 +44,10 @@ socket.onmessage = function (event) {
         PopulateChatLogWithMultipleMessages(json_dict["receive_multiple_chat_message"]);
 	else if ("new_monster" in json_dict)
 		NewMonster(json_dict["new_monster"]);
+	else if ("player_signed_in" in json_dict) {
+		ReadPlayerMessage(json_dict["player_signed_in"]["player"]);
+		UpdateMonsterTierVoteBasedOnCurrentPlayerVote(json_dict["player_signed_in"]["current_vote"])
+	}
 	else if ("error_message" in json_dict)
 		LogToGeneralLog(json_dict["error_message"], true)
 	else
@@ -141,24 +153,10 @@ async function RequestMostRecentMessages(messages_to_fetch=10) {
 
 // TEST WebSocket button
 async function LoginTestUser() {
-	const obj = {
-		request_key: "FetchPlayer",
-		request_data: JSON.stringify({
-			player_id: "1337"
-		})
-	};
-	const json_obj = JSON.stringify(obj);
-	socket.send(json_obj);
+	await SendSignInRequest("Demo", "A");
 }
 
 // TEST WebSocket button2
 async function LoginTestUser2() {
-	const obj = {
-		request_key: "FetchPlayer",
-		request_data: JSON.stringify({
-			player_id: "9001"
-		})
-	};
-	const json_obj = JSON.stringify(obj);
-	socket.send(json_obj);
+	await SendSignInRequest("Test", "B");
 }
