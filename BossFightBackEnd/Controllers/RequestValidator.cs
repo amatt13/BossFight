@@ -303,5 +303,7 @@ AND p.Password = {pPassword.ToDbString()}";
         {
             return Enum.IsDefined(pEnum.GetType(), pValue);
         }
+
+        public static bool Example() {return false;}
     }
 }

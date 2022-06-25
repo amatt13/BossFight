@@ -37,7 +37,7 @@ namespace BossFight.Controllers
             }
             else
             {
-                throw new ArgumentException($"Method '{ handler }' does not exist!\n");
+                throw new ArgumentException($"Method '{handler}' does not exist!\n");
             }
         }
 
@@ -55,25 +55,34 @@ namespace BossFight.Controllers
             await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
         }
 
-        // takes: player_id: "int"
-        // returns: player
-        public async Task FetchPlayer(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
-        {
-            var player = new Player().FindOne(Convert.ToInt32(pJsonParameters["player_id"].ToString()));
-            var response = new Dictionary<string, Player>
-                {
-                    { "update_player", player }
-                };
-            string output = JsonSerializer.Serialize(response);
-            var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
-            await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
-        }
+        // // takes: player_id: "int"
+        // // returns: player
+        // public async Task FetchPlayer(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        // {
+        //     var requiredValues = CreateValueList(pJsonParameters, new List<string>{"player_id", "cake"});
+
+        //     if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
+        //     {
+        //         var player = new Player().FindOne(Convert.ToInt32(pJsonParameters["player_id"].ToString()));
+        //         var response = new Dictionary<string, Player>
+        //             {
+        //                 { "update_player", player }
+        //             };
+        //         string output = JsonSerializer.Serialize(response);
+        //         var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
+        //         await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+        //     }
+        //     else
+        //         await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        // }
 
         // takes: player_id: "int", weapon_id: "int"
         // returns: dict => gold, weapons
         public async Task SellWeapon(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
-            if (RequestValidator.PlayerCanSellWeapon(pJsonParameters["player_id"].GetInt32(), pJsonParameters["weapon_id"].GetInt32(), out string error))
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "weapon_id" });
+
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error) && RequestValidator.PlayerCanSellWeapon(pJsonParameters["player_id"].GetInt32(), pJsonParameters["weapon_id"].GetInt32(), out error))
             {
                 var player = new Player().FindOne(pJsonParameters["player_id"].GetInt32());
                 var weaponId = pJsonParameters["weapon_id"].GetInt32();
@@ -100,7 +109,8 @@ namespace BossFight.Controllers
         // returns: weapon
         public async Task EquipWeapon(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
-            if (RequestValidator.PlayerCanEquipWeapon(pJsonParameters["player_id"].GetInt32(), pJsonParameters["weapon_id"].GetInt32(), out string error))
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "weapon_id" });
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error) && RequestValidator.PlayerCanEquipWeapon(pJsonParameters["player_id"].GetInt32(), pJsonParameters["weapon_id"].GetInt32(), out error))
             {
                 var player = new Player().FindOne(pJsonParameters["player_id"].GetInt32());
                 var weaponId = pJsonParameters["weapon_id"].GetInt32();
@@ -121,7 +131,8 @@ namespace BossFight.Controllers
         // returns: PlayerAttackSummary
         public async Task PlayerAttackMonsterWithEquippedWeapon(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
-            if (RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(pJsonParameters["player_id"].GetInt32(), out string error))
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id" });
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error) && RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(pJsonParameters["player_id"].GetInt32(), out error))
             {
                 var player = new Player().FindOne(pJsonParameters["player_id"].GetInt32());
                 var monster = new MonsterInstance { Active = true }.FindAll().First();
@@ -162,8 +173,8 @@ namespace BossFight.Controllers
             var newMonsterInstance = MonsterSpawner.SpawnNewMonster();
             if (newMonsterInstance != null)
             {
-                var monsterWasKilledMessage = $"{ (pMonster.IsBossMonster ? "BOSS KILL\n" : String.Empty) }{ pPLayer.Name } killed { pMonster.Name }!";
-                var monsterDamageInfo = "Player - Damage dealt\n" + String.Join("\n", pMonster.MonsterDamageTrackerList.OrderBy(x => x.DamageReceivedFromPlayer).Select(x => $"{ x.Player.Name } { x.DamageReceivedFromPlayer }"));
+                var monsterWasKilledMessage = $"{(pMonster.IsBossMonster ? "BOSS KILL\n" : String.Empty)}{pPLayer.Name} killed {pMonster.Name}!";
+                var monsterDamageInfo = "Player - Damage dealt\n" + String.Join("\n", pMonster.MonsterDamageTrackerList.OrderBy(x => x.DamageReceivedFromPlayer).Select(x => $"{x.Player.Name} {x.DamageReceivedFromPlayer}"));
                 var newMonsterMessage = new Dictionary<string, object>
                 {
                     { "new_monster", new Dictionary<string, object>
@@ -184,27 +195,31 @@ namespace BossFight.Controllers
         // returns: player & MonsterTierVote
         public async Task SignIn(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
-            var userName = pJsonParameters["userName"].GetString();
-            var password = pJsonParameters["password"].GetString();
-
-            if (RequestValidator.ValidateUserLoginCredentials(userName, password, out string error))
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "userName", "password" });
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
             {
-                userName = userName.Trim();
-                password = password.Trim();
-                var player = new Player { UserName = userName, Password = password }.FindAll().First();
-                var currentVote = MonsterTierVoteUpdater.PlayersCurrentMonsterTierVote(player.PlayerId.Value);
-                var response = new Dictionary<string, Dictionary<string, object>>
+                var userName = pJsonParameters["userName"].GetString();
+                var password = pJsonParameters["password"].GetString();
+
+                if (RequestValidator.ValidateUserLoginCredentials(userName, password, out error))
                 {
-                    { "player_signed_in", new Dictionary<string, object> {
-                        {"player", player},
-                        {"current_vote", currentVote}
-                    } }
-                };
-                string output = JsonSerializer.Serialize(response);
-                var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
-                await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                    userName = userName.Trim();
+                    password = password.Trim();
+                    var player = new Player { UserName = userName, Password = password }.FindAll().First();
+                    var currentVote = MonsterTierVoteUpdater.PlayersCurrentMonsterTierVote(player.PlayerId.Value);
+                    var response = new Dictionary<string, Dictionary<string, object>>
+                    {
+                        { "player_signed_in", new Dictionary<string, object> {
+                            {"player", player},
+                            {"current_vote", currentVote}
+                        } }
+                    };
+                    string output = JsonSerializer.Serialize(response);
+                    var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
+                    await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                }
             }
-            else
+            if (!String.IsNullOrEmpty(error))
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
@@ -212,27 +227,31 @@ namespace BossFight.Controllers
         // receive an message from the client. This message must then be sent to all connection
         public async Task SendChatMessage(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
-            var message = pJsonParameters["message"].GetString();
-            var playerId = pJsonParameters["player_id"].GetInt32(); //TODO validate valid player
-            if (RequestValidator.ValidateChatMessage(message, playerId, out string error))
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "message", "player_id" });
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
             {
-                var sanitized = new HtmlSanitizer().Sanitize(message);
-                var doubleEscaped = sanitized.Replace(@"\", @"\\");
-                var player = new Player().FindOne(playerId);
-                var chatMessage = new ChatMessage{ MessageContent = doubleEscaped, Timestamp = DateTime.Now, Player = player };
-                chatMessage.Persist();
-                chatMessage.MessageContent = sanitized;
-
-                var response = new Dictionary<string, ChatMessage>
+                var message = pJsonParameters["message"].GetString();
+                var playerId = pJsonParameters["player_id"].GetInt32(); //TODO validate valid player
+                if (RequestValidator.ValidateChatMessage(message, playerId, out error))
                 {
-                    { "receive_chat_message", chatMessage }
-                };
-                string output = JsonSerializer.Serialize(response);
-                var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
-                foreach (var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
-                    await ws.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                    var sanitized = new HtmlSanitizer().Sanitize(message);
+                    var doubleEscaped = sanitized.Replace(@"\", @"\\");
+                    var player = new Player().FindOne(playerId);
+                    var chatMessage = new ChatMessage { MessageContent = doubleEscaped, Timestamp = DateTime.Now, Player = player };
+                    chatMessage.Persist();
+                    chatMessage.MessageContent = sanitized;
+
+                    var response = new Dictionary<string, ChatMessage>
+                    {
+                        { "receive_chat_message", chatMessage }
+                    };
+                    string output = JsonSerializer.Serialize(response);
+                    var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
+                    foreach (var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
+                        await ws.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                }
             }
-            else
+            if (!String.IsNullOrEmpty(error))
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
@@ -240,27 +259,31 @@ namespace BossFight.Controllers
         // returns: list of ChatMessage
         public async Task FetchMostRecentMessages(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
-            var messagesToFetch = pJsonParameters["messages_to_fetch"].GetInt32();
-
-            if (RequestValidator.ValidateMaxMessageRequestNumberNotExceeded(messagesToFetch, out string error))
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "messages_to_fetch" });
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
             {
-                var chatMessages = new ChatMessage{}.FindTop((UInt32)messagesToFetch, nameof(ChatMessage.Timestamp));
-                var response = new Dictionary<string, IEnumerable<ChatMessage>>
+                var messagesToFetch = pJsonParameters["messages_to_fetch"].GetInt32();
+
+                if (RequestValidator.ValidateMaxMessageRequestNumberNotExceeded(messagesToFetch, out error))
                 {
-                    { "receive_multiple_chat_message", chatMessages }
-                };
-                string output = JsonSerializer.Serialize(response);
-                var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
-                await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                    var chatMessages = new ChatMessage { }.FindTop((UInt32)messagesToFetch, nameof(ChatMessage.Timestamp));
+                    var response = new Dictionary<string, IEnumerable<ChatMessage>>
+                    {
+                        { "receive_multiple_chat_message", chatMessages }
+                    };
+                    string output = JsonSerializer.Serialize(response);
+                    var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
+                    await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                }
             }
-            else
+            if (!String.IsNullOrEmpty(error))
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
         // takes: player_id: "int", monster_instance_id: "int", vote: "int"
         public async Task VoteForMonsterTier(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
-            var requiredValues = CreateValueList(pJsonParameters, new List<string>{"player_id", "monster_instance_id", "vote"});
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "monster_instance_id", "vote" });
 
             if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
             {
@@ -272,7 +295,7 @@ namespace BossFight.Controllers
                     MonsterTierVoteUpdater.UpdatePlayersMonsterTierVote(playerId, monsterInstanceId, vote);
                 }
             }
-            
+
             if (!String.IsNullOrEmpty(error))
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
@@ -280,7 +303,7 @@ namespace BossFight.Controllers
         private List<Tuple<object, string>> CreateValueList(Dictionary<string, JsonElement> pDict, List<string> pRequiredValues)
         {
             var valuesList = new List<Tuple<object, string>>();
-            foreach(var key in pRequiredValues)
+            foreach (var key in pRequiredValues)
             {
                 if (pDict.ContainsKey(key))
                 {
@@ -302,6 +325,32 @@ namespace BossFight.Controllers
             };
             var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
             await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+        }
+
+        // EXAMPLE/TEMPLATE FUNCTION
+        // takes: player_id: "int"
+        public async Task Example(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id" });
+
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
+            {
+                var playerId = pJsonParameters["player_id"].GetInt32();
+                if (RequestValidator.Example())
+                {
+                    var player = new Player().FindOne(playerId);
+                    var response = new Dictionary<string, string>
+                    {
+                        { "player_name", player.Name }
+                    };
+
+                    var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
+                    await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                }
+            }
+
+            if (!String.IsNullOrEmpty(error))
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
     }
 }
