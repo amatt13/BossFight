@@ -21,4 +21,16 @@ public static class MonsterTierVoteUpdater
             monsterTierVote.Persist();
         }
     }
+
+    public static MonsterTierVote PlayersCurrentMonsterTierVote(int pPlayerId)
+    {
+        var monsterTierVote = new MonsterTierVote();
+        var currentMonster = new MonsterInstance{ Active = true }.FindOne();
+        if (currentMonster != null)
+        {
+            monsterTierVote = new MonsterTierVote{ PlayerId = pPlayerId, MonsterInstanceId = currentMonster.MonsterInstanceId }.FindOne();
+        }
+
+        return monsterTierVote;
+    }
 }

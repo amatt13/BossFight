@@ -3,6 +3,6 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	echo Publish
-	scp -r D:/SSD/C#\ projects/BossFight/BossFightBackEnd/bin/Debug/netcoreapp3.1/publish pi@raspberrypi:~/bossfight_published
+	scp -r D:/SSD/C#\ projects/BossFight/BossFightBackEnd/bin/Debug/net6.0/publish pi@raspberrypi:~/bossfight
 	echo Done
 fi

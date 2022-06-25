@@ -7,8 +7,7 @@ namespace BossFight
     public class Program
     {
         public static void Main(string[] args)
-        {
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);           
+        {         
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -18,10 +17,5 @@ namespace BossFight
                 {
                     webBuilder.UseStartup<Startup>();
                 });
-
-        static void CurrentDomain_ProcessExit(object sender, EventArgs e)
-        {
-            Console.WriteLine("bye bye!");
-        }
     }
 }

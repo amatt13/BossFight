@@ -6,7 +6,7 @@ using BossFight.Extentions;
 using BossFight.Models.DB;
 using BossFight.Models.Loot;
 using MySqlConnector;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace BossFight.Models
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using BossFight.BossFightEnums;
 using BossFight.Extentions;
 using MySqlConnector;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace BossFight.Models
 {

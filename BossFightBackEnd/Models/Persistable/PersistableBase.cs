@@ -86,6 +86,11 @@ namespace BossFight.Models
             return result;
         }
 
+        public virtual T FindOne()
+        {
+            return FindOne(null);
+        }
+
         public virtual T FindOne(int? id)
         {
             T fetched = null;

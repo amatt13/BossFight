@@ -10,10 +10,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading;
 using System.Text;
-using System.Linq;
-using Newtonsoft.Json;
-using System.IO;
-using BossFight.Models.DB;
+using System.Text.Json;
 
 namespace BossFight.Controllers
 {
@@ -22,11 +19,14 @@ namespace BossFight.Controllers
     public class WebSocketController : ControllerBase
     {
         public WebSocketController()
-        { }
+        { 
+            Console.WriteLine("Init WebSocketController");
+        }
 
         [HttpGet("/ws")]
         public async Task GetWebsocketMessage()
         {
+            Console.WriteLine("GetWebsocketMessage");
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using WebSocket webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
@@ -42,6 +42,7 @@ namespace BossFight.Controllers
 
         private async Task ReadMessage(HttpContext pContext, WebSocket pWebSocket)
         {
+            Console.WriteLine($"ReadMessage. From '{pContext.Connection.RemoteIpAddress}'");
             var buffer = new byte[1024 * 4];
             var arraySegment = new ArraySegment<byte>(buffer);
             string jsonString = String.Empty;
@@ -52,7 +53,7 @@ namespace BossFight.Controllers
             {
                 arraySegment = new ArraySegment<byte>(buffer, 0, result.Count);
                 jsonString = Encoding.UTF8.GetString(arraySegment);
-                jsonDictionary = JsonConvert.DeserializeObject<Dictionary<String, Object>>(jsonString);
+                jsonDictionary = JsonSerializer.Deserialize<Dictionary<String, Object>>(jsonString);
                 
                 //await new SocketMessageHandler(Db).HandleMessage(jsonDictionary, result, pWebSocket);
                 await new SocketMessageHandler().HandleMessage(jsonDictionary, result, pWebSocket);

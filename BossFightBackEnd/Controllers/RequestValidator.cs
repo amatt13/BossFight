@@ -12,151 +12,129 @@ namespace BossFight.Controllers
 {
     public static class RequestValidator
     {
-        public static bool PlayerCanSellWeapon(string pPlayerId, string pWeaponId, out string pError)
+        public static bool PlayerCanSellWeapon(int pPlayerId, int pWeaponId, out string pError)
         {
             bool playerCanSellWeapon = false;
-            var parsed = int.TryParse(pPlayerId, out int playerId);
-            parsed &= int.TryParse(pWeaponId, out int weaponID);
+            using var connection = GlobalConnection.GetNewOpenConnection();
+            using var cmd = connection.CreateCommand();
 
-            if (parsed)
-            {
-                using var connection = GlobalConnection.GetNewOpenConnection();
-                using var cmd = connection.CreateCommand();
-
-                /*
-                return true if:
-                    player owns weapon (and it is not equipped)
-                    player owns at least two coppies of weapon and it is equipped
-                */
-                cmd.CommandText = @$"SELECT
+            /*
+            return true if:
+                player owns weapon (and it is not equipped)
+                player owns at least two coppies of weapon and it is equipped
+            */
+            cmd.CommandText = @$"SELECT
 CASE 
-	WHEN p.WeaponId != pw.WeaponId 
-		THEN TRUE
-	WHEN COUNT(pw.WeaponId) > 1 
-		THEN TRUE
-	ELSE FALSE
+WHEN p.WeaponId != pw.WeaponId 
+    THEN TRUE
+WHEN COUNT(pw.WeaponId) > 1 
+    THEN TRUE
+ELSE FALSE
 END AS CanSell
 FROM { nameof(PlayerWeapon) } pw
 JOIN { nameof(Player) } p 
-	ON p.PlayerId = pw.PlayerId 
+ON p.PlayerId = pw.PlayerId 
 WHERE pw.PlayerId = @player_id
 AND pw.WeaponId = @weapon_id
 GROUP BY pw.WeaponId";
 
-                cmd.Parameters.AddParameter(playerId, "@player_id");
-                cmd.Parameters.AddParameter(weaponID, "@weapon_id");
-                var reader = cmd.ExecuteReader();
-                reader.Read();
-                playerCanSellWeapon = reader.GetBooleanNullable("CanSell").GetValueOrDefault(false);
-                reader.Close();
-                connection.Close();
-                if (playerCanSellWeapon)
-                {
-                    pError = String.Empty;
-                }
-                else
-                    pError = "Could not sell weapon. Make sure it is not your only copy and you haven't equipped it.";
+            cmd.Parameters.AddParameter(pPlayerId, "@player_id");
+            cmd.Parameters.AddParameter(pWeaponId, "@weapon_id");
+            var reader = cmd.ExecuteReader();
+            reader.Read();
+            playerCanSellWeapon = reader.GetBooleanNullable("CanSell").GetValueOrDefault(false);
+            reader.Close();
+            connection.Close();
+            if (playerCanSellWeapon)
+            {
+                pError = String.Empty;
             }
             else
-                pError = $"player ({ pPlayerId }) or weapon id ({ pWeaponId }) is not a valid id";
+                pError = "Could not sell weapon. Make sure it is not your only copy and you haven't equipped it.";
 
             return playerCanSellWeapon;
         }
 
-        public static bool PlayerCanEquipWeapon(string pPlayerId, string pWeaponId, out string pError)
+        public static bool PlayerCanEquipWeapon(int pPlayerId, int pWeaponId, out string pError)
         {
             bool playerCanEquipWeapon = false;
-            var parsed = int.TryParse(pPlayerId, out int playerId);
-            parsed &= int.TryParse(pWeaponId, out int weaponID);
+            using var connection = GlobalConnection.GetNewOpenConnection();
+            using var cmd = connection.CreateCommand();
 
-            if (parsed)
-            {
-                using var connection = GlobalConnection.GetNewOpenConnection();
-                using var cmd = connection.CreateCommand();
-
-                /*
-                return true if:
-                    player owns weapon (and it is not equipped)
-                */
-                cmd.CommandText = @$"SELECT
+            /*
+            return true if:
+                player owns weapon (and it is not equipped)
+            */
+            cmd.CommandText = @$"SELECT
 CASE 
-	WHEN p.WeaponId != pw.WeaponId 
-		THEN TRUE
-	ELSE FALSE
+WHEN p.WeaponId != pw.WeaponId 
+    THEN TRUE
+ELSE FALSE
 END AS CanEquip
 FROM { nameof(PlayerWeapon) } pw
 JOIN { nameof(Player) } p 
-	ON p.PlayerId = pw.PlayerId 
+ON p.PlayerId = pw.PlayerId 
 WHERE pw.PlayerId = @player_id
 AND pw.WeaponId = @weapon_id
 GROUP BY pw.WeaponId";
 
-                cmd.Parameters.AddParameter(playerId, "@player_id");
-                cmd.Parameters.AddParameter(weaponID, "@weapon_id");
-                var reader = cmd.ExecuteReader();
-                if (reader.Read())
-                {
-                    playerCanEquipWeapon = reader.GetBooleanNullable("CanEquip").GetValueOrDefault(false);
-                }
-                reader.Close();
-                connection.Close();
-                if (playerCanEquipWeapon)
-                {
-                    pError = String.Empty;
-                }
-                else
-                    pError = "Could not equip weapon. Make sure you haven't already equipped it.";
+            cmd.Parameters.AddParameter(pPlayerId, "@player_id");
+            cmd.Parameters.AddParameter(pWeaponId, "@weapon_id");
+            var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                playerCanEquipWeapon = reader.GetBooleanNullable("CanEquip").GetValueOrDefault(false);
+            }
+            reader.Close();
+            connection.Close();
+            if (playerCanEquipWeapon)
+            {
+                pError = String.Empty;
             }
             else
-                pError = $"player ({ pPlayerId }) or weapon id ({ pWeaponId }) is not a valid id";
+                pError = "Could not equip weapon. Make sure you haven't already equipped it.";
 
             return playerCanEquipWeapon;
         }
 
-        public static bool PlayerCanAttackMonsterWithEquippedWeapon(string pPlayerId, out string pError)
+        public static bool PlayerCanAttackMonsterWithEquippedWeapon(int pPlayerId, out string pError)
         {
             var playerCanAttackMonsterWithEquippedWeapon = false;
-            var parsed = int.TryParse(pPlayerId, out int playerId);
 
-            if (parsed)
-            {
-                using var connection = GlobalConnection.GetNewOpenConnection();
-                using var cmd = connection.CreateCommand();
+            using var connection = GlobalConnection.GetNewOpenConnection();
+            using var cmd = connection.CreateCommand();
 
-                cmd.CommandText = $@"SELECT 
-	p.Hp > 0 AND p.{ nameof(Player.WeaponId) } IS NOT NULL AND mi.{ nameof(MonsterInstance.MonsterInstanceId) } IS NOT NULL AND mi.Hp > 0 as ""can attack"",
-	CASE 
-		WHEN p.Hp <= 0
-			THEN 'Not enough health'
-		WHEN p.WeaponId IS NULL
-			THEN 'No weapon equpped'
-		WHEN mi.MonsterInstanceId IS NULL
-			THEN 'No active monster to attack'
-		WHEN mi.Hp <= 0
-			THEN 'Monster is already dead'
-	END AS error
+            cmd.CommandText = $@"SELECT 
+p.Hp > 0 AND p.{ nameof(Player.WeaponId) } IS NOT NULL AND mi.{ nameof(MonsterInstance.MonsterInstanceId) } IS NOT NULL AND mi.Hp > 0 as ""can attack"",
+CASE 
+    WHEN p.Hp <= 0
+        THEN 'Not enough health'
+    WHEN p.WeaponId IS NULL
+        THEN 'No weapon equpped'
+    WHEN mi.MonsterInstanceId IS NULL
+        THEN 'No active monster to attack'
+    WHEN mi.Hp <= 0
+        THEN 'Monster is already dead'
+END AS error
 FROM Player p 
 LEFT JOIN MonsterInstance mi 
-	ON mi.Active = TRUE 
-WHERE p.PlayerId = @{ nameof(playerId) }";
-                
-                cmd.Parameters.AddParameter(playerId, nameof(playerId));
-                var reader = cmd.ExecuteReader();
-                if (reader.Read())
-                {
-                    playerCanAttackMonsterWithEquippedWeapon = reader.GetBooleanNullable("can attack").GetValueOrDefault(false);
-                    pError = reader.IsDBNull("error") ? String.Empty : reader.GetString("error");
-                }
-                else
-                {
-                    pError = "Could not attack monster for an unkown reason (try reloading the site)";
-                }
-                reader.Close();
-                connection.Close();
+ON mi.Active = TRUE 
+WHERE p.PlayerId = @{ nameof(pPlayerId) }";
+            
+            cmd.Parameters.AddParameter(pPlayerId, nameof(pPlayerId));
+            var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                playerCanAttackMonsterWithEquippedWeapon = reader.GetBooleanNullable("can attack").GetValueOrDefault(false);
+                pError = reader.IsDBNull("error") ? String.Empty : reader.GetString("error");
             }
             else
-                pError = $"player ({ pPlayerId }) is not a valid id";
-
+            {
+                pError = "Could not attack monster for an unkown reason (try reloading the site)";
+            }
+            reader.Close();
+            connection.Close();
+            
             return playerCanAttackMonsterWithEquippedWeapon;
         }
 
