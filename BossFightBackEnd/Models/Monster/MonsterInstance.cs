@@ -11,7 +11,7 @@ namespace BossFight.Models
 {
     public class MonsterInstance : Target<MonsterInstance>, IPersist<MonsterInstance>
     {
-        private static Random _random = new Random();
+        private static readonly Random _random = new Random();
         private const int TIER_DIVIDER = 5;
         private const float MONSTER_CRIT_MODIFIER = 1.5f;
 
@@ -51,6 +51,20 @@ namespace BossFight.Models
         [PersistProperty]
         public int EasierToCritPercentage { get; set; }
 
+        private int? _maxHp;
+        [PersistProperty]
+        public int MaxHp 
+        { 
+            get
+            {
+                if (_maxHp == null)
+                    _maxHp = CalcMaxHealth();
+                    
+                return _maxHp.Value;
+            }
+            set { _maxHp = value; }
+        }
+
         // From other tables
         [JsonIgnore]
         public Dictionary<int, DamageTrackerEntry> DamageOverTimeTracker { get; set; }  // key is player_id
@@ -64,18 +78,6 @@ namespace BossFight.Models
         public MonsterTemplate MonsterTemplate { get; set; }
 
         // Calculated (not persisted) fields/properties
-        private int? _maxHp;
-        public int MaxHp 
-        { 
-            get
-            {
-                if (_maxHp == null)
-                    _maxHp = CalcMaxHealth();
-                    
-                return _maxHp.Value;
-            }
-            set { _maxHp = value; }
-        }
 
         public bool IsBossMonster { get { return MonsterTemplate.BossMonster.GetValueOrDefault(false); } }
 
@@ -93,6 +95,12 @@ namespace BossFight.Models
 
         #region PersistableBase implementation
 
+        public override void BeforePersist()
+        {
+            base.BeforePersist();
+            if (_maxHp == null)
+                MaxHp = CalcMaxHealth();
+        }
 
         public override IEnumerable<MonsterInstance> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
@@ -104,6 +112,7 @@ namespace BossFight.Models
                 monsterInstance.MonsterInstanceId = reader.GetInt(nameof(MonsterInstanceId));
                 monsterInstance.MonsterTemplateId = reader.GetInt(nameof(MonsterTemplateId));
                 monsterInstance.Hp = reader.GetInt(nameof(Hp));
+                monsterInstance.MaxHp = reader.GetInt(nameof(MaxHp));
                 monsterInstance.Active = reader.GetBoolean(nameof(Active));
                 monsterInstance.Level = reader.GetInt(nameof(Level));
                 monsterInstance.BlindDuration = reader.GetInt(nameof(BlindDuration));

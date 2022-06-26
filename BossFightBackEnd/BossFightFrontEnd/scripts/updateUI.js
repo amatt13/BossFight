@@ -90,3 +90,35 @@ function UpdateMonsterTierVoteBasedOnCurrentPlayerVote(vote_dict) {
 		}
 	}
 }
+
+function CreatePlayerclassTitleCardForShop(playerclass, row) {
+	const card_html = `<div style="border: solid"; grid-column: 1; grid-row: ${ row }>
+		<img id="shop_menu_player_class${ playerclass.name }_sprite" src="./images/sprites/player_classes/${ playerclass.name }.png" width="75" height="75" style="object-fit: fill;">
+		<br>
+		<label>${ playerclass.name } - cost ${ playerclass.purchase_price }</label>
+		<br>
+		<label>Base health: ${ playerclass.base_health }</label>
+		<br>
+		<label>Base mana: ${ playerclass.base_mana }</label>
+	</div>`;
+
+	return card_html;
+}
+
+function UpdateUiShop(shop_dict) {
+	const player_classes = shop_dict["playerClasses"];
+	let player_class_html = "";
+	player_classes.forEach((player_class, i) => {
+		const playerclass_count = i + 2;
+		const aquired = player_class["Aquired"];
+		const pc = PlayerClass.CreateFromDict(player_class["PlayerClass"]);
+		const card = CreatePlayerclassTitleCardForShop(pc, playerclass_count);
+		const class_row = `<div id="PlayerClassContainer" style="grid-column: 1; grid-row: ${ playerclass_count };">
+		${ card }
+		<button class="buy-button btn-primary" onclick="return;">Buy</button>
+	</div>`;
+		player_class_html += class_row;
+	});
+
+	document.getElementById("playerclass_buy_options").innerHTML = player_class_html;
+}

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
+using System.Threading.Tasks;
 
 namespace BossFight 
 {
@@ -77,6 +79,13 @@ namespace BossFight
             {
                 return _connections.Where(c => c.State == WebSocketState.Open).Count();
             }
+        }
+
+        public async Task SendMessageToEveryOneElseAsync(WebSocket pWebSocket, ArraySegment<Byte> pMessage)
+        {
+            var otherConnections = GetAllOpenConnections().Where(con => con != pWebSocket);
+            foreach (var ws in otherConnections)
+                await ws.SendAsync(pMessage, WebSocketMessageType.Text, true, System.Threading.CancellationToken.None);
         }
     }
 }

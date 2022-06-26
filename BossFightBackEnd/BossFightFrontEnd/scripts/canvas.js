@@ -29,6 +29,7 @@ function Vote(vote) {
 			};
 			const json_obj = JSON.stringify(obj);
 			socket.send(json_obj);
+			FetchMonsterVotesTotals();
 		}
 		else {
 			LogToGeneralLog("Can't vote without a active monster", true)
@@ -152,6 +153,24 @@ function CanvasShowDamageAnimation(damage) {
 	_damage_to_show = damage;
 	_enable_damage_to_show = true;  
 	setInterval(() => {_enable_damage_to_show = false;}, 3000); // set to 5000 for crit
+}
+
+function UpdateCanvasMonsterTierVotesTotal(monster_tier_votes_total) {
+	up_votes = parseInt(monster_tier_votes_total.UpVotes);
+	down_votes = parseInt(monster_tier_votes_total.DownVotes);
+	vote_up_text = "<img src=\"./images/ui_icons/green_arrow_up.png\" class=\"vote-button\"> Difficulty up";
+	vote_down_text = "<img src=\"./images/ui_icons/red_arrow_down.png\" class=\"vote-button\"> Difficulty down";
+
+	if (up_votes > 0) {
+		vote_up_text += ` (${up_votes})`;
+	}
+
+	if (down_votes > 0) {
+		vote_down_text += ` (${down_votes})`;
+	}
+
+	voteUpButton.innerHTML = vote_up_text;
+	voteDownButton.innerHTML = vote_down_text;
 }
 
 // function DebuffsString()

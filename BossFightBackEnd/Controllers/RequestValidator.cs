@@ -276,7 +276,7 @@ AND p.Password = {pPassword.ToDbString()}";
             return allValuesAreFilled;
         }
 
-        private static bool PlayerExists(int pPlayerId)
+        public static bool PlayerExists(int pPlayerId)
         {
             var sql = $@"SELECT TRUE FROM { nameof(Player) } WHERE { nameof(Player.PlayerId) } = @{ nameof(Player.PlayerId) }";
             var cmd = new MySqlCommand(sql);

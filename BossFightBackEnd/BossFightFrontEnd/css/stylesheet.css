@@ -183,6 +183,11 @@ hover-light-grey:hover{
 	border-color: goldenrod;
 }
 
+.vote-button {
+	max-width: 100%; 
+	max-height: 100%;
+}
+
 * {
 	font-family: myFirstFont;
 	font-size: 18px;

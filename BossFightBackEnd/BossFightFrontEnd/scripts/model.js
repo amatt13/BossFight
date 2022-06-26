@@ -80,6 +80,32 @@ class ChatMessage {
 	}
 }
 
+class PlayerClass {
+	constructor(Abilities, AttackPowerBonus, BaseHealth, BaseMana, CritChance, HpRegenRate, HpScale, ManaRegenRate, ManaScale, Name, PlayerClassId, PlayerClassRequirementList, ProficientWeaponTypesList, PurchasePrice, SpellPowerBonus) {
+		this.abilities = Abilities
+		this.attack_power_bonus = AttackPowerBonus
+		this.base_health = BaseHealth
+		this.base_mana = BaseMana
+		this.crit_chance = CritChance
+		this.hp_regen_rate = HpRegenRate
+		this.hp_scale = HpScale
+		this.mana_regen_rate = ManaRegenRate
+		this.mana_scale = ManaScale
+		this.name = Name
+		this.player_class_id = PlayerClassId
+		this.player_class_requirement_list = PlayerClassRequirementList  // TODO (currently just a dict)
+		this.proficient_weapon_types_list = ProficientWeaponTypesList  // TODO (currently just a dict)
+		this.purchase_price = PurchasePrice
+		this.spell_power_bonus = SpellPowerBonus
+	}
+
+	static CreateFromDict(player_class_dict) {
+		return new PlayerClass(player_class_dict["Abilities"], player_class_dict["AttackPowerBonus"], player_class_dict["BaseHealth"], player_class_dict["BaseMana"], player_class_dict["CritChance"], player_class_dict["HpRegenRate"], 
+			player_class_dict["HpScale"], player_class_dict["ManaRegenRate"], player_class_dict["ManaScale"], player_class_dict["Name"], player_class_dict["PlayerClassId"], player_class_dict["PlayerClassRequirementList"], 
+			player_class_dict["ProficientWeaponTypesList"], player_class_dict["PurchasePrice"], player_class_dict["SpellPowerBonus"])
+	}
+}
+
 
 class MonsterTierVoteChoice
 {

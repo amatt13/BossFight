@@ -3,16 +3,16 @@
 let socket = undefined; 
 let conn_string = "";
 
-// if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-// 	conn_string = "ws://localhost:5000/ws";  // test
-// 	console.log("localhost");
-// }
-// else {
-// 	console.log("remote host");
-	//conn_string = "ws://185.126.108.48:5000/ws"; // Windows (public IP)
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+	conn_string = "ws://localhost:5000/ws";  // test
+	console.log("localhost");
+}
+else {
+	console.log("remote host");
+	conn_string = "ws://185.126.108.48:5000/ws"; // public IP
 	// conn_string = "ws://192.168.0.185:5000/ws"; // PI
-	conn_string = "ws://192.168.0.183:5000/ws"; // PI ????
-//}
+	// conn_string = "ws://192.168.0.183:5000/ws"; // PI ????
+}
 
 
 
@@ -22,7 +22,8 @@ socket = new WebSocket(conn_string);
 socket.onopen = function (e) {
 	LogToGeneralLog("[open] Connection established")
 	FetchActiveMonster()
-	RequestMostRecentMessages()
+	FetchMostRecentMessages()
+	FetchMonsterVotesTotals()
 };
 
 socket.onmessage = function (event) {
@@ -46,12 +47,20 @@ socket.onmessage = function (event) {
 		NewMonster(json_dict["new_monster"]);
 	else if ("player_signed_in" in json_dict) {
 		ReadPlayerMessage(json_dict["player_signed_in"]["player"]);
-		UpdateMonsterTierVoteBasedOnCurrentPlayerVote(json_dict["player_signed_in"]["current_vote"])
+		if (json_dict["player_signed_in"]["current_vote"] != null) {
+			UpdateMonsterTierVoteBasedOnCurrentPlayerVote(json_dict["player_signed_in"]["current_vote"]);
+		}
+	}
+	else if ("monster_tier_votes_total" in json_dict) {
+		UpdateCanvasMonsterTierVotesTotal(json_dict["monster_tier_votes_total"]);
+	}
+	else if ("shopMenu" in json_dict) {
+		UpdateUiShop(json_dict["shopMenu"]);
 	}
 	else if ("error_message" in json_dict)
-		LogToGeneralLog(json_dict["error_message"], true)
+		LogToGeneralLog(json_dict["error_message"], true);
 	else
-		LogToGeneralLog(`Unkown message received '${json_dict}'`, true)
+		LogToGeneralLog(`Unkown message received '${json_dict}'`, true);
 	
 };
 
@@ -137,7 +146,7 @@ async function SellWeapon(weapon_id_to_equip) {
 	socket.send(json_obj);
 }
 
-async function RequestMostRecentMessages(messages_to_fetch=10) {
+async function FetchMostRecentMessages(messages_to_fetch=10) {
     if (messages_to_fetch <= 100) {
         const obj = { 
             request_key: "FetchMostRecentMessages", 
@@ -148,6 +157,15 @@ async function RequestMostRecentMessages(messages_to_fetch=10) {
         const json_obj = JSON.stringify(obj);
         socket.send(json_obj);
     }
+}
+
+async function FetchMonsterVotesTotals() {
+	const obj = { 
+		request_key: "FetchMonsterVotesTotals",
+		request_data: null
+	};
+	const json_obj = JSON.stringify(obj);
+	socket.send(json_obj);
 }
 
 

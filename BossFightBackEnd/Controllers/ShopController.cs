@@ -9,45 +9,20 @@ using BossFight.CustemExceptions;
 
 namespace BossFight.Controllers
 {
-    public class ShopController : ControllerBase
+    public static class ShopController
     {
-        private readonly ILogger<ShopController> _logger;
-
-        public ShopController(ILogger<ShopController> logger)  //TODO create base controller class
+        public static Dictionary<string, object> GetShopForPlayer(Player pPlayer)
         {
-            _logger = logger;
+            var shop = new Dictionary<string, object>();
+            var playerClasses = PlayerUnlocks.UnlockedClasses(pPlayer, false);
+            shop["playerClasses"] = playerClasses;
+
+            //TODO add weapons as well
+
+            return shop;
         }
 
-        public string GetShopText()
-        {
-            var shopText = "Players' gold";
-            shopText += "\n```python\n";
-            // shopText += String.Join("\n", from p in gameManager.globalGameManager.players
-            //                        select p.shopStr(lenOfLongestPlayerName, lenOfLongestPlayerGold));
-            shopText += "\n```";
-            shopText += "\nType 'buy <name>' to place an weapon into your inventory";
-            shopText += "\n```python\n";
-            shopText += "\n{'Weapon name'.ljust(lenOfLongestWName)}\n";
-            // shopText += String.Join("\n", from Tup2 in weaponsSortedByCost.Select((P4, P5) => Tuple.Create(P5, P4)).Chop((idx, w) => (idx, w))
-            //                        let idx = Tup2.Item1
-            //                        let w = Tup2.Item2
-            //                        select "{w.shopStr(lenOfLongestWName, lenOfLongestWType, longestWAttackDigit, longestWGoldPriceDigit, longestWCritChanceDigit, longestWSpellPowerDigit, longestWSpellCritChanceDigit)}");
-            shopText += "\n```";
-            shopText += "\nType 'info <class name>' to get information about the class";
-            shopText += "\nType 'buy <class name>' to buy an class";
-            shopText += "\n```python\n";
-            shopText += "\n{'Name'.ljust(lenOfLongestPlayerClassName)} {'Gold cost'.ljust(lenOfLongestPlayerClassCost)}  Requirements\n";
-            // shopText += String.Join("\n", from pc in classesSortedByCost
-            //                        select pc.shopStr(lenOfLongestPlayerClassName, lenOfLongestPlayerClassCost));
-            shopText += "\n```";
-            shopText += "\n";
-            shopText += "\nType 'sell <loot name>' to sell an item from your inventory";
-            shopText += "\nType 'autosell <loot name>' to add/remove an item from your auto-sell list";
-            
-            return shopText;
-        }
-
-        public string BuyWeapon(string pLootName, string pClientId)
+        public static string BuyWeapon(string pLootName, string pClientId)
         {
             var resultText = "";
             pLootName = pLootName.ToLower();
@@ -80,7 +55,7 @@ namespace BossFight.Controllers
             return resultText;
         }
 
-        public string BuyClass(string pClassName, string pClientId)
+        public static string BuyClass(string pClassName, string pClientId)
         {
             var resultText = "";
 
@@ -141,7 +116,7 @@ namespace BossFight.Controllers
         //     return replyMessage;
         // }
 
-        public string SellItem(string pLootName, string pClientId)
+        public static string SellItem(string pLootName, string pClientId)
         {
             string mes;
             try
@@ -161,7 +136,7 @@ namespace BossFight.Controllers
             return mes;
         }
 
-        public string AutoSellItem(string pLootName, string pClientId)
+        public static string AutoSellItem(string pLootName, string pClientId)
         {
             string mes;
             try

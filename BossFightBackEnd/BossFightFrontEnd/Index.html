@@ -28,11 +28,11 @@
 		<div class="column" style="float:left; flex: 24%; border: solid; color: hsl(256, 13%, 28%);">
 			<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color:hsl(349, 19%, 45%); padding-top: 15px;">
 				<button id="voteMonsterTierDownButton" type="button" class="btn-primary">
-					<img src="./images/ui_icons/red_arrow_down.png" style="max-width: 100%; max-height: 100%;">
+					<img src="./images/ui_icons/red_arrow_down.png" class="vote-button">
 					Difficulty down
 				</button>
 				<button id="voteMonsterTierUpButton" type="button" class="btn-primary">
-					<img src="./images/ui_icons/green_arrow_up.png" style="max-width: 100%; max-height: 100%;">
+					<img src="./images/ui_icons/green_arrow_up.png" class="vote-button">
 					Difficulty up
 				</button>
 			</div>
@@ -41,6 +41,7 @@
 		<!-- Main menu/centre column -->
 		<div class="column" style="float:left; padding-left: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: hsl(256, 13%, 28%); margin-left: 5px; margin-right: 5px;">
 			<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color:hsl(349, 19%, 45%); padding-top: 15px;">
+				<!-- Player info column -->
 				<div style="grid-column: 1; grid-row: 1;">
 					<label>User: </label>
 					<label id="player_name">Player name</label>
@@ -48,7 +49,6 @@
 				<div style="grid-column: 1; grid-row: 2;">
 					<img id="playerSprite" src="./images/sprites/player_classes/peasant.png" alt="Player class sprite" width="150" height="150" style="object-fit: fill;">
 				</div>
-				<!-- Player info column -->
 				<div style="grid-column: 1; grid-row: 3;">
 					<label style="display: inline-block; width: 50px;">HP: </label>
 					<progress id="progress_player_health" value="0" max="100"></progress>
@@ -93,7 +93,7 @@
 				<!-- Player inventory -->
 				<div style="grid-column: 2; grid-row: 1/20;">
 					<select id="player_inventory" size="1" style="flex-grow:1; float:left; width: 95%;"></select>
-					<button id="openShopButton" type="button" class="btn-primary" style="flex-grow:1; float:left;">Open shop</button>
+					<button id="openShopButton" type="button" class="btn-primary" style="flex-grow:1; float:left; margin-top: 5px;">Open shop</button>
 				</div>
 			</div>
 		</div>
@@ -145,6 +145,7 @@
 	<li id=custom_menu_sell data-action = "sell" data-sell_id=none>Sell weapon</li>
 </ul>
 
+<!-- shop dialog -->
 <div id="dialogBackground" class="shop-background"></div>
 <div id="shopDialog" class="modal-dialog">
 	<form method="dialog">
@@ -167,14 +168,7 @@
 			<div class="column" style="float:right; padding-right: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: hsl(256, 13%, 28%); margin-left: 5px; margin-right: 5px;">
 				<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color:hsl(349, 19%, 45%); padding-top: 15px;">
 					<label style="grid-column: 1; grid-row: 1; text-align: center; font-size: xx-large;">Classes</label>
-					<div id="testClassContainer1" style="grid-column: 1; grid-row: 2;">
-						<button class="buy-button btn-primary" onclick="return;">Buy</button>
-						<label class="buy-label">Class 1</label>
-					</div>
-					<div id="testClassContainer2" style="grid-column: 1; grid-row: 3;">
-						<button class="buy-button btn-primary">Buy</button>
-						<label class="buy-label">Class 2</label>
-					</div>
+					<div id="playerclass_buy_options" style="grid-column: 1; grid-row: 2;"></div>
 				</div>
 			</div>
 		</div>
