@@ -21,7 +21,7 @@ namespace BossFight
                     if (randomMonsterTemplate != null)
                     {
                         newMonster = new MonsterInstance(randomMonsterTemplate);
-                        newMonster.Level = randomMonsterTemplate.Tier.Value * new Random().Next(1, 6);
+                        newMonster.Level = randomMonsterTemplate.Tier.Value * 5 + new Random().Next(1, 6);
                         newMonster.Active = true;
                         newMonster.CalcHealth();
                         newMonster.Persist();

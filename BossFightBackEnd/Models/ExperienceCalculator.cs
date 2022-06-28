@@ -27,37 +27,38 @@ namespace BossFight
 
         public static int CalcXpPenalty(int pXP, int pPlayerLevel, int? pMonsterLevel)
         {
-            double result = pXP;
-            if (pMonsterLevel == null)
+            // XP penality system is copied straight from Diablo II (http://classic.battle.net/diablo2exp/basics/experience.shtml).
+            // There is differences in the actual numbers, but the idea is the same.
+            decimal result = pXP;
+            decimal playerLevel_decimal = pPlayerLevel;
+            decimal monsterLevel_decimal = pMonsterLevel.GetValueOrDefault(pPlayerLevel);
+            
+            if (monsterLevel_decimal > playerLevel_decimal + 2)
             {
-                pMonsterLevel = pPlayerLevel;
+                result = pXP * (playerLevel_decimal / monsterLevel_decimal);
             }
-            if (pMonsterLevel > pPlayerLevel + 2)
+            else if (monsterLevel_decimal < playerLevel_decimal)
             {
-                result = pXP * (pPlayerLevel / pMonsterLevel.Value);
-            }
-            else if (pMonsterLevel < pPlayerLevel)
-            {
-                var levelsBelow = pPlayerLevel - pMonsterLevel;
+                var levelsBelow = playerLevel_decimal - monsterLevel_decimal;
                 if (levelsBelow == 6)
                 {
-                    result *= 0.81;
+                    result *= 0.81m;
                 }
                 else if (levelsBelow == 7)
                 {
-                    result *= 0.62;
+                    result *= 0.62m;
                 }
                 else if (levelsBelow == 8)
                 {
-                    result *= 0.43;
+                    result *= 0.43m;
                 }
                 else if (levelsBelow == 9)
                 {
-                    result *= 0.24;
+                    result *= 0.24m;
                 }
                 else if (levelsBelow >= 10)
                 {
-                    result *= 0.05;
+                    result *= 0.05m;
                 }
             }
             return (int)Math.Ceiling(result);

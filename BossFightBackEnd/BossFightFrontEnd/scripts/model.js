@@ -14,6 +14,12 @@ class Weapon {
 		this.loot_drop_chance = LootDropChance
 		this.cost = Cost
 	}
+
+	static CreateFromDict(weapon_dict) {
+		const weapon = new Weapon(weapon_dict["WeaponType"], weapon_dict["AttackMessage"], weapon_dict["BossWeapon"], weapon_dict["WeaponLvl"], weapon_dict["AttackPower"], weapon_dict["AttackCritChance"], weapon_dict["SpellPower"], 
+			weapon_dict["SpellCritChance"], weapon_dict["LootId"], weapon_dict["LootName"], weapon_dict["LootDropChance"], weapon_dict["Cost"]);
+		return weapon;
+	}
 }
 
 class PlayerPlayerClass {
@@ -24,6 +30,11 @@ class PlayerPlayerClass {
 		this.max_mana = max_mana;
 		this.player_class_name = player_class_name;
 		this.xp_to_next_level = xp_to_next_level;
+	}
+
+	static CreateFromDict(player_player_class_dict) {
+		const player_player_class = new PlayerPlayerClass(player_player_class_dict["XP"], player_player_class_dict["Level"], player_player_class_dict["MaxHp"], player_player_class_dict["MaxMana"], player_player_class_dict["PlayerClassName"], player_player_class_dict["XpNeededToNextLevel"]);
+		return player_player_class;
 	}
 }
 
@@ -64,6 +75,22 @@ class Player {
 		this.player_player_class = player_player_class;
 		this.player_weapon_list = player_weapon_list
 		this.user_name = user_name;
+	}
+
+	static CreateFromDict(playerDict_dict) {
+		const weapon_dict = playerDict_dict["Weapon"];
+		const weapon = Weapon.CreateFromDict(weapon_dict);
+
+		const player_player_class_dict = playerDict_dict["PlayerPlayerClass"];
+		const player_player_class = PlayerPlayerClass.CreateFromDict(player_player_class_dict);
+
+		let player_weapon_list = [];
+		const player_weapon_dict = playerDict_dict["PlayerWeaponList"];
+		player_weapon_dict.forEach(pw => {
+			player_weapon_list.push(new PlayerWeapon(pw["WeaponId"], pw["WeaponName"]))
+		});
+		const player = new Player(playerDict_dict["PlayerId"], playerDict_dict["Name"], playerDict_dict["Hp"], playerDict_dict["Mana"], playerDict_dict["Gold"], weapon, player_player_class, player_weapon_list, playerDict_dict["UserName"]);
+		return player;
 	}
 
 	IsAlive() {
