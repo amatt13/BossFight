@@ -3,20 +3,30 @@
 	src: url("./RPGSystem.ttf");
 }
 
+:root {
+	--wallpaper-background-colour: hsl(235, 22%, 20%);
+	--border-colour: hsl(256, 13%, 28%);
+	--shadow-colour: hsl(256, 15%, 14%);
+	--text-background-colour: hsl(318, 11%, 35%);
+	--default-font-colour: hsl(349, 19%, 45%);
+}
+
 progress[value] {
 	/* Reset the default appearance */
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
 	height: 20px;
-	background-color: hsl(256, 15%, 14%);
+	background-color: var(--shadow-colour);
 	border-width: 0px;
 }
+
 progress::-webkit-progress-bar {
-	background-color: hsl(256, 15%, 14%);
+	background-color: var(--shadow-colour);
 	border-radius: 2px;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
 }
+
 progress::-webkit-progress-value {
 	background-color: crimson;
 	border-radius: 2px; 
@@ -44,8 +54,9 @@ progress.mana-progress::-moz-progress-bar
 
 Body
 {
-	color:hsl(349, 19%, 45%);
+	color: var(--default-font-colour);
 }
+
 .custom-menu {
 	display: none;
 	z-index: 1000;
@@ -59,6 +70,26 @@ Body
 	border-radius: 5px;
 }
 
+.wallpaper {
+	background-color: var(--wallpaper-background-colour);
+}
+
+.login-group {
+	float: right;  
+	display: grid; 
+	grid-template-columns: repeat(2, 1fr); 
+	grid-auto-rows: minmax(1080, auto);
+	gap: 10px;
+}
+
+.context-menu {
+	list-style-type: none; 
+	padding: 0; 
+	margin: 0; 
+	background-color: var(--wallpaper-background-colour);
+	color: var(--default-font-colour);
+}
+
 .custom-menu li {
 	padding: 8px 12px;
 	cursor: pointer;
@@ -69,8 +100,8 @@ Body
 }
 
 .btn-primary {
-	background-color: hsl(256, 13%, 28%);
-	color: hsl(256, 15%, 14%);
+	background-color: var(--border-colour);
+	color: var(--shadow-colour);
 	height: 25px;
 	text-align: center;
 	padding-bottom: 7px;
@@ -78,7 +109,7 @@ Body
 
 
 input:-webkit-autofill{
-    -webkit-box-shadow: 0 0 0 30px hsl(318, 11%, 35%) inset !important;
+    -webkit-box-shadow: 0 0 0 30px var(--text-background-colour) inset !important;
 }
 
 @supports (-moz-appearance:none)  {
@@ -123,20 +154,20 @@ input:-webkit-autofill{
 }
 
 input {
-	background-color: hsl(318, 11%, 35%);
+	background-color: var(--text-background-colour);
 }
 
 textarea {
-	background-color: hsl(318, 11%, 35%);
+	background-color: var(--text-background-colour);
 }
 
 select {
-	background-color: hsl(318, 11%, 35%);
+	background-color: var(--text-background-colour);
 }
 
 .modal-dialog {
-	background-color: hsl(235, 22%, 20%);
-	color: hsl(349, 19%, 45%);
+	background-color: var(--wallpaper-background-colour);
+	color: var(--default-font-colour);
 	border-radius: 5px;
 	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
 	width:85%;
@@ -186,6 +217,38 @@ hover-light-grey:hover{
 .vote-button {
 	max-width: 100%; 
 	max-height: 100%;
+}
+
+.title {
+	font-size: 60px; margin-top: 0px;
+}
+
+.flex {
+	display: flex;
+	width: 100%;
+}
+
+.hidden {
+	visibility: hidden;
+}
+
+.left-column {
+	float:left; 
+	flex: 24%; 
+	border: solid; 
+	color: var(--border-colour);
+}
+
+.grid-col1-grid-row1 {
+	grid-column: 1; grid-row: 1;
+}
+
+.grid-col1-grid-row2 {
+	grid-column: 1; grid-row: 2;
+}
+
+.grid-col1DIV3-grid-row3 {
+	grid-column: 1/3; grid-row: 3;
 }
 
 * {

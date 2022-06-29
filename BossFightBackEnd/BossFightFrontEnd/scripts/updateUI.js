@@ -92,10 +92,10 @@ function UpdateMonsterTierVoteBasedOnCurrentPlayerVote(vote_dict) {
 }
 
 function CreatePlayerclassTitleCardForShop(playerclass, row) {
-	const card_html = `<div style="border: solid"; grid-column: 1; grid-row: ${ row }>
+	const card_html = `<div style=\"border: solid; grid-column: 1; grid-row: ${ row }; border-color: var(--border-colour); margin-left: 5px\">
 		<img id="shop_menu_player_class${ playerclass.name }_sprite" src="./images/sprites/player_classes/${ playerclass.name }.png" width="75" height="75" style="object-fit: fill;">
 		<br>
-		<label>${ playerclass.name } - cost ${ playerclass.purchase_price }</label>
+		<label>${ playerclass.name.toLowerCase() } - cost ${ playerclass.purchase_price }</label>
 		<br>
 		<label>Base health: ${ playerclass.base_health }</label>
 		<br>

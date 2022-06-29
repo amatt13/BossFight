@@ -6,6 +6,7 @@ namespace BossFight
     public class MonsterSpawner
     {
         private static object _spawnNewMonsterLock = new object();
+        public static readonly int MAX_MONSTER_TIER;
 
         public static MonsterInstance SpawnNewMonster()
         {
@@ -55,8 +56,15 @@ WHERE mi.Active  = 1";
             {
                 nextTier += 1;
             }
-            else if  (votes < 0)
+            else if (votes < 0)
                 nextTier -= 1;
+
+            if (nextTier < 0)
+            {
+                nextTier = 0;
+            }
+            else if (nextTier > MAX_MONSTER_TIER)
+                nextTier = MAX_MONSTER_TIER;
 
             return nextTier;
         }
