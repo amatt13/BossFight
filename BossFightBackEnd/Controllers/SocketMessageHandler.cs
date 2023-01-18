@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BossFight.Models;
 using BossFight.Models.DB;
-using Ganss.;
+using Ganss.Xss;
 using System.Text.Json;
 
 using Microsoft.AspNetCore.Builder;
