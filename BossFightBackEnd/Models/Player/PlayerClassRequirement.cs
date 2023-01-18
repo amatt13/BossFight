@@ -14,13 +14,13 @@ namespace BossFight.Models
         public override string IdColumn { get; set; } = nameof(PlayerClassId);
 
         // Persisted on PlayerClassRequirement table
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int? PlayerClassId { get; set; }  // "owner"
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int RequiredPlayerClassId { get; set; }  // Nedded class
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int LevelRequirement {get; set;}
 
         // From other tables

@@ -55,19 +55,11 @@ namespace BossFight.Controllers
             return resultText;
         }
 
-        public static string BuyClass(string pClassName, string pClientId)
+        public static string BuyPlayerClass(int pPlayerClassId, int pPlayerId)
         {
             var resultText = "";
 
-            // check class exists
-            try
-            {
-                throw new MyException();
-            }
-            catch (MyException)
-            {
-                resultText = $"Could not find class '{pClassName}'";
-            }
+            
             // var purchasingPlayer = next(from p in gameManager.globalGameManager.players
             //                              where p.playerId == pClientId.author.id.ToString()
             //                              select p);

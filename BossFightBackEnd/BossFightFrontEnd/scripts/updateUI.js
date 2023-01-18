@@ -92,30 +92,53 @@ function UpdateMonsterTierVoteBasedOnCurrentPlayerVote(vote_dict) {
 }
 
 function CreatePlayerclassTitleCardForShop(playerclass, row) {
-	const card_html = `<div style=\"border: solid; grid-column: 1; grid-row: ${ row }; border-color: var(--border-colour); margin-left: 5px\">
-		<img id="shop_menu_player_class${ playerclass.name }_sprite" src="./images/sprites/player_classes/${ playerclass.name }.png" width="75" height="75" style="object-fit: fill;">
-		<br>
-		<label>${ playerclass.name.toLowerCase() } - cost ${ playerclass.purchase_price }</label>
-		<br>
-		<label>Base health: ${ playerclass.base_health }</label>
-		<br>
-		<label>Base mana: ${ playerclass.base_mana }</label>
-	</div>`;
+	const card_html = `<div style="border: solid; border-color: var(--border-colour); margin-left: 5px">
+		<table>
+			<tr>
+				<td style="width: 50%">
+					<img id="shop_menu_player_class${ playerclass.name }_sprite" src="./images/sprites/player_classes/${ playerclass.name }.png" width="75" height="75" style="object-fit: fill;">
+				</td>
+				<td>
+					<label>${ playerclass.description }</label>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label>${ playerclass.name.toLowerCase() } - cost ${ playerclass.purchase_price }</label>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label>Base health: ${ playerclass.base_health }</label>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label>Base mana: ${ playerclass.base_mana }</label>
+				</td>
+			</tr>
+		</table>
+	</div>`
 
 	return card_html;
 }
 
+let _playerclasses_list = new Array();
+
 function UpdateUiShop(shop_dict) {
 	const player_classes = shop_dict["playerClasses"];
 	let player_class_html = "";
+	_playerclasses_list = new Array();
+
 	player_classes.forEach((player_class, i) => {
 		const playerclass_count = i + 2;
 		const aquired = player_class["Aquired"];
 		const pc = PlayerClass.CreateFromDict(player_class["PlayerClass"]);
+		_playerclasses_list.push(pc);
 		const card = CreatePlayerclassTitleCardForShop(pc, playerclass_count);
-		const class_row = `<div id="PlayerClassContainer" style="grid-column: 1; grid-row: ${ playerclass_count };">
+		const class_row = `<div id="PlayerClassContainer" style="grid-column: 2; grid-row: ${ playerclass_count };">
 		${ card }
-		<button class="buy-button btn-primary" onclick="return;">Buy</button>
+		<button class="buy-button btn-primary" ${ aquired ? "disabled" : "" } onclick="buy_playerclass(${ i });">${ aquired ? "Already owned" : "Buy" }</button>
 	</div>`;
 		player_class_html += class_row;
 	});

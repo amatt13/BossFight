@@ -20,25 +20,25 @@ namespace BossFight.Models
         public override string IdColumn { get; set; } = nameof(PlayerId);
 
         // Persisted on Player table
-        [PersistPropertyAttribute(true)]
+        [PersistProperty(true)]
         public int? PlayerId { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int Gold { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int WeaponId { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int Mana { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int CurentPlayerClassId { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public string UserName { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         [JsonIgnore]
         public string Password { get; set; }
         

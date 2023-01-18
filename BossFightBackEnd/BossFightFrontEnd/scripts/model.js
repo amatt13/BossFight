@@ -108,7 +108,7 @@ class ChatMessage {
 }
 
 class PlayerClass {
-	constructor(Abilities, AttackPowerBonus, BaseHealth, BaseMana, CritChance, HpRegenRate, HpScale, ManaRegenRate, ManaScale, Name, PlayerClassId, PlayerClassRequirementList, ProficientWeaponTypesList, PurchasePrice, SpellPowerBonus) {
+	constructor(Abilities, AttackPowerBonus, BaseHealth, BaseMana, CritChance, HpRegenRate, HpScale, ManaRegenRate, ManaScale, Name, PlayerClassId, PlayerClassRequirementList, ProficientWeaponTypesList, PurchasePrice, SpellPowerBonus, Description) {
 		this.abilities = Abilities
 		this.attack_power_bonus = AttackPowerBonus
 		this.base_health = BaseHealth
@@ -124,12 +124,13 @@ class PlayerClass {
 		this.proficient_weapon_types_list = ProficientWeaponTypesList  // TODO (currently just a dict)
 		this.purchase_price = PurchasePrice
 		this.spell_power_bonus = SpellPowerBonus
+		this.description = Description
 	}
 
 	static CreateFromDict(player_class_dict) {
 		return new PlayerClass(player_class_dict["Abilities"], player_class_dict["AttackPowerBonus"], player_class_dict["BaseHealth"], player_class_dict["BaseMana"], player_class_dict["CritChance"], player_class_dict["HpRegenRate"], 
 			player_class_dict["HpScale"], player_class_dict["ManaRegenRate"], player_class_dict["ManaScale"], player_class_dict["Name"], player_class_dict["PlayerClassId"], player_class_dict["PlayerClassRequirementList"], 
-			player_class_dict["ProficientWeaponTypesList"], player_class_dict["PurchasePrice"], player_class_dict["SpellPowerBonus"])
+			player_class_dict["ProficientWeaponTypesList"], player_class_dict["PurchasePrice"], player_class_dict["SpellPowerBonus"], player_class_dict["Description"])
 	}
 }
 

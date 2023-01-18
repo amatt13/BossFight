@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BossFight.Models;
 using BossFight.Models.DB;
-using Ganss.XSS;
+using Ganss.;
 using System.Text.Json;
 
 using Microsoft.AspNetCore.Builder;
@@ -344,6 +344,28 @@ namespace BossFight.Controllers
                     {
                         { "shopMenu", shop }
                     };
+
+                    var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
+                    await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                }
+            }
+
+            if (!String.IsNullOrEmpty(error))
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        }
+
+        // takes: player_id: "int", player_class_id: "int"
+        public async Task BuyPlayerClass(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "player_class_id" });
+
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
+            {
+                var playerId = pJsonParameters["player_id"].GetInt32();
+                var player_class_id = pJsonParameters["player_class_id"].GetInt32();
+                if (RequestValidator.PlayerExists(playerId, out error) && RequestValidator.PlayerClassExists(player_class_id, out error))
+                {
+                    var response = ShopController.BuyPlayerClass(player_class_id, playerId);
 
                     var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
                     await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);

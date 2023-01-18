@@ -23,25 +23,25 @@ namespace BossFight.Models
         
         public WeaponType WeaponType { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public string AttackMessage { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public bool BossWeapon { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int WeaponLevel { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int AttackPower { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int AttackCritChance { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int SpellPower { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int SpellCritChance { get; set; }
 
         public Weapon() { }

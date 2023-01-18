@@ -9,7 +9,7 @@ namespace BossFight.Models
     public abstract class Target<T> : PersistableBase<T>, iTarget
     where T: PersistableBase<T>
     {       
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int Hp { get; set; }
 
         public virtual string Name { get; set; }

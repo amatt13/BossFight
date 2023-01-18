@@ -15,13 +15,13 @@ namespace BossFight.Models
         public override string IdColumn { get; set; } = nameof(PlayerWeaponId);
 
         // Persisted on PlayerWeapon table
-        [PersistPropertyAttribute(true)]
+        [PersistProperty(true)]
         public int? PlayerWeaponId { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int? PlayerId { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int WeaponId { get; set; }
 
         // From other tables

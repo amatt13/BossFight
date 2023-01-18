@@ -16,6 +16,7 @@ openShopBottun.addEventListener('click', function onOpen() {
     //TODO add "ativity spinner" and delete below code. Only show the dialog when we have recived an answer in "UpdateUiShop()"
     dialogBackground.style.display = 'block';
     shopDialog.style.display = 'block';
+    document.getElementById("shop_gold_amount_label").innerHTML = `Gold: ${ _player.gold }`;
 });
 
 closeButton.addEventListener('click', function onOpen() {

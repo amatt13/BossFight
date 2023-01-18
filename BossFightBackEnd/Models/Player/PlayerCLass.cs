@@ -17,41 +17,44 @@ namespace BossFight.Models
         public override string IdColumn { get; set; } = nameof(PlayerClassId);
 
         // Persisted on PlayerClass table
-        [PersistPropertyAttribute(true)]
+        [PersistProperty(true)]
         public int? PlayerClassId { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public string Name { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public double HpScale { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public double ManaScale { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int PurchasePrice { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int CritChance { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int HpRegenRate { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int ManaRegenRate { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int AttackPowerBonus { get; set; }
         
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int SpellPowerBonus { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int BaseHealth { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int BaseMana { get; set; }
+
+        [PersistProperty]
+        public string Description { get; set; }
 
         // From other tables
         public IEnumerable<PlayerClassWeaponProficiency> ProficientWeaponTypesList { get; set; }
@@ -79,6 +82,7 @@ namespace BossFight.Models
                 playerClass.SpellPowerBonus = reader.GetInt(nameof(SpellPowerBonus));
                 playerClass.BaseHealth = reader.GetInt(nameof(BaseHealth));
                 playerClass.BaseMana = reader.GetInt(nameof(BaseMana));
+                playerClass.Description = reader.GetString(nameof(Description));
                 
                 playerClass.ProficientWeaponTypesList = new PlayerClassWeaponProficiency().FindAll(playerClass.PlayerClassId);
                 foreach(var x in playerClass.ProficientWeaponTypesList) { x.PlayerClass = playerClass; }
@@ -97,33 +101,27 @@ namespace BossFight.Models
             return Name;
         }
 
-        public virtual string ShopString(int pLengthOfLongestPlayerClassName, int pLengthOfLongestPlayerClassCost)
-        {
-            var purchasePriceString = String.Format("{0:n0}", PurchasePrice);
-            purchasePriceString = purchasePriceString.Replace(",", ".");  //TODO is this needed?
-            var playerClassRequirementsString = String.Join(", ", (from req in PlayerClassRequirementList select $"Level {req.LevelRequirement} {req.RequiredPlayerClassName}"));
-            return $"{Name.PadLeft(pLengthOfLongestPlayerClassName, '.')} {purchasePriceString.PadLeft(pLengthOfLongestPlayerClassCost)} gold {playerClassRequirementsString}";
-        }
 
-        public virtual string InfoString()
-        {
-            var classNameStr = $"Class: { Name }";
-            var critChanceStr = $"Base critical chance: { CritChance }%";
-            var baseHpManaStr = $"Start hp: {BaseHealth}; start mana: { BaseMana }";
-            var scalesStr = $"{ HpScale } hp per level; { ManaScale } mana per level";
-            var regenStr = $"{ HpRegenRate } hp per regen tick; { ManaRegenRate } mana per regen tick";
-            var proficientWeaponsStr = $"Is proficient with: { String.Join(", ", ProficientWeaponTypesList.Select(p => p.ToString())) }";
-            var AbilitiesStr = $"Spell list:\n" + String.Join("\n", (from s in Abilities.Values select s.ToString()));
-            return String.Join("\n", new List<string> {
-                    classNameStr,
-                    critChanceStr,
-                    baseHpManaStr,
-                    scalesStr,
-                    regenStr,
-                    AbilitiesStr,
-                    proficientWeaponsStr
-                });
-        }
+        // public virtual string InfoString()
+        // {
+        //     var classNameStr = $"Class: { Name }";
+        //     var critChanceStr = $"Base critical chance: { CritChance }%";
+        //     var baseHpManaStr = $"Start hp: {BaseHealth}; start mana: { BaseMana }";
+        //     var scalesStr = $"{ HpScale } hp per level; { ManaScale } mana per level";
+        //     var regenStr = $"{ HpRegenRate } hp per regen tick; { ManaRegenRate } mana per regen tick";
+        //     var proficientWeaponsStr = $"Is proficient with: { String.Join(", ", ProficientWeaponTypesList.Select(p => p.ToString())) }";
+        //     var AbilitiesStr = $"Spell list:\n" + String.Join("\n", from s in Abilities.Values select s.ToString());
+        //     // var DescriptionStr
+        //     return String.Join("\n", new List<string> {
+        //             classNameStr,
+        //             critChanceStr,
+        //             baseHpManaStr,
+        //             scalesStr,
+        //             regenStr,
+        //             AbilitiesStr,
+        //             proficientWeaponsStr
+        //         });
+        // }
 
         public int CalculateMaxHp(int pClassLevel)
         {

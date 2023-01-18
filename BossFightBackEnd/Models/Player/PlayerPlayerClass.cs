@@ -16,20 +16,20 @@ namespace BossFight.Models
         public override string IdColumn { get; set; } = nameof(PlayerClassId);
 
         // Persisted on PlayerPlayerClass table
-        [PersistPropertyAttribute(true)]
+        [PersistProperty(true)]
         public int? PlayerId { get; set; }
         
         [JsonIgnore]
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int PlayerClassId { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int XP { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int Level { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public bool? Active { get; set; }  // Indicates if this is the current Player-PlayerClass relation
 
         // From other tables

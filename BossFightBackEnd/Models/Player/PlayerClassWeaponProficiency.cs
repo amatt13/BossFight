@@ -14,10 +14,10 @@ namespace BossFight.Models
         public override string IdColumn { get; set; } = nameof(PlayerClassId);
 
         // Persisted on PlayerClassWeaponProficiency table
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int? PlayerClassId { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int WeaponTypeId { get; set; }
 
         // From other tables

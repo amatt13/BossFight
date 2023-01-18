@@ -16,13 +16,13 @@ namespace BossFight.Models
         public override string IdColumn { get; set; } = nameof(MonsterTierVoteId);
 
         // Persisted on MonsterTierVote table
-        [PersistPropertyAttribute(true)]
+        [PersistProperty(true)]
         public int? MonsterTierVoteId { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public MonsterTierVoteChoice? Vote { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int? PlayerId 
         { 
             get { return Player?.PlayerId; }
@@ -34,7 +34,7 @@ namespace BossFight.Models
             }
         }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int? MonsterInstanceId 
         { 
             get { return MonsterInstance?.MonsterInstanceId; }

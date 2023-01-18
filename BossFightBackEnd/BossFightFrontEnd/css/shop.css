@@ -12,7 +12,8 @@
 
 .btn-shop {
 	z-index: 99;
-	position: relative;
+	float: right;
+	position: sticky;
 }
 
 .shop-column-divider {

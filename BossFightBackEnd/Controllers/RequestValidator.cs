@@ -5,7 +5,7 @@ using System.Linq;
 using BossFight.BossFightEnums;
 using BossFight.Extentions;
 using BossFight.Models;
-using Ganss.XSS;
+using Ganss.Xss;
 using MySqlConnector;
 
 namespace BossFight.Controllers
@@ -278,13 +278,32 @@ AND p.Password = {pPassword.ToDbString()}";
 
         public static bool PlayerExists(int pPlayerId)
         {
-            var sql = $@"SELECT TRUE FROM { nameof(Player) } WHERE { nameof(Player.PlayerId) } = @{ nameof(Player.PlayerId) }";
+            string _;
+            return PlayerExists(pPlayerId, out _);
+        }
+
+        public static bool PlayerExists(int pPlayerId, out string pError)
+        {
+            var sql = $@"SELECT TRUE FROM { nameof(Player) } WHERE { nameof(Player.IdColumn) } = @{ nameof(Player.PlayerId) }";
             var cmd = new MySqlCommand(sql);
-            cmd.Parameters.AddParameter(pPlayerId, nameof(Player.PlayerId));
+            cmd.Parameters.AddParameter(pPlayerId, nameof(Player.IdColumn));
             var playerExists = GlobalConnection.SingleValue<bool>(cmd);
+            pError = playerExists ? String.Empty : "Could not find player";
 
             return playerExists;
         }
+
+        public static bool PlayerClassExists(int pPlayerClassId, out string pError)
+        {
+            var sql = $@"SELECT TRUE FROM { nameof(PlayerClass) } WHERE { nameof(PlayerClass.IdColumn) } = @{ nameof(PlayerClass.IdColumn) }";
+            var cmd = new MySqlCommand(sql);
+            cmd.Parameters.AddParameter(pPlayerClassId, nameof(PlayerClass.IdColumn));
+            var playerExists = GlobalConnection.SingleValue<bool>(cmd);
+            pError = playerExists ? String.Empty : "Could not find class";
+
+            return playerExists;
+        }
+
 
         private static bool MonsterInstanceExists(int pMonsterInstanceId)
         {

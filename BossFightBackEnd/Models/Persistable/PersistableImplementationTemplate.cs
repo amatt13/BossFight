@@ -15,7 +15,7 @@ namespace BossFight.Models.DB
         public override string IdColumn { get; set; } = nameof(PersistableImplementationTemplateId);
 
         // Persisted on PersistableImplementationTemplate table
-        [PersistPropertyAttribute(true)]
+        [PersistProperty(true)]
         public int? PersistableImplementationTemplateId { get; set; }
 
         // From other tables

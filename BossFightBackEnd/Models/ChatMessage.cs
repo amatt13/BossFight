@@ -15,11 +15,11 @@ namespace BossFight.Models.DB
         public override string IdColumn { get; set; } = nameof(ChatMessageId);
 
         // Persisted on ChatMessage table
-        [PersistPropertyAttribute(true)]
+        [PersistProperty(true)]
         public int? ChatMessageId { get; set; }
 
         [JsonIgnore]
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public int? PlayerId 
         { 
             get { return Player?.PlayerId; }
@@ -31,10 +31,10 @@ namespace BossFight.Models.DB
             }
         }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public string MessageContent { get; set; }
 
-        [PersistPropertyAttribute]
+        [PersistProperty]
         public DateTime Timestamp { get; set; }
 
         // From other tables
