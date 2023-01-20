@@ -73,5 +73,10 @@ namespace BossFight.Models
             // this is so fucking janky. Move "ORDY BY RAND" to PersistableBase?
             return pStartWithAnd && !additionalSearchCriteriaText.StartsWith(" AND") ? additionalSearchCriteriaText : additionalSearchCriteriaText.Substring(4, additionalSearchCriteriaText.Length - 4);
         }
+
+        public override string ToString()
+        {
+            return Name + "_template";
+        }
     }
 }

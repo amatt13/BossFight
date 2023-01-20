@@ -80,7 +80,7 @@ namespace BossFight.Models.DB
 
             foreach (ChatMessage chatMessage in result)
             {
-                chatMessage.Player = new Player().FindOneForParent(chatMessage.PlayerId.Value, pConnection);
+                chatMessage.Player = new Player().FindOne(chatMessage.PlayerId.Value);
             }
 
             return result;

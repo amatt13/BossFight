@@ -284,9 +284,9 @@ AND p.Password = {pPassword.ToDbString()}";
 
         public static bool PlayerExists(int pPlayerId, out string pError)
         {
-            var sql = $@"SELECT TRUE FROM { nameof(Player) } WHERE { nameof(Player.IdColumn) } = @{ nameof(Player.PlayerId) }";
+            var sql = $@"SELECT TRUE FROM { nameof(Player) } WHERE { nameof(Player.PlayerId) } = @{ nameof(Player.PlayerId) }";
             var cmd = new MySqlCommand(sql);
-            cmd.Parameters.AddParameter(pPlayerId, nameof(Player.IdColumn));
+            cmd.Parameters.AddParameter(pPlayerId, nameof(Player.PlayerId));
             var playerExists = GlobalConnection.SingleValue<bool>(cmd);
             pError = playerExists ? String.Empty : "Could not find player";
 
@@ -295,9 +295,9 @@ AND p.Password = {pPassword.ToDbString()}";
 
         public static bool PlayerClassExists(int pPlayerClassId, out string pError)
         {
-            var sql = $@"SELECT TRUE FROM { nameof(PlayerClass) } WHERE { nameof(PlayerClass.IdColumn) } = @{ nameof(PlayerClass.IdColumn) }";
+            var sql = $@"SELECT TRUE FROM { nameof(PlayerClass) } WHERE { nameof(PlayerClass.PlayerClassId) } = @{ nameof(PlayerClass.PlayerClassId) }";
             var cmd = new MySqlCommand(sql);
-            cmd.Parameters.AddParameter(pPlayerClassId, nameof(PlayerClass.IdColumn));
+            cmd.Parameters.AddParameter(pPlayerClassId, nameof(PlayerClass.PlayerClassId));
             var playerExists = GlobalConnection.SingleValue<bool>(cmd);
             pError = playerExists ? String.Empty : "Could not find class";
 

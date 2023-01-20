@@ -135,7 +135,7 @@ namespace BossFight.Controllers
             if (RequestValidator.AllValuesAreFilled(requiredValues, out string error) && RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(pJsonParameters["player_id"].GetInt32(), out error))
             {
                 var player = new Player().FindOne(pJsonParameters["player_id"].GetInt32());
-                var monster = new MonsterInstance { Active = true }.FindAll().First();
+                var monster = new MonsterInstance { Active = true }.FindOne();
                 var summary = DamageDealer.PlayerAttackMonster(player, monster, true);
                 var response = new Dictionary<string, PlayerAttackSummary>
                 {
@@ -172,7 +172,11 @@ namespace BossFight.Controllers
             if (newMonsterInstance != null)
             {
                 var monsterWasKilledMessage = $"{(pMonster.IsBossMonster ? "BOSS KILL\n" : String.Empty)}{pPLayer.Name} killed {pMonster.Name}!";
-                var monsterDamageInfo = "Player - Damage dealt\n" + String.Join("\n", pMonster.MonsterDamageTrackerList.OrderBy(x => x.DamageReceivedFromPlayer).Select(x => $"{x.Player.Name} {x.DamageReceivedFromPlayer}"));
+                var monsterDamageInfo = "Player - Damage dealt\n" + String.Join(
+                    "\n", pMonster.MonsterDamageTrackerList
+                    .OrderBy(x => x.DamageReceivedFromPlayer)
+                    .Select(x => $"{x.Player.Name} {x.DamageReceivedFromPlayer}")
+                    ) + "\n__________";
                 var votesTotal = MonsterTierVoteUpdater.CountMonsterTierVotesTotalForActiveMonster();
 
                 var newMonsterMessage = new Dictionary<string, object>

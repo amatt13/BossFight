@@ -60,6 +60,10 @@ namespace BossFight.Models
             return result;
         }
 
+        /// <summary>
+        /// Don't provide the "id" column if you want to find more than 1 result.
+        /// Set the childs parent foreign key property if you want those that reference the parent
+        /// </summary>
         public IEnumerable<T> FindAllForParent(int? id, MySqlConnection pConnection)
         {
             using var cmd = pConnection.CreateCommand();
@@ -144,7 +148,7 @@ namespace BossFight.Models
 
         private object GetValueFromProperyInfo(PropertyInfo pPropertyInfo)
         {
-            object resultString = null;
+            object resultString;
             if (pPropertyInfo.PropertyType == typeof(DateTime))
             {
                 resultString = ((DateTime)pPropertyInfo.GetValue(this)).ToString("yyyy-MM-dd HH:mm:ss");

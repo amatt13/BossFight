@@ -51,14 +51,13 @@ namespace BossFight.Models
         {
             var result = new List<MonsterDamageTracker>();
 
-            while (!reader.IsClosed && reader.Read())
+            while (reader.Read())
             {   
                 var monsterDamageTracker = new MonsterDamageTracker();
                 monsterDamageTracker.MonsterDamageTrackerId = reader.GetInt(nameof(MonsterDamageTrackerId));
                 monsterDamageTracker.PlayerId = reader.GetInt(nameof(PlayerId));
                 monsterDamageTracker.MonsterInstanceId = reader.GetInt(nameof(MonsterInstanceId));
                 monsterDamageTracker.DamageReceivedFromPlayer = reader.GetInt(nameof(DamageReceivedFromPlayer));
-                reader.Close();
 
                 monsterDamageTracker.Player = new Player().FindOne(monsterDamageTracker.PlayerId);
                 result.Add(monsterDamageTracker);

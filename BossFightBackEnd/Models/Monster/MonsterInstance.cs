@@ -121,13 +121,16 @@ namespace BossFight.Models
                 monsterInstance.LowerAttackPercentage = reader.GetFloat(nameof(LowerAttackPercentage));
                 monsterInstance.EasierToCritDuration = reader.GetInt(nameof(EasierToCritDuration));
                 monsterInstance.EasierToCritPercentage = reader.GetInt(nameof(EasierToCritPercentage));
-                reader.Close();
+                result.Add(monsterInstance);               
+            }
+            reader.Close();
 
+            foreach (var monsterInstance in result)
+            {
                 monsterInstance.MonsterTemplate = new MonsterTemplate().FindOneForParent(monsterInstance.MonsterTemplateId, pConnection);
 
-                monsterInstance.MonsterDamageTrackerList = new MonsterDamageTracker().FindAllForParent(monsterInstance.MonsterInstanceId, pConnection);
+                monsterInstance.MonsterDamageTrackerList = new MonsterDamageTracker{MonsterInstanceId = monsterInstance.MonsterInstanceId}.FindAllForParent(null, pConnection);
                 monsterInstance.MonsterDamageTrackerList.ForEach(mdt => mdt.MonsterInstance = monsterInstance);
-                result.Add(monsterInstance);
             }
 
             return result;
@@ -144,6 +147,11 @@ namespace BossFight.Models
         }
 
         #endregion PersistableBase implementation
+
+        public override string ToString()
+        {
+            return this.MonsterTemplate.Name;
+        }
 
         public bool HasMonsterType(List<MonsterType> pMonsterTypeList)
         {
