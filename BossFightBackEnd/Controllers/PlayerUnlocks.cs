@@ -11,12 +11,12 @@ namespace BossFight.Controllers
         // Relation that details if the PlayerClass is owned/Aquired (not to be confused with its "locked" status)
         public record PlayerClassUnlockStatus(PlayerClass PlayerClass, bool Aquired);
 
-        public static List<PlayerClassUnlockStatus> UnlockedClasses(Player pPlayer, bool pOnlyClassesThatAreOwnedBy)
+        public static List<PlayerClassUnlockStatus> UnlockedClasses(int pPlayerId, bool pOnlyClassesThatAreOwnedBy)
         {
             var unlockedClasses = new List<PlayerClassUnlockStatus>();
             
             // Find list of classes that are already aquired
-            var aquiredClasses = new PlayerPlayerClass{ PlayerId = pPlayer.PlayerId }.FindAll().Select(pc => pc.PlayerClass);
+            var aquiredClasses = new PlayerPlayerClass{ PlayerId = pPlayerId }.FindAll().Select(pc => pc.PlayerClass);
             foreach (var aquiredClass in aquiredClasses)
             {
                 unlockedClasses.Add(new PlayerClassUnlockStatus(aquiredClass, true));
@@ -24,7 +24,7 @@ namespace BossFight.Controllers
 
             if (!pOnlyClassesThatAreOwnedBy)
             {
-                var unlockableClasses = GetPlayerClassesThatPlayerCanUnlock(pPlayer, aquiredClasses.Select(ac => ac.PlayerClassId.Value));
+                var unlockableClasses = GetPlayerClassesThatPlayerCanUnlock(pPlayerId, aquiredClasses.Select(ac => ac.PlayerClassId.Value));
                 foreach (var unlockedClass in unlockableClasses)
                 {
                     unlockedClasses.Add(new PlayerClassUnlockStatus(unlockedClass, false));
@@ -34,7 +34,7 @@ namespace BossFight.Controllers
             return unlockedClasses;
         }
 
-        public static List<PlayerClass> GetPlayerClassesThatPlayerCanUnlock(Player pPlayer, IEnumerable<int> pPlayerClassIdsToIgnore)
+        public static List<PlayerClass> GetPlayerClassesThatPlayerCanUnlock(int pPlayerId, IEnumerable<int> pPlayerClassIdsToIgnore)
         {
             using var connection = GlobalConnection.GetNewOpenConnection();
             using var cmd = connection.CreateCommand();
@@ -58,7 +58,7 @@ WHERE { notInClause } EXISTS (SELECT 1
 	)
 )
 ";
-            cmd.Parameters.AddParameter(pPlayer.PlayerId.Value, "@playerID");
+            cmd.Parameters.AddParameter(pPlayerId, "@playerID");
             var reader = cmd.ExecuteReader();
             var playerClasses = new PlayerClass().BuildObjectFromReader(reader, connection).ToList();
             connection.Close();

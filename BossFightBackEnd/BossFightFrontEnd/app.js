@@ -9,5 +9,5 @@ app.get('/', function (req, res) {
 });
 
 server.listen(port, () => {
-	console.log(`Example app listening at http://localhost:${port}`)
+	console.log(`Boss Fight FE listening at http://localhost:${port}`)
 })

@@ -57,7 +57,7 @@ namespace BossFight.Models.DB
         public override void BeforePersist()
         {
             base.BeforePersist();
-            if (Timestamp == null || Timestamp == DateTime.MinValue)
+            if (Timestamp == DateTime.MinValue)
                 Timestamp = DateTime.Now;
         }
 

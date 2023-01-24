@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Linq;
 using MySqlConnector;
 
 namespace BossFight.Extentions
@@ -42,7 +43,7 @@ namespace BossFight.Extentions
         public static string ToSqlString(this MySqlCommand pCommand)
         {
             var sql = pCommand.CommandText;
-            foreach (MySqlParameter param in pCommand.Parameters)
+            foreach (MySqlParameter param in pCommand.Parameters.Cast<MySqlParameter>())
             {
                 sql = sql.Replace(param.ParameterName, param.Value.ToString());
             }

@@ -10,10 +10,6 @@ using BossFight.Models.DB;
 using Ganss.Xss;
 using System.Text.Json;
 
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-
-
 namespace BossFight.Controllers
 {
     public class SocketMessageHandler
@@ -342,8 +338,7 @@ namespace BossFight.Controllers
                 var playerId = pJsonParameters["player_id"].GetInt32();
                 if (RequestValidator.PlayerExists(playerId))
                 {
-                    var player = new Player().FindOne(playerId);
-                    var shop = ShopController.GetShopForPlayer(player);
+                    var shop = ShopController.GetShopForPlayer(playerId);
                     var response = new Dictionary<string, object>
                     {
                         { "shopMenu", shop }
@@ -359,6 +354,7 @@ namespace BossFight.Controllers
         }
 
         // takes: player_id: "int", player_class_id: "int"
+        // returns: {sucess: bool, updated_player}
         public async Task BuyPlayerClass(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "player_class_id" });
@@ -367,9 +363,24 @@ namespace BossFight.Controllers
             {
                 var playerId = pJsonParameters["player_id"].GetInt32();
                 var player_class_id = pJsonParameters["player_class_id"].GetInt32();
-                if (RequestValidator.PlayerExists(playerId, out error) && RequestValidator.PlayerClassExists(player_class_id, out error))
+                if (
+                    RequestValidator.PlayerExists(playerId, out error) 
+                    && RequestValidator.PlayerClassExists(player_class_id, out error) 
+                    && RequestValidator.PlayerIsEligibleForPlayerClassAcquisition(playerId, player_class_id, out error))
                 {
-                    var response = ShopController.BuyPlayerClass(player_class_id, playerId);
+                    Tuple<bool, string> result = ShopController.BuyPlayerClass(player_class_id, playerId);
+                    var updated_player = new Player{PlayerId = playerId}.FindOne();
+                    var response = new Dictionary<string, Dictionary<string, object>>
+                    {
+                        { 
+                            "bought_player_class", new Dictionary<string, object> 
+                            {
+                                {"sucess", result.Item1},
+                                {"message", result.Item2},
+                                {"updated_player", updated_player}
+                            } 
+                        }
+                    };
 
                     var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
                     await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);

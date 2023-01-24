@@ -11,10 +11,10 @@ namespace BossFight.Controllers
 {
     public static class ShopController
     {
-        public static Dictionary<string, object> GetShopForPlayer(Player pPlayer)
+        public static Dictionary<string, object> GetShopForPlayer(int pPlayerId)
         {
             var shop = new Dictionary<string, object>();
-            var playerClasses = PlayerUnlocks.UnlockedClasses(pPlayer, false);
+            var playerClasses = PlayerUnlocks.UnlockedClasses(pPlayerId, false);
             shop["playerClasses"] = playerClasses;
 
             //TODO add weapons as well
@@ -22,112 +22,50 @@ namespace BossFight.Controllers
             return shop;
         }
 
-        public static string BuyWeapon(string pLootName, string pClientId)
+        public static Tuple<bool, string> BuyPlayerClass(int pPlayerClassId, int pPlayerId)
         {
             var resultText = "";
-            pLootName = pLootName.ToLower();
-            try
+            var purchaseComplete = false;
+            var playerClassToPurchase = new PlayerClass{PlayerClassId = pPlayerClassId}.FindOne();
+            var purchasingPlayer = new Player{PlayerId = pPlayerId}.FindOne();
+
+            if (purchasingPlayer.Gold >= playerClassToPurchase.PurchasePrice)
             {
-                throw new MyException();
+                using var connection = GlobalConnection.GetNewOpenConnection();
+                var transaction = connection.BeginTransaction();
+                try
+                {
+                    purchasingPlayer.Gold -= playerClassToPurchase.PurchasePrice;
+                    var purchasedPlayerClass = new PlayerPlayerClass{PlayerId = purchasingPlayer.PlayerId, PlayerClassId = playerClassToPurchase.PlayerClassId.Value, Level = 1};
+                    
+                    purchasingPlayer.Persist();
+                    purchasedPlayerClass.Persist();
+                    transaction.Commit();
+                    
+                    purchaseComplete = true;
+                    resultText = $"You bough the {playerClassToPurchase.Name} for {playerClassToPurchase.PurchasePrice:,} gold";
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Failed to persis PlayerPlayerClass Acquisition");
+                    Console.WriteLine(e);
+                    transaction.Rollback();
+                }
+                finally
+                {
+                    connection.Close();
+                }
             }
-            catch (MyException)
+            else
             {
-                resultText = $"Could not find item '{ pLootName }'";
+                resultText = $"You can't afford '{playerClassToPurchase.Name}'. Current gold: {purchasingPlayer.Gold:,}, item cost: {playerClassToPurchase.PurchasePrice:,}";
             }
-            // var purchasingPlayer = next(from p in gameManager.globalGameManager.players
-            //                              where p.playerId == pClientId.author.id.ToString()
-            //                              select p);
-            // if (purchasingPlayer.loot.Contains(itemToPurchase.lootId))
-            // {
-            //     var replyMessage = "You already own '{itemToPurchase.lootName}'";
-            // }
-            // else if (itemToPurchase.cost > purchasingPlayer.gold)
-            // {
-            //     replyMessage = "You can't afford that item. Current gold: {purchasingPlayer.gold:,}, item cost: {itemToPurchase.cost:,}";
-            // }
-            // else
-            // {
-            //     purchasingPlayer.gold -= itemToPurchase.cost;
-            //     purchasingPlayer.addLoot(itemToPurchase.lootId);
-            //     gameManager.globalGameManager.persistChanges();
-            //     replyMessage = "You bough the {itemToPurchase.lootName} for {itemToPurchase.cost:,} gold";
-            // }
-            return resultText;
+
+            return new Tuple<bool, string>(purchaseComplete, resultText);
         }
+        
 
-        public static string BuyPlayerClass(int pPlayerClassId, int pPlayerId)
-        {
-            var resultText = "";
-
-            
-            // var purchasingPlayer = next(from p in gameManager.globalGameManager.players
-            //                              where p.playerId == pClientId.author.id.ToString()
-            //                              select p);
-            // // check player haven't already unlocked class
-            // Debug.Assert(!(from pc in purchasingPlayer.playerClassList
-            //                select pc.playerClassId).ToList().Contains(classToPurchase.playerClassId));
-            // Debug.Assert("You have already acquired that class");
-            // // check player can afford class
-            // Debug.Assert(purchasingPlayer.gold >= classToPurchase.purchasePrice);
-            // Debug.Assert($"You can't afford '{classToPurchase.name}'. Current gold: {purchasingPlayer.gold:,}, item cost: {classToPurchase.purchasePrice:,}");
-            // // check player have fulfilled class requirements
-            // classToPurchase.haveMetRequirements(purchasingPlayer.playerClassList);
-            // // make the actual purchase
-            // purchasingPlayer.gold -= classToPurchase.purchasePrice;
-            // purchasingPlayer.playerClassList.append(classToPurchase.@Class(purchasingPlayer));
-            // gameManager.globalGameManager.persistChanges();
-            // var buyMessage = $"You bough the {classToPurchase.name} for {classToPurchase.purchasePrice:,} gold";
-            return resultText;
-        }
-
-        // public string BuyItem(string pThingToBuyId, string pClientId)
-        // {
-        //     string replyMessage = String.Empty;
-        //     // replyMessage = buyWeapon(int(itemId), playerMessage)
-        //     try
-        //     {
-        //         replyMessage = BuyClass(pThingToBuyId, pClientId);
-        //     }
-        //     catch (Exception ae)
-        //     {
-        //         replyMessage = $"Failed to acquire class: { ae }";
-        //     }
-        //     catch
-        //     {
-        //         //TODO will now reach this place
-        //         // Should be split up anyways
-        //         try
-        //         {
-        //             replyMessage = BuyWeapon(pThingToBuyId, pClientId);
-        //         }
-        //         catch
-        //         {
-        //             replyMessage = $"no items found";
-        //         }
-        //     }
-        //     return replyMessage;
-        // }
-
-        public static string SellItem(string pLootName, string pClientId)
-        {
-            string mes;
-            try
-            {
-                // var sellingPlayer = next(from p in gameManager.globalGameManager.players
-                //                           where p.playerId == pClientId.author.id.ToString()
-                //                           select p);
-                // var weaponToSell = statics.findLootByName(pLootName);
-                // Debug.Assert(sellingPlayer.loot.Contains(weaponToSell.lootId));
-                mes = $"You don't own '{ pLootName }'";
-                //mes = sellingPlayer.sellLoot(weaponToSell);
-            }
-            catch (Exception err)
-            {
-                mes = err.ToString();
-            }
-            return mes;
-        }
-
+        // currently unused
         public static string AutoSellItem(string pLootName, string pClientId)
         {
             string mes;

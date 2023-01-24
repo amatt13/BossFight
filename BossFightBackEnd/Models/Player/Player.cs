@@ -218,13 +218,6 @@ namespace BossFight.Models
             return roll <= critChance;
         }
 
-        public string UnlockedClassesInfo()
-        {
-            var info = "Unlocked classes\n";
-            info += String.Join("\n", from pc in UnlockedPlayerPlayerClassList select $"{ pc.PlayerClassName } level { pc.Level }\nHp { pc.MaxHp } Mana { pc.MaxMana }");
-            return info;
-        }
-
         public bool BuffBonusDamageIfStronger(int bonusDamage, int duration)
         {
             var buffApplied = false;

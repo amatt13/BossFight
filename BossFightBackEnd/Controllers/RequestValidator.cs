@@ -276,6 +276,7 @@ AND p.Password = {pPassword.ToDbString()}";
             return allValuesAreFilled;
         }
 
+        // if you don't care about the error message
         public static bool PlayerExists(int pPlayerId)
         {
             string _;
@@ -313,6 +314,26 @@ AND p.Password = {pPassword.ToDbString()}";
             var monsterInstanceExists = GlobalConnection.SingleValue<bool>(cmd);
 
             return monsterInstanceExists;
+        }
+
+        public static bool PlayerIsEligibleForPlayerClassAcquisition(int pPlayerId, int pPlayerClassId, out string pError)
+        {
+            pError = String.Empty;
+            var unlockStatusList = PlayerUnlocks.UnlockedClasses(pPlayerId, false);
+            var alreadyOwnedPlayerClass = unlockStatusList.FirstOrDefault(us => us.Aquired && us.PlayerClass.PlayerClassId == pPlayerClassId)?.PlayerClass;
+
+            // have the player already bought this class?
+            if (alreadyOwnedPlayerClass != null)
+            {
+                pError = $"You already own {alreadyOwnedPlayerClass.Name}";
+            }
+            // is the class even on the list of available classes? (sanity check)
+            else if (unlockStatusList.Any(us => us.PlayerClass.PlayerClassId == pPlayerClassId))
+            {
+                pError = "You haven't unlocked this class yet";
+            }
+
+            return String.IsNullOrEmpty(pError);
         }
 
         /// <summary>

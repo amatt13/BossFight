@@ -57,6 +57,9 @@ socket.onmessage = function (event) {
 	else if ("shopMenu" in json_dict) {
 		UpdateUiShop(json_dict["shopMenu"]);
 	}
+	else if ("bought_player_class" in json_dict) {
+
+	}
 	else if ("error_message" in json_dict)
 		LogToGeneralLog(json_dict["error_message"], true);
 	else
@@ -169,12 +172,28 @@ async function FetchMonsterVotesTotals() {
 }
 
 
+function playerAttemptedToBuyAPlayerClass(params_dict) {
+	const sucess = bool(params_dict["sucess"]);
+	if (sucess) {
+		const message = params_dict["message"];
+		const updated_player = params_dict[updated_player];
+		const player = Player.CreateFromDict(updated_player);
+		UpdateUiPlayerStats(player);
+		show_custom_alert(message, "congratulate");
+	}
+	else {
+		show_custom_alert(message, "alert");
+	}
+}
+
 // TEST WebSocket button
 async function LoginTestUser() {
 	await SendSignInRequest("Demo", "A");
+	show_custom_alert("TEST TEST", "alert");
 }
 
 // TEST WebSocket button2
 async function LoginTestUser2() {
 	await SendSignInRequest("Test", "B");
+	show_custom_alert("I'm a long text\nthat is split into two seperate lines. WOW!", "congratulate");
 }

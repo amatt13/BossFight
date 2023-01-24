@@ -12,11 +12,9 @@ $("#player_inventory").bind("contextmenu", function (event) {
         event.preventDefault();
         
         // Show contextmenu
-        $(".custom-menu").finish().toggle(100).
-        
-        // In the right position (the mouse)
-        css({
-            top: event.pageY + "px",
+        $(".context-menu").finish().toggle(100).css({
+            // In the right position (the mouse)
+            top: event.pageY + "px", 
             left: event.pageX + "px"
         });
     }
@@ -27,16 +25,16 @@ $("#player_inventory").bind("contextmenu", function (event) {
 $(document).bind("mousedown", function (e) {
     
     // If the clicked element is not the menu
-    if (!$(e.target).parents(".custom-menu").length > 0) {
+    if (!$(e.target).parents(".context-menu").length > 0) {
         
         // Hide it
-        $(".custom-menu").hide(100);
+        $(".context-menu").hide(100);
     }
 });
 
 
 // If the menu element is clicked
-$(".custom-menu li").click(function(){
+$(".context-menu li").click(function(){
     
     // This is the triggered action name
     switch($(this).attr("data-action")) {
@@ -55,5 +53,5 @@ $(".custom-menu li").click(function(){
     }
   
     // Hide it AFTER the action was triggered
-    $(".custom-menu").hide(100);
+    $(".context-menu").hide(100);
   });
