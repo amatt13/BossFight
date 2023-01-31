@@ -25,8 +25,8 @@
 	</h1>
 	<div class="flex">
 		<!-- Canvas/Left column -->
-		<div class="left-column">
-			<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color: var(--default-font-colour); padding-top: 15px;">
+		<column class="left-column">
+			<div class="inner-column">
 				<button id="voteMonsterTierDownButton" type="button" class="btn-primary">
 					<img src="./images/ui_icons/red_arrow_down.png" class="vote-button">
 					Difficulty down
@@ -37,10 +37,10 @@
 				</button>
 			</div>
 			<canvas id="mainCanvas"></canvas>
-		</div>
+		</column>
 		<!-- Main menu/centre column -->
-		<div class="column" style="float:left; padding-left: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: var(--border-colour); margin-left: 5px; margin-right: 5px;">
-			<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color: var(--default-font-colour); padding-top: 15px;">
+		<column class="centre-column">
+			<div class="inner-column">
 				<!-- Player info column -->
 				<div style="grid-column: 1; grid-row: 1;">
 					<label>User: </label>
@@ -50,12 +50,12 @@
 					<img id="playerSprite" src="./images/sprites/player_classes/peasant.png" alt="Player class sprite" width="150" height="150" style="object-fit: fill;">
 				</div>
 				<div style="grid-column: 1; grid-row: 3;">
-					<label style="display: inline-block; width: 50px;">HP: </label>
+					<label class="hp-mana-label">HP: </label>
 					<progress id="progress_player_health" value="0" max="100"></progress>
 					<label id="player_hp"></label>
 				</div>
 				<div style="grid-column: 1; grid-row: 4;">
-					<label style="display: inline-block; width: 50px;">Mana: </label>
+					<label class="hp-mana-label">Mana: </label>
 					<progress class="mana-progress" id="progress_player_mana" value="0" max="100"></progress>
 					<label id="player_mana"></label>
 				</div>
@@ -86,22 +86,22 @@
 				</div>
 				<div style="grid-column: 1; grid-row: 10;">
 					<button type="button" class="btn-primary" onclick="AttackMonster()">
-						<img src="./images/ui_icons/attack_sword.png" style="max-width: 100%; max-height: 100%;">
+						<img src="./images/ui_icons/attack_sword.png" class="max-size-100-percent">
 						Attack Monster
 					</button>
 				</div>
 				<!-- Player inventory -->
 				<div style="grid-column: 2; grid-row: 1/20;">
-					<select id="player_inventory" size="1" style="flex-grow:1; float:left; width: 95%;"></select>
+					<select id="player_inventory" size="1" style="flex-grow:1; float:left; width: 100%;"></select>
 					<button id="openShopButton" type="button" class="btn-primary" style="flex-grow:1; float:left; margin-top: 5px;">Open shop</button>
 				</div>
 			</div>
-		</div>
+		</column>
 		<!-- Right column -->
-		<div class="column" style="float:right; flex: 10%; border: solid; color: var(--border-colour);">
-			<div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color: var(--default-font-colour); margin-right: 5px; margin-left: 5px;">
+		<column class="right-column">
+			<div class="inner-column">
 				<!-- logs -->
-				<div style="grid-column: 1/-1; grid-row: 2;">
+				<div style="grid-column: 1/-1; grid-row: 1;">
 					<label onclick="OpenLog(event, 'text_log');">
 					  <div id="text_log_hover" class="log-tab hover-light-grey border-red">General</div>
 					</label>
@@ -112,13 +112,12 @@
 					  <div id="chat_log_hover" class="log-tab hover-light-grey">Chat</div>
 					</label>
 				  </div>
-				<textarea id="text_log" class="log" placeholder="General log..." readonly=true></textarea>
-				<textarea id="combat_log" class="log" placeholder="Combat log..." readonly=true style="display: none;"></textarea>
-				<textarea id="chat_log" class="log" placeholder="Chat log..." readonly=true style="display: none;"></textarea>
-	
-				<button id="sendChatMessageButton" type="button" class="btn-primary" style="grid-row: 5; grid-column: 1">Send</button>
-				<input id="chatMessageContentInput" type="text" style="grid-row: 5; grid-column: 2/-1" ></input>
-				<div style="grid-column: 1/-1; grid-row: 6;">
+				<textarea id="text_log" class="log" placeholder="General log..." readonly=true style="grid-column: 1/-1; grid-row: 2;"></textarea>
+				<textarea id="combat_log" class="log" placeholder="Combat log..." readonly=true style="grid-column: 1/-1; grid-row: 2; display: none;"></textarea>
+				<textarea id="chat_log" class="log" placeholder="Chat log..." readonly=true style="grid-column: 1/-1; grid-row: 2; display: none;"></textarea>
+				<button id="sendChatMessageButton" type="button" class="btn-primary" style="grid-column: 1">Send</button>
+				<input id="chatMessageContentInput" type="text" style="grid-column: 2/-1" ></input>
+				<div style="grid-column: 1/-1;">
 					<div style="background-color: var(--wallpaper-background-colour); width: 30px; height: 30px; float: left; border: solid; color: white; border-width: 1px;"></div>
 					<div style="background-color: var(--border-colour); width: 30px; height: 30px; float: left; border: solid; color: white; border-width: 1px;"></div>
 					<div style="background-color: var(--shadow-colour); width: 30px; height: 30px; float: left; border: solid; color: white; border-width: 1px;"></div>
@@ -126,7 +125,7 @@
 					<div style="background-color: var(--default-font-colour); width: 30px; height: 30px; float: left; border: solid; color: white; border-width: 1px;"></div>
 				</div>
 			</div>
-		</div>
+		</column>
 	</div>
 	<label style="float: left;">
 		UI icons provided by 
@@ -145,6 +144,7 @@
 	<li id=custom_menu_sell data-action = "sell" data-sell_id=none>Sell weapon</li>
 </ul>
 
+<!-- alerts dialog -->
 <ul class="custom-alert custom-menu center-browser-div">
 	<label id="custom-alert-text-label"></label>
 </ul>

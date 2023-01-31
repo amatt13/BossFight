@@ -114,7 +114,7 @@ function AnimateMonster() {
 	else {
 		montserBonusSize *= 3;
 	}
-	ctx.drawImage(monsterImage, monsterImageX, monsterImageY, 75 + montserBonusSize, 75 + montserBonusSize);
+	ctx.drawImage(monsterImage, monsterImageX, monsterImageY, 100 + montserBonusSize, 100 + montserBonusSize);
 }
 
 function AnimatePlayer() {
@@ -133,7 +133,7 @@ function DrawMonsterStatus() {
 
 	ctx.fillText('Debuffs:', 10, 90);
 
-	var monster_name_y = monsterImageY + monsterImage.height + 60;
+	var monster_name_y = monsterImageY + monsterImage.height + 30;
 	var monster_name_x = monsterImageX;
 	let monster_name = _monster1.monster_name ?? "?";
 	let monsterlevel = _monster1.level ?? "?";
