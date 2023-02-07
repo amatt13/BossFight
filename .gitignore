@@ -356,3 +356,4 @@ MigrationBackup/
 BossFight Rest/TodoApi/.vscode/*
 BossFightBackEnd/appsettings.Development.json
 BossFightBackEnd/appsettings.json
+*appsettings.Development.json
