@@ -138,7 +138,7 @@ function UpdateUiShop(shop_dict) {
 		const card = CreatePlayerclassTitleCardForShop(pc, playerclass_count);
 		const class_row = `<div id="PlayerClassContainer" style="grid-column: 2; grid-row: ${ playerclass_count };">
 		${ card }
-		<button class="buy-button btn-primary" ${ aquired ? "disabled" : "" } onclick="buy_playerclass(${ i });">${ aquired ? "Already owned" : "Buy" }</button>
+		<button class="buy-button btn-primary" ${ aquired ? "disabled" : "" } onclick="BuyPlayerClass(${ pc.player_class_id });">${ aquired ? "Already owned" : "Buy" }</button>
 	</div>`;
 		player_class_html += class_row;
 	});

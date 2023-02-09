@@ -369,7 +369,7 @@ namespace BossFight.Controllers
                     && RequestValidator.PlayerIsEligibleForPlayerClassAcquisition(playerId, player_class_id, out error))
                 {
                     Tuple<bool, string> result = ShopController.BuyPlayerClass(player_class_id, playerId);
-                    var updated_player = new Player{PlayerId = playerId}.FindOne();
+                    var updated_player = new Player{}.FindOne(playerId);
                     var response = new Dictionary<string, Dictionary<string, object>>
                     {
                         { 

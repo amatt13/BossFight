@@ -27,6 +27,18 @@ dialogBackground.addEventListener('click', function onOpen() {
     CloseShop();
 });
 
+function BuyPlayerClass(player_class_id) {
+    const obj = { 
+		request_key: "BuyPlayerClass",
+		request_data: JSON.stringify({
+            player_id: _player.player_id, 
+            player_class_id: player_class_id
+        })
+	};
+	const json_obj = JSON.stringify(obj);
+	socket.send(json_obj);
+}
+
 function CloseShop() {
     shopDialog.style.display = 'none';
     dialogBackground.style.display = 'none';

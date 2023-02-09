@@ -26,8 +26,8 @@ namespace BossFight.Controllers
         {
             var resultText = "";
             var purchaseComplete = false;
-            var playerClassToPurchase = new PlayerClass{PlayerClassId = pPlayerClassId}.FindOne();
-            var purchasingPlayer = new Player{PlayerId = pPlayerId}.FindOne();
+            var playerClassToPurchase = new PlayerClass{}.FindOne(pPlayerClassId);
+            var purchasingPlayer = new Player{}.FindOne(pPlayerId);
 
             if (purchasingPlayer.Gold >= playerClassToPurchase.PurchasePrice)
             {
@@ -36,14 +36,19 @@ namespace BossFight.Controllers
                 try
                 {
                     purchasingPlayer.Gold -= playerClassToPurchase.PurchasePrice;
-                    var purchasedPlayerClass = new PlayerPlayerClass{PlayerId = purchasingPlayer.PlayerId, PlayerClassId = playerClassToPurchase.PlayerClassId.Value, Level = 1};
+                    var purchasedPlayerClass = new PlayerPlayerClass {
+                        PlayerId = purchasingPlayer.PlayerId, 
+                        PlayerClassId = playerClassToPurchase.PlayerClassId.Value, 
+                        Level = 1, 
+                        XP = 0,
+                        Active = false};
                     
                     purchasingPlayer.Persist();
                     purchasedPlayerClass.Persist();
                     transaction.Commit();
                     
                     purchaseComplete = true;
-                    resultText = $"You bough the {playerClassToPurchase.Name} for {playerClassToPurchase.PurchasePrice:,} gold";
+                    resultText = $"You bough the {playerClassToPurchase.Name} for {playerClassToPurchase.PurchasePrice:n0} gold";
                 }
                 catch (Exception e)
                 {
@@ -58,7 +63,7 @@ namespace BossFight.Controllers
             }
             else
             {
-                resultText = $"You can't afford '{playerClassToPurchase.Name}'. Current gold: {purchasingPlayer.Gold:,}, item cost: {playerClassToPurchase.PurchasePrice:,}";
+                resultText = $"You can't afford '{playerClassToPurchase.Name}'. Current gold: {purchasingPlayer.Gold:n0}, item cost: {playerClassToPurchase.PurchasePrice:n0}";
             }
 
             return new Tuple<bool, string>(purchaseComplete, resultText);

@@ -299,10 +299,10 @@ AND p.Password = {pPassword.ToDbString()}";
             var sql = $@"SELECT TRUE FROM { nameof(PlayerClass) } WHERE { nameof(PlayerClass.PlayerClassId) } = @{ nameof(PlayerClass.PlayerClassId) }";
             var cmd = new MySqlCommand(sql);
             cmd.Parameters.AddParameter(pPlayerClassId, nameof(PlayerClass.PlayerClassId));
-            var playerExists = GlobalConnection.SingleValue<bool>(cmd);
-            pError = playerExists ? String.Empty : "Could not find class";
+            var playerClassExists = GlobalConnection.SingleValue<bool>(cmd);
+            pError = playerClassExists ? String.Empty : "Could not find class";
 
-            return playerExists;
+            return playerClassExists;
         }
 
 
@@ -328,7 +328,7 @@ AND p.Password = {pPassword.ToDbString()}";
                 pError = $"You already own {alreadyOwnedPlayerClass.Name}";
             }
             // is the class even on the list of available classes? (sanity check)
-            else if (unlockStatusList.Any(us => us.PlayerClass.PlayerClassId == pPlayerClassId))
+            else if (!unlockStatusList.Any(us => us.PlayerClass.PlayerClassId == pPlayerClassId))
             {
                 pError = "You haven't unlocked this class yet";
             }
