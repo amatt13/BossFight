@@ -60,6 +60,8 @@ socket.onmessage = function (event) {
 	else if ("bought_player_class" in json_dict) {
 		playerAttemptedToBuyAPlayerClass(json_dict["bought_player_class"])
 	}
+	else if ("unlocked_classes" in json_dict) 
+		showPlayerClassesMenu(json_dict["unlocked_classes"]);
 	else if ("error_message" in json_dict) {
 		error_message = json_dict["error_message"]
 		show_custom_alert(error_message, "alarm")

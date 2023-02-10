@@ -3,6 +3,7 @@
 <head>
 	<link rel="stylesheet" href="css/stylesheet.css" type="text/css" charset="utf-8" />
 	<link rel="stylesheet" href="css/shop.css" type="text/css" charset="utf-8" />
+	<link rel="stylesheet" href="css/playerClassMenu.css" type="text/css" charset="utf-8" />
 	<meta charset="utf-8">
 	<meta http-equiv="content_security_policy" content="script-src 'self'; script-src-elem 'self'">
 	<title>Boss Fight</title>
@@ -90,10 +91,11 @@
 						Attack Monster
 					</button>
 				</div>
-				<!-- Player inventory -->
+				<!-- Player inventory/classes -->
 				<div style="grid-column: 2; grid-row: 1/20;">
 					<select id="player_inventory" size="1" style="flex-grow:1; float:left; width: 100%;"></select>
 					<button id="openShopButton" type="button" class="btn-primary" style="flex-grow:1; float:left; margin-top: 5px;">Open shop</button>
+					<button id="openUnlockedClassesButton" type="button" class="btn-primary" style="flex-grow:1; float:left; margin-top: 5px;">Change Class</button>
 				</div>
 			</div>
 		</column>
@@ -184,6 +186,31 @@
 	</form>
 </div>
 
+<!-- PlayerClass dialog -->
+<div id="playerClassMenu" class="modal-dialog">
+	<form method="dialog">
+		<div class="player-class-column-divider">
+			<!-- current player class -->
+			<div class="column" style="float:left; padding-left: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: var(--border-colour); margin-left: 5px; margin-right: 5px; flex: 50%;">
+				<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color: var(--default-font-colour); padding-top: 15px;">
+					<label style="grid-column: 1; grid-row: 1; text-align: center;  font-size: xx-large;">Name of current class></label>
+					
+				</div>
+			</div>
+			<!-- list of unlocked classes -->
+			<div class="column" style="float:right; padding-right: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: var(--border-colour); margin-left: 5px; margin-right: 5px; flex: 50%;">
+				<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color: var(--default-font-colour); padding-top: 15px;">
+					<label style="grid-column: 1; grid-row: 1; text-align: center; font-size: xx-large;">Classes</label>
+					<div id="unlockedPlayerClasses" style="grid-column: 1; grid-row: 2;"></div>
+				</div>
+			</div>
+		</div>
+		<menu style="position: sticky; bottom: 0px;">
+			<button id="closeplayerClassMenuButton" value="default" class="btn-primary">Close</button>
+		</menu>
+	</form>
+</div>
+
 <img id="monsterSprite" src="./images/sprites/monsters/goblin.png" alt="Current monster sprite" class="hidden">
 
 <!-- not to self... the order of these scripts matter -->
@@ -195,5 +222,6 @@
 <script type="text/javascript" src="scripts/custom_context_menu.js"></script>
 <script type="text/javascript" src="scripts/custom_alert.js"></script>
 <script type="text/javascript" src="scripts/shop_dialog.js"></script>
+<script type="text/javascript" src="scripts/playerClasses.js"></script>
 <script type="text/javascript" src="scripts/sign_in.js"></script>
 <script type="text/javascript" src="scripts/updateUI.js"></script>
