@@ -274,23 +274,20 @@ namespace BossFight.Models
 
         public void SubtractHealth(int pDamage, Player pAttackingPlayer)
         {
-            if (IsAlive())
+            var monsterDamageTrackerItem = MonsterDamageTrackerList.FirstOrDefault(mdt => mdt.PlayerId == pAttackingPlayer.PlayerId);
+            if (monsterDamageTrackerItem != null)
             {
-                var monsterDamageTrackerItem = MonsterDamageTrackerList.FirstOrDefault(mdt => mdt.PlayerId == pAttackingPlayer.PlayerId);
-                if (monsterDamageTrackerItem != null)
-                {
-                    monsterDamageTrackerItem.DamageReceivedFromPlayer += pDamage;
-                    monsterDamageTrackerItem.Persist();
-                }
-                else
-                {
-                    monsterDamageTrackerItem = new MonsterDamageTracker(pAttackingPlayer, this, pDamage);
-                    monsterDamageTrackerItem.Persist();
-                    MonsterDamageTrackerList.Append(monsterDamageTrackerItem);
-                }
-                    
-                Hp -= pDamage;
+                monsterDamageTrackerItem.DamageReceivedFromPlayer += pDamage;
+                monsterDamageTrackerItem.Persist();
             }
+            else
+            {
+                monsterDamageTrackerItem = new MonsterDamageTracker(pAttackingPlayer, this, pDamage);
+                monsterDamageTrackerItem.Persist();
+                MonsterDamageTrackerList.Append(monsterDamageTrackerItem);
+            }
+                
+            Hp -= pDamage;
         }
 
         public bool MonsterAttackIsCrit()

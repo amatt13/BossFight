@@ -13,10 +13,13 @@ namespace BossFight.Models
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(PlayerPlayerClass);
         [JsonIgnore]
-        public override string IdColumn { get; set; } = nameof(PlayerClassId);
+        public override string IdColumn { get; set; } = nameof(PlayerPlayerClassId);
 
         // Persisted on PlayerPlayerClass table
         [PersistProperty(true)]
+        public int? PlayerPlayerClassId {get; set;}
+
+        [PersistProperty]
         public int? PlayerId { get; set; }
         
         [JsonIgnore]
@@ -36,7 +39,6 @@ namespace BossFight.Models
         [JsonIgnore]
         public Player Player { get; set; }
 
-        [JsonIgnore]
         public PlayerClass PlayerClass { get; set; }
 
         [JsonIgnore]
@@ -88,6 +90,7 @@ namespace BossFight.Models
             while (reader.Read())
             {
                 var playerPlayerClass = new PlayerPlayerClass();
+                playerPlayerClass.PlayerPlayerClassId = reader.GetInt(nameof(PlayerPlayerClassId));
                 playerPlayerClass.PlayerId = reader.GetInt(nameof(PlayerId));
                 playerPlayerClass.PlayerClassId = reader.GetInt(nameof(PlayerClassId));
                 playerPlayerClass.XP = reader.GetInt(nameof(XP));
@@ -112,6 +115,12 @@ namespace BossFight.Models
                 additionalSearchCriteriaText += $" AND { nameof(PlayerId) } = { ppc.PlayerId.Value }\n";
 
             return TrimAdditionalSearchCriteriaText(additionalSearchCriteriaText, pStartWithAnd);
+        }
+
+        public override void BeforePersist()
+        {
+            base.BeforePersist();
+            Active ??= false;
         }
 
         public void LevelUp()

@@ -369,7 +369,7 @@ namespace BossFight.Controllers
                     && RequestValidator.PlayerIsEligibleForPlayerClassAcquisition(playerId, player_class_id, out error))
                 {
                     Tuple<bool, string> result = ShopController.BuyPlayerClass(player_class_id, playerId);
-                    var updated_player = new Player{PlayerId = playerId}.FindOne();
+                    var updated_player = new Player{}.FindOne(playerId);
                     var response = new Dictionary<string, Dictionary<string, object>>
                     {
                         { 
@@ -380,6 +380,32 @@ namespace BossFight.Controllers
                                 {"updated_player", updated_player}
                             } 
                         }
+                    };
+
+                    var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
+                    await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                }
+            }
+
+            if (!String.IsNullOrEmpty(error))
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        }
+
+        // takes: player_id: "int"
+        public async Task GetUnlockedClassesForPlayer(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id" });
+
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
+            {
+                var playerId = pJsonParameters["player_id"].GetInt32();
+                if (RequestValidator.PlayerExists(playerId))
+                {
+                    var player = new Player().FindOne(playerId);
+                    var unlockedClasses = player.UnlockedPlayerPlayerClassList;
+                    var response = new Dictionary<string, object>
+                    {
+                        { "unlocked_classes", unlockedClasses }
                     };
 
                     var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));

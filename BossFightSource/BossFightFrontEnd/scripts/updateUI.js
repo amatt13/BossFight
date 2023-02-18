@@ -9,12 +9,12 @@ function UpdateUiActiveMonster(monster_dict, monster_is_new = false) {
 
 function UpdateUiPlayerStats(player) {
 	document.getElementById("player_name").innerHTML = player.name;
-	document.getElementById("player_level_and_class").innerHTML = `${player.player_player_class.level} ${player.player_player_class.player_class_name}`;
-	document.getElementById("player_xp").innerHTML = player.player_player_class.xp;
-	document.getElementById("player_xp_to_next_level").innerHTML = `(${player.player_player_class.xp_to_next_level} to next level)`
-	document.getElementById("player_hp").innerHTML = `${player.hp}/${player.player_player_class.max_hp}`;
-	document.getElementById("player_mana").innerHTML = `${player.mana}/${player.player_player_class.max_mana}`;
-	document.getElementById("player_gold").innerHTML = _player.gold;
+	document.getElementById("player_level_and_class").innerHTML = `${numberToString(player.player_player_class.level)} ${player.player_player_class.player_class_name}`;
+	document.getElementById("player_xp").innerHTML = numberToString(player.player_player_class.xp);
+	document.getElementById("player_xp_to_next_level").innerHTML = `(${numberToString(player.player_player_class.xp_to_next_level)} to next level)`
+	document.getElementById("player_hp").innerHTML = `${numberToString(player.hp)}/${numberToString(player.player_player_class.max_hp)}`;
+	document.getElementById("player_mana").innerHTML = `${numberToString(player.mana)}/${numberToString(player.player_player_class.max_mana)}`;
+	document.getElementById("player_gold").innerHTML = numberToString(_player.gold);
 	document.getElementById("player_equipped_weapon_name").innerHTML = player.weapon.loot_name;
 
 	RepopulatePlayerInventory();
@@ -36,7 +36,7 @@ function UpdateUiPlayerStats(player) {
 function UpdateUiPlayerSoldWeapon(json_dict) {
 	const gold = json_dict["gold"]
 	_player.gold = gold;
-	document.getElementById("player_gold").innerHTML = _player.gold;
+	document.getElementById("player_gold").innerHTML = numberToString(_player.gold);  //TODO use bindings instead of manually setting the text whenever something changes?
 	BlinkDiv("player_gold");
 
 	var player_weapon_list = [];
@@ -136,7 +136,7 @@ function CreatePlayerclassTitleCardForShop(playerclass, row) {
 	const card_html = `<div style="border: solid; border-color: var(--border-colour); margin-left: 5px">
 		<table>
 			<tr>
-				<td style="width: 50%">
+				<td style="width: 50%; float: left">
 					<img id="shop_menu_player_class${ playerclass.name }_sprite" src="./images/sprites/player_classes/${ playerclass.name }.png" width="75" height="75" style="object-fit: fill;">
 				</td>
 				<td>
@@ -145,17 +145,17 @@ function CreatePlayerclassTitleCardForShop(playerclass, row) {
 			</tr>
 			<tr>
 				<td>
-					<label>${ playerclass.name.toLowerCase() } - cost ${ playerclass.purchase_price }</label>
+					<label>${ playerclass.name.toLowerCase() } - cost ${ numberToString(playerclass.purchase_price) }</label>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<label>Base health: ${ playerclass.base_health }</label>
+					<label>Base health: ${ numberToString(playerclass.base_health) }</label>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<label>Base mana: ${ playerclass.base_mana }</label>
+					<label>Base mana: ${ numberToString(playerclass.base_mana) }</label>
 				</td>
 			</tr>
 		</table>
@@ -179,7 +179,7 @@ function UpdateUiShop(shop_dict) {
 		const card = CreatePlayerclassTitleCardForShop(pc, playerclass_count);
 		const class_row = `<div id="PlayerClassContainer" style="grid-column: 2; grid-row: ${ playerclass_count };">
 		${ card }
-		<button class="buy-button btn-primary" ${ aquired ? "disabled" : "" } onclick="buy_playerclass(${ i });">${ aquired ? "Already owned" : "Buy" }</button>
+		<button class="buy-button btn-primary" ${ aquired ? "disabled" : "" } onclick="BuyPlayerClass(${ pc.player_class_id });">${ aquired ? "Already owned" : "Buy" }</button>
 	</div>`;
 		player_class_html += class_row;
 	});

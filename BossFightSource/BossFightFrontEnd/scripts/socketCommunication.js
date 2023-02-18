@@ -58,10 +58,15 @@ socket.onmessage = function (event) {
 		UpdateUiShop(json_dict["shopMenu"]);
 	}
 	else if ("bought_player_class" in json_dict) {
-
+		playerAttemptedToBuyAPlayerClass(json_dict["bought_player_class"])
 	}
-	else if ("error_message" in json_dict)
-		LogToGeneralLog(json_dict["error_message"], true);
+	else if ("unlocked_classes" in json_dict) 
+		showPlayerClassesMenu(json_dict["unlocked_classes"]);
+	else if ("error_message" in json_dict) {
+		error_message = json_dict["error_message"]
+		show_custom_alert(error_message, "alarm")
+		LogToGeneralLog(error_message, true);
+	}
 	else
 		LogToGeneralLog(`Unkown message received '${json_dict}'`, true);
 	
@@ -78,6 +83,7 @@ socket.onclose = function (event) {
 
 socket.onerror = function (error) {
 	LogToGeneralLog(`[error] ${error.message}`, true);
+	show_custom_alert(error.message, "alarm")
 };
 function UpdateUiTargets(json_dict)
 {
@@ -177,27 +183,25 @@ async function FetchMonsterVotesTotals() {
 
 
 function playerAttemptedToBuyAPlayerClass(params_dict) {
-	const sucess = bool(params_dict["sucess"]);
+	const sucess = params_dict["sucess"];
+	const message = params_dict["message"];
 	if (sucess) {
-		const message = params_dict["message"];
-		const updated_player = params_dict[updated_player];
+		const updated_player = params_dict["updated_player"];
 		const player = Player.CreateFromDict(updated_player);
 		UpdateUiPlayerStats(player);
 		show_custom_alert(message, "congratulate");
 	}
 	else {
-		show_custom_alert(message, "alert");
+		show_custom_alert(message, "alarm");
 	}
 }
 
 // TEST WebSocket button
 async function LoginTestUser() {
 	await SendSignInRequest("Demo", "A");
-	show_custom_alert("TEST TEST", "alert");
 }
 
 // TEST WebSocket button2
 async function LoginTestUser2() {
 	await SendSignInRequest("Test", "B");
-	show_custom_alert("I'm a long text\nthat is split into two seperate lines. WOW!", "congratulate");
 }
