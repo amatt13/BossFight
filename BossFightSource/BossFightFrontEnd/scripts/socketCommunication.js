@@ -78,6 +78,7 @@ socket.onclose = function (event) {
 	}
 	else {
 		LogToGeneralLog('[close] Connection died', true);
+		show_custom_alert("Connection to server closed. Please reload the site.", "alarm");
 	}
 };
 

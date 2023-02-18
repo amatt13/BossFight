@@ -402,7 +402,7 @@ namespace BossFight.Controllers
                 if (RequestValidator.PlayerExists(playerId))
                 {
                     var player = new Player().FindOne(playerId);
-                    var unlockedClasses = player.UnlockedPlayerPlayerClassList;
+                    IEnumerable<PlayerPlayerClass> unlockedClasses = player.UnlockedPlayerPlayerClassList;
                     var response = new Dictionary<string, object>
                     {
                         { "unlocked_classes", unlockedClasses }

@@ -136,7 +136,7 @@ function UpdateUiShop(shop_dict) {
 		const pc = PlayerClass.CreateFromDict(player_class["PlayerClass"]);
 		_playerclasses_list.push(pc);
 		const card = CreatePlayerclassTitleCardForShop(pc, playerclass_count);
-		const class_row = `<div id="PlayerClassContainer" style="grid-column: 2; grid-row: ${ playerclass_count };">
+		const class_row = `<div style="grid-column: 2; grid-row: ${ playerclass_count };">
 		${ card }
 		<button class="buy-button btn-primary" ${ aquired ? "disabled" : "" } onclick="BuyPlayerClass(${ pc.player_class_id });">${ aquired ? "Already owned" : "Buy" }</button>
 	</div>`;

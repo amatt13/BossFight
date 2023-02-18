@@ -6,10 +6,18 @@
 
 .playerClassSelectorTable {
 	border-spacing: 0px;
+	border: solid; 
+	border-color: var(--border-colour); margin-left: 5px;
 }
 
 .playerClassSelectorRow:hover {
-	background-color: var(--text-background-colour);
+	background-color: var(--border-colour);
+	font-style: italic;
+}
+
+.playerClassSelectorRowSelectedRow {
+	background-color: var(--border-colour);
+	font-style: italic;
 }
 
 .playerClassSelectorRowPlayerClassQuickDescription {
