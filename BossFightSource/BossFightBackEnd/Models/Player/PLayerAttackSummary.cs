@@ -12,6 +12,7 @@ namespace BossFight.Models
         public string MonsterAffectedByDots { get; set; }
         public string MonsterRetaliateMessage { get; set; }
         public bool PlayerKilledMonster { get; set; }
+        public int MonsterTotalDamage {get; set;}
 
         public PlayerAttackSummary(Player pPlayer, MonsterInstance pMonster)
         {

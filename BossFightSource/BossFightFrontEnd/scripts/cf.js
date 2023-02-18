@@ -26,31 +26,7 @@ function RepopulatePlayerInventory() {
 	player_inventory.size = inventory_lenght;
 }
 
-function CreatePlayerAttackSummaryMessage(summary_dict) {
-	let player_combat_log_message = ""
-	const player_dict = summary_dict["Player"]
-	const monster_dict = summary_dict["Monster"];
-	const player = Player.CreateFromDict(player_dict);
-	const monster_name = monster_dict["Name"]
-	const player_attack_was_crit = summary_dict["PlayerCrit"]
-	const player_total_damage = summary_dict["PlayerTotalDamage"]
-	
-	if (player_attack_was_crit) {
-		player_combat_log_message += "Critical hit!\n"
-	}
-	
-	let hit_message = "You hit";
-	if (player.weapon.attack_message != null && player.weapon.attack_message != "") {
-		hit_message = player.weapon.attack_message;
-		// if the last char is NOT '.', '?', or '!'
-		if (!/[.?!]/.test(hit_message.slice(-1))) {
-			hit_message += "."
-		}
-	}
 
-	player_combat_log_message += `${hit_message} ${monster_name} takes ${player_total_damage} damage`;
-	return player_combat_log_message
-}
 
 function BlinkDiv(div_id, color = 'yellow') {
 	let element = document.getElementById(div_id)

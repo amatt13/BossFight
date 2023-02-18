@@ -41,6 +41,7 @@ namespace BossFight.Controllers
                 if (pMonster.HasLowerAttackDefuff())
                     monsterDamage = pMonster.LowerAttackBecauseOfLowerAttackDebuff(monsterDamage);
                     
+                pPlayerAttackSummary.MonsterTotalDamage = monsterDamage; 
                 pPlayerToAttack.SubtractHealth(monsterDamage);
                 damageTexts.Add($"{ pMonster.Name } hits you for { monsterDamage } damage");
             }
