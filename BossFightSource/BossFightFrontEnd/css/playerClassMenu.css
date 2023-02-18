@@ -3,3 +3,16 @@
 	display: flex; 
 	padding-top: 5px;
 }
+
+.playerClassSelectorTable {
+	border-spacing: 0px;
+}
+
+.playerClassSelectorRow:hover {
+	background-color: var(--text-background-colour);
+}
+
+.playerClassSelectorRowPlayerClassQuickDescription {
+	width: 100%;
+	padding-left: 0px;
+}

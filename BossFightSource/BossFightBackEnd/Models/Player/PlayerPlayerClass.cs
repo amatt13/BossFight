@@ -39,7 +39,6 @@ namespace BossFight.Models
         [JsonIgnore]
         public Player Player { get; set; }
 
-        [JsonIgnore]
         public PlayerClass PlayerClass { get; set; }
 
         [JsonIgnore]

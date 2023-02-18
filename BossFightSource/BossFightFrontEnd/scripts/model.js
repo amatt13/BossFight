@@ -23,17 +23,19 @@ class Weapon {
 }
 
 class PlayerPlayerClass {
-	constructor(xp, level, max_hp, max_mana, player_class_name, xp_to_next_level) {
+	constructor(xp, level, max_hp, max_mana, player_class_name, xp_to_next_level, player_class) {
 		this.xp = xp;
 		this.level = level;
 		this.max_hp = max_hp;
 		this.max_mana = max_mana;
 		this.player_class_name = player_class_name;
 		this.xp_to_next_level = xp_to_next_level;
+		this.player_Class = player_class;
 	}
 
 	static CreateFromDict(player_player_class_dict) {
-		const player_player_class = new PlayerPlayerClass(player_player_class_dict["XP"], player_player_class_dict["Level"], player_player_class_dict["MaxHp"], player_player_class_dict["MaxMana"], player_player_class_dict["PlayerClassName"], player_player_class_dict["XpNeededToNextLevel"]);
+		const player_class = PlayerClass.CreateFromDict(player_player_class_dict["PlayerClass"]);
+		const player_player_class = new PlayerPlayerClass(player_player_class_dict["XP"], player_player_class_dict["Level"], player_player_class_dict["MaxHp"], player_player_class_dict["MaxMana"], player_player_class_dict["PlayerClassName"], player_player_class_dict["XpNeededToNextLevel"], player_class);
 		return player_player_class;
 	}
 }
