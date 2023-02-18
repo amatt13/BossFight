@@ -5,6 +5,7 @@ let monsterImage = document.getElementById("monsterSprite");
 const voteUpButton = document.getElementById("voteMonsterTierUpButton");
 const voteDownButton = document.getElementById("voteMonsterTierDownButton");
 let initialMonsterImageX = 30, initialMonsterImageY = -1;
+let playerWidthPlacement = 0;
 
 monsterImage.addEventListener("load", () => {
 	initialMonsterImageY = canvas.height / 2;
@@ -63,11 +64,17 @@ function Draw() {
 	AnimateMonster();
 	DrawMonsterStatus();
 	AnimatePlayer();
+	WriteToVariables();
 	if (_enable_damage_to_show) {
 		DrawDamage();
+		DrawDamageOnPlayer();
 	}
 
 	window.requestAnimationFrame(Draw);
+}
+
+function WriteToVariables(){
+	playerWidthPlacement = canvas.width-playerImage.width;
 }
 
 function ReSizeCanvas() {
@@ -119,6 +126,7 @@ function AnimateMonster() {
 
 function AnimatePlayer() {
 	ctx.drawImage(playerImage, canvas.width-playerImage.width, initialMonsterImageY, 100, 100);
+	
 }
 
 function DrawMonsterStatus() {
@@ -151,6 +159,20 @@ function DrawDamage() {
 
 function CanvasShowDamageAnimation(damage) {
 	_damage_to_show = damage;
+	_enable_damage_to_show = true;  
+	setInterval(() => {_enable_damage_to_show = false;}, 3000); // set to 5000 for crit
+}
+
+let _damage_to_showPlayer;
+function DrawDamageOnPlayer(){
+	var Player_y = initialMonsterImageY - 20;
+	var player_x = playerWidthPlacement + 72 / 2 - 5;
+	ctx.font = "60px myFirstFont";
+	ctx.fillText(`${ _damage_to_showPlayer }!`, player_x, Player_y);
+}
+
+function CanvasShowDamageAnimationForPlayer(damage) {
+	_damage_to_showPlayer = damage;
 	_enable_damage_to_show = true;  
 	setInterval(() => {_enable_damage_to_show = false;}, 3000); // set to 5000 for crit
 }

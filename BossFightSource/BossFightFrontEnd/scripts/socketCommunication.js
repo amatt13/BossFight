@@ -38,7 +38,7 @@ socket.onmessage = function (event) {
 	else if ("update_player_equipped_weapon" in json_dict)
 		UpdateUiPlayerEquippedWeapon(json_dict["update_player_equipped_weapon"])
 	else if ("player_attacked_monster_with_weapon" in json_dict)
-		UpdateUiPlayerAttackedMonsterWithWeapon(json_dict["player_attacked_monster_with_weapon"])
+		UpdateUiTargets(json_dict["player_attacked_monster_with_weapon"])
 	else if ("receive_chat_message" in json_dict)
         ReceiveChatMessage(json_dict["receive_chat_message"]);
     else if ("receive_multiple_chat_message" in json_dict)
@@ -86,7 +86,11 @@ socket.onerror = function (error) {
 	LogToGeneralLog(`[error] ${error.message}`, true);
 	show_custom_alert(error.message, "alarm")
 };
-
+function UpdateUiTargets(json_dict)
+{
+	UpdateUiPlayerAttackedMonsterWithWeapon(json_dict) // omskriv
+	UpdateUiMonsterAttackedPlayer(json_dict)
+}
 async function FetchActiveMonster() {
 	const obj = {
 		request_key: "FetchActiveMonster",
