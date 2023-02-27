@@ -25,6 +25,7 @@ function showPlayerClassesMenu(player_player_classes) {
 	const active_player_class = player_player_classes_instances.find(pc => pc.active == true)
 	if (active_player_class != undefined) {
 		changePlayerClassSelectorCurrentlySelectedRow(active_player_class.player_class.player_class_id);
+		setLeftPaneToSelectedClass(active_player_class);
 	}
     playerClassMenuBackground.style.display = 'block';
     playerClassMenu.style.display = 'block';
@@ -88,4 +89,13 @@ function changePlayerClassSelectorCurrentlySelectedRow(player_class_id) {
 			}
 		}
 	};
+}
+
+__current_player_class = null;
+function setLeftPaneToSelectedClass(current_player_player_class) {
+	__current_player_class = current_player_player_class.player_class;
+	title = document.getElementById("playerClassSelectorLeftPaneTitle");
+	title.text = __current_player_class.name;
+	sprite = document.getElementById("playerClassSelectorLeftPaneSprite");
+	sprite.src = `./images/sprites/player_classes/${ __current_player_class.name }.png`
 }

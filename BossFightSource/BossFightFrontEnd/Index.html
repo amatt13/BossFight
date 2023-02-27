@@ -191,10 +191,10 @@
 	<form method="dialog">
 		<div class="player-class-column-divider">
 			<!-- current player class -->
-			<div class="column" style="float:left; padding-left: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: var(--border-colour); margin-left: 5px; margin-right: 5px; flex: 50%;">
-				<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color: var(--default-font-colour); padding-top: 15px;">
-					<label style="grid-column: 1; grid-row: 1; text-align: center;  font-size: xx-large;">Name of current class></label>
-					
+			<div class="column playerClassSelectorLeftPaneColumn">
+				<div class="playerClassSelectorLeftPaneContainer">
+					<label id="playerClassSelectorLeftPaneTitle" class="playerClassSelectorLeftPaneTitle" style="grid-column: 1; grid-row: 1;">Current Class name</label>
+					<img id="playerClassSelectorLeftPaneSprite" class="playerClassSelectorLeftPaneSprite" width="250" height="250" style="object-fit: fill; grid-column: 1; grid-row: 2;">
 				</div>
 			</div>
 			<!-- list of unlocked classes -->
