@@ -3,6 +3,17 @@ let playerClassMenu = document.getElementById('playerClassMenu');
 let playerClassMenuBackground = document.getElementById('dialogBackground');
 let closeplayerClassMenuButton = document.getElementById('closeplayerClassMenuButton');
 
+// Close the menu on "esc" key press
+document.onkeydown = function(evt) {
+    evt = evt || window.event;
+    if ("key" in evt && (evt.key === "Escape" || evt.key === "Esc")) {
+		if (playerClassMenu.style.display == 'block' && playerClassMenuBackground.style.display == 'block') {
+			CloseMenu();
+		}
+    }
+};
+
+// Request the list of classes
 openUnlockedClassesButton.addEventListener('click', function onOpen() {
     const obj = {
 		request_key: "GetUnlockedClassesForPlayer",
@@ -14,15 +25,17 @@ openUnlockedClassesButton.addEventListener('click', function onOpen() {
 	socket.send(json_obj);
 });
 
+let __player_player_classes_instances = new Array();
+// Build the menu and make it visible
 function showPlayerClassesMenu(player_player_classes) {
-	let player_player_classes_instances = new Array();
+	__player_player_classes_instances = new Array();
     player_player_classes.forEach(player_class_dict => {
         const player_player_class = PlayerPlayerClass.CreateFromDict(player_class_dict);
-        player_player_classes_instances.push(player_player_class);
+        __player_player_classes_instances.push(player_player_class);
     });
 
-    PopulatePlayerClassList(player_player_classes_instances);
-	const active_player_class = player_player_classes_instances.find(pc => pc.active == true)
+    PopulatePlayerClassList(__player_player_classes_instances);
+	const active_player_class = __player_player_classes_instances.find(pc => pc.active == true)
 	if (active_player_class != undefined) {
 		changePlayerClassSelectorCurrentlySelectedRow(active_player_class.player_class.player_class_id);
 		setLeftPaneToSelectedClass(active_player_class);
@@ -44,7 +57,7 @@ function CloseMenu() {
     playerClassMenuBackground.style.display = 'none';
 }
 
-
+// This is the PlayerClass "cards"
 function CreatePlayerclassTitleCardForPlayerClassMenu(playerclass) {
 	const card_html = `<table class="playerClassSelectorTable" id="playerClassSelectorTable">
 		<tr class="playerClassSelectorRow">
@@ -73,7 +86,17 @@ function PopulatePlayerClassList(player_player_classes) {
     player_player_class_html += class_row;
 	});
 
+	// Add click event that changes what class whould be displayed in the details pane
 	document.getElementById("unlockedPlayerClasses").innerHTML = player_player_class_html;
+	const containers = document.getElementsByClassName("playerClassSelectorContainer")
+	for (let con of containers) {
+		con.addEventListener("click", () => {
+			const player_class_id = con.attributes["playerClassId"].value;
+			const clicked_player_class = __player_player_classes_instances.find(pci => pci.player_class.player_class_id == player_class_id);
+			changePlayerClassSelectorCurrentlySelectedRow(player_class_id);
+			setLeftPaneToSelectedClass(clicked_player_class);
+		});
+	}
 }
 
 // mark a new table row as the "active" row
@@ -95,7 +118,7 @@ __current_player_class = null;
 function setLeftPaneToSelectedClass(current_player_player_class) {
 	__current_player_class = current_player_player_class.player_class;
 	title = document.getElementById("playerClassSelectorLeftPaneTitle");
-	title.text = __current_player_class.name;
+	title.innerHTML = __current_player_class.name;
 	sprite = document.getElementById("playerClassSelectorLeftPaneSprite");
 	sprite.src = `./images/sprites/player_classes/${ __current_player_class.name }.png`
 }
