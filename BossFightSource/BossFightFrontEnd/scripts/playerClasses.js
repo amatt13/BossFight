@@ -3,16 +3,6 @@ let playerClassMenu = document.getElementById('playerClassMenu');
 let playerClassMenuBackground = document.getElementById('dialogBackground');
 let closeplayerClassMenuButton = document.getElementById('closeplayerClassMenuButton');
 
-// Close the menu on "esc" key press
-document.onkeydown = function(evt) {
-    evt = evt || window.event;
-    if ("key" in evt && (evt.key === "Escape" || evt.key === "Esc")) {
-		if (playerClassMenu.style.display == 'block' && playerClassMenuBackground.style.display == 'block') {
-			CloseMenu();
-		}
-    }
-};
-
 // Request the list of classes
 openUnlockedClassesButton.addEventListener('click', function onOpen() {
     const obj = {
