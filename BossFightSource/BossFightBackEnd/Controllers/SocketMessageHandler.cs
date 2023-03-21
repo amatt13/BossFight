@@ -17,7 +17,25 @@ namespace BossFight.Controllers
         public static string REQUEST_KEY = "request_key";
         public static string REQUEST_DATA = "request_data";
 
-        public SocketMessageHandler() { }
+        private readonly Dictionary<string, Func<Dictionary<string, JsonElement>, WebSocketReceiveResult, WebSocket, Task>> methodDictionary = new();
+        public SocketMessageHandler() 
+        { 
+            // Populate the dictionary with method delegates
+            methodDictionary[nameof(FetchActiveMonster)] = FetchActiveMonster;
+            methodDictionary[nameof(FetchPlayer)] = FetchPlayer;
+            methodDictionary[nameof(SellWeapon)] = SellWeapon;
+            methodDictionary[nameof(EquipWeapon)] = EquipWeapon;
+            methodDictionary[nameof(PlayerAttackMonsterWithEquippedWeapon)] = PlayerAttackMonsterWithEquippedWeapon;
+            methodDictionary[nameof(SignIn)] = SignIn;
+            methodDictionary[nameof(SendChatMessage)] = SendChatMessage;
+            methodDictionary[nameof(FetchMostRecentMessages)] = FetchMostRecentMessages;
+            methodDictionary[nameof(VoteForMonsterTier)] = VoteForMonsterTier;
+            methodDictionary[nameof(FetchMonsterVotesTotals)] = FetchMonsterVotesTotals;
+            methodDictionary[nameof(GetShopForPlayer)] = GetShopForPlayer;
+            methodDictionary[nameof(BuyPlayerClass)] = BuyPlayerClass;
+            methodDictionary[nameof(GetUnlockedClassesForPlayer)] = GetUnlockedClassesForPlayer;
+            //methodDictionary[nameof(Example)] = Example;
+        }
 
         public async Task HandleMessage(Dictionary<string, object> pJsonObject, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
@@ -26,10 +44,9 @@ namespace BossFight.Controllers
             var data = pJsonObject[REQUEST_DATA] ?? "{}";
             var dataJsonDictionary = JsonSerializer.Deserialize<Dictionary<String, JsonElement>>(data.ToString());
 
-            var methodToCall = this.GetType().GetMethod(handler);
-            if (methodToCall != null)
+            if (methodDictionary.TryGetValue(handler, out var method))
             {
-                await (Task)methodToCall.Invoke(this, new object[] { dataJsonDictionary, pWebSocketReceiveResult, pWebSocket });
+                await method(dataJsonDictionary, pWebSocketReceiveResult, pWebSocket);
             }
             else
             {
@@ -39,7 +56,7 @@ namespace BossFight.Controllers
 
         // takes: no data
         // returns: monster
-        public async Task FetchActiveMonster(Dictionary<string, JsonElement> _, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task FetchActiveMonster(Dictionary<string, JsonElement> _, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var monster = new MonsterInstance { Active = true }.FindAll().First();
             var response = new Dictionary<string, MonsterInstance>
@@ -53,7 +70,7 @@ namespace BossFight.Controllers
 
         // takes: player_id: "int"
         // returns: player
-        public async Task FetchPlayer(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task FetchPlayer(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string>{"player_id", "cake"});
 
@@ -74,7 +91,7 @@ namespace BossFight.Controllers
 
         // takes: player_id: "int", weapon_id: "int"
         // returns: dict => gold, weapons
-        public async Task SellWeapon(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task SellWeapon(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "weapon_id" });
 
@@ -103,7 +120,7 @@ namespace BossFight.Controllers
 
         // takes: player_id: "int", weapon_id: "int
         // returns: weapon
-        public async Task EquipWeapon(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task EquipWeapon(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "weapon_id" });
             if (RequestValidator.AllValuesAreFilled(requiredValues, out string error) && RequestValidator.PlayerCanEquipWeapon(pJsonParameters["player_id"].GetInt32(), pJsonParameters["weapon_id"].GetInt32(), out error))
@@ -125,7 +142,7 @@ namespace BossFight.Controllers
 
         // takes: player_id: "int"
         // returns: PlayerAttackSummary
-        public async Task PlayerAttackMonsterWithEquippedWeapon(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task PlayerAttackMonsterWithEquippedWeapon(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id" });
             if (RequestValidator.AllValuesAreFilled(requiredValues, out string error) && RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(pJsonParameters["player_id"].GetInt32(), out error))
@@ -162,7 +179,8 @@ namespace BossFight.Controllers
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
-        private async Task NewMonster(MonsterInstance pMonster, Player pPLayer)
+        //TODO: move to another class
+        private static async Task NewMonster(MonsterInstance pMonster, Player pPLayer)
         {
             var newMonsterInstance = MonsterSpawner.SpawnNewMonster();
             if (newMonsterInstance != null)
@@ -201,7 +219,7 @@ namespace BossFight.Controllers
 
         // takes: userName: "string", password: "string"
         // returns: player & MonsterTierVote
-        public async Task SignIn(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task SignIn(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "userName", "password" });
             if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
@@ -233,7 +251,7 @@ namespace BossFight.Controllers
 
         // takes: message: "string", player_id: "int"
         // receive an message from the client. This message must then be sent to all connection
-        public async Task SendChatMessage(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task SendChatMessage(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "message", "player_id" });
             if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
@@ -265,7 +283,7 @@ namespace BossFight.Controllers
 
         // takes: messages_to_fetch: "int"
         // returns: list of ChatMessage
-        public async Task FetchMostRecentMessages(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task FetchMostRecentMessages(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "messages_to_fetch" });
             if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
@@ -289,7 +307,7 @@ namespace BossFight.Controllers
         }
 
         // takes: player_id: "int", monster_instance_id: "int", vote: "int"
-        public async Task VoteForMonsterTier(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task VoteForMonsterTier(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "monster_instance_id", "vote" });
 
@@ -317,7 +335,7 @@ namespace BossFight.Controllers
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
-        public async Task FetchMonsterVotesTotals(Dictionary<string, JsonElement> _, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task FetchMonsterVotesTotals(Dictionary<string, JsonElement> _, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var votesTotal = MonsterTierVoteUpdater.CountMonsterTierVotesTotalForActiveMonster();
             var response = new Dictionary<string, MonsterTierVoteUpdater.MonsterTierVotesTotal>
@@ -329,7 +347,7 @@ namespace BossFight.Controllers
             await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
         }
 
-        public async Task GetShopForPlayer(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task GetShopForPlayer(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id" });
 
@@ -355,7 +373,7 @@ namespace BossFight.Controllers
 
         // takes: player_id: "int", player_class_id: "int"
         // returns: {sucess: bool, updated_player}
-        public async Task BuyPlayerClass(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task BuyPlayerClass(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "player_class_id" });
 
@@ -392,7 +410,7 @@ namespace BossFight.Controllers
         }
 
         // takes: player_id: "int"
-        public async Task GetUnlockedClassesForPlayer(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task GetUnlockedClassesForPlayer(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id" });
 
@@ -446,7 +464,7 @@ namespace BossFight.Controllers
 
         // EXAMPLE/TEMPLATE FUNCTION
         // takes: player_id: "int"
-        public async Task Example(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        private async Task Example(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id" });
 
