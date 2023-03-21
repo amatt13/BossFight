@@ -48,7 +48,7 @@
 					<label id="player_name">Player name</label>
 				</div>
 				<div style="grid-column: 1; grid-row: 2;">
-					<img id="playerSprite" src="./images/sprites/player_classes/peasant.png" alt="Player class sprite" width="150" height="150" style="object-fit: fill;">
+					<img id="playerSprite" src="./images/sprites/player_classes/peasant_m.png" alt="Player class sprite" width="150" height="150" style="object-fit: fill;">
 				</div>
 				<div style="grid-column: 1; grid-row: 3;">
 					<label class="hp-mana-label">HP: </label>
@@ -198,7 +198,7 @@
 					<div class="masculin-feminine-slider" style="grid-column: 1/-1; grid-row: 3;">
 						<p class="masculine-feminine-slider-symbol">masculine ♂️</p>
 						<label class="switch" style="float: left;">
-							<input type="checkbox" style="float: left;">
+							<input type="checkbox" id="playerClassMenuMasculineFeminineSliderCheckbox" style="float: left;">
 							<span class="slider round" style="float: left;"></span>
 						</label>
 						<p class="masculine-feminine-slider-symbol">feminine ♀️</p>
@@ -248,6 +248,7 @@
 <img id="monsterSprite" src="./images/sprites/monsters/goblin.png" alt="Current monster sprite" class="hidden">
 
 <!-- not to self... the order of these scripts matter -->
+<script type="text/javascript" src="scripts/sprites.js"></script>
 <script type="text/javascript" src="scripts/formatter.js"></script>
 <script type="text/javascript" src="scripts/model.js"></script>
 <script type="text/javascript" src="scripts/chat.js"></script>

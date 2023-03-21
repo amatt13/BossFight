@@ -2,6 +2,7 @@ const openUnlockedClassesButton = document.getElementById('openUnlockedClassesBu
 let playerClassMenu = document.getElementById('playerClassMenu');
 let playerClassMenuBackground = document.getElementById('dialogBackground');
 let closeplayerClassMenuButton = document.getElementById('closeplayerClassMenuButton');
+let playerClassMenuMasculineFeminineSliderCheckbox = document.getElementById("playerClassMenuMasculineFeminineSliderCheckbox");
 
 // Request the list of classes
 openUnlockedClassesButton.addEventListener('click', function onOpen() {
@@ -49,10 +50,11 @@ function CloseMenu() {
 
 // This is the PlayerClass "cards"
 function CreatePlayerclassTitleCardForPlayerClassMenu(playerclass) {
+	const sprite_source = getPlayerClassSprite(playerclass.name).src;
 	const card_html = `<table class="playerClassSelectorTable" id="playerClassSelectorTable">
 		<tr class="playerClassSelectorRow">
 			<td >
-				<img id="player_class_menu_player_class${ playerclass.name }_sprite" src="./images/sprites/player_classes/${ playerclass.name }.png" width="75" height="75" style="object-fit: fill;">
+				<img id="player_class_menu_player_class${ playerclass.name }_sprite" src="${ sprite_source }" width="75" height="75" style="object-fit: fill;">
 			</td>
 			<td class="playerClassSelectorRowPlayerClassQuickDescription">
 				<label >${ playerclass.name }<br>${ playerclass.description }</label>
@@ -92,6 +94,7 @@ function PopulatePlayerClassList(player_player_classes) {
 // mark a new table row as the "active" row
 function changePlayerClassSelectorCurrentlySelectedRow(player_class_id) {
 	const all_player_class_selector_containers = document.getElementsByClassName("playerClassSelectorContainer")
+	
 	for (var i = 0; i != all_player_class_selector_containers.length; i++) {
 		var player_class_container = all_player_class_selector_containers[i];
 		if ("playerclassid" in player_class_container.attributes) {
@@ -110,5 +113,13 @@ function setLeftPaneToSelectedClass(current_player_player_class) {
 	title = document.getElementById("playerClassSelectorLeftPaneTitle");
 	title.innerHTML = __current_player_class.name;
 	sprite = document.getElementById("playerClassSelectorLeftPaneSprite");
-	sprite.src = `./images/sprites/player_classes/${ __current_player_class.name }.png`
+
+	let sprite_source = new Image();
+	if (playerClassMenuMasculineFeminineSliderCheckbox.checked) {
+		sprite_source = getPlayerClassSprite(__current_player_class.name, "feminine");
+	}
+	else {
+		sprite_source = getPlayerClassSprite(__current_player_class.name, "masculine");
+	}
+	sprite.src = sprite_source.src;
 }

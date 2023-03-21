@@ -20,17 +20,18 @@ function UpdateUiPlayerStats(player) {
 	RepopulatePlayerInventory();
 
 	// set HP bar
-	var progress_player_health = document.getElementById("progress_player_health");
+	let progress_player_health = document.getElementById("progress_player_health");
 	progress_player_health.max = player.player_player_class.max_hp;
 	progress_player_health.value = player.hp;
 
 	// set mana bar
-	var progress_player_mana = document.getElementById("progress_player_mana");
+	let progress_player_mana = document.getElementById("progress_player_mana");
 	progress_player_mana.max = player.player_player_class.max_mana;
 	progress_player_mana.value = player.mana;
 
 	// set player sprite
-	document.getElementById("playerSprite").src = `./images/sprites/player_classes/${player.player_player_class.player_class_name.toLowerCase()}.png`
+	const sprite_source = getPlayerClassSprite(player.player_player_class.player_class_name.toLowerCase());
+	document.getElementById("playerSprite").src = sprite_source.src;
 }
 
 function UpdateUiPlayerSoldWeapon(json_dict) {
@@ -39,8 +40,8 @@ function UpdateUiPlayerSoldWeapon(json_dict) {
 	document.getElementById("player_gold").innerHTML = numberToString(_player.gold);  //TODO use bindings instead of manually setting the text whenever something changes?
 	BlinkDiv("player_gold");
 
-	var player_weapon_list = [];
-	var player_weapon_dict = json_dict["weapons"];
+	let player_weapon_list = [];
+	let player_weapon_dict = json_dict["weapons"];
 	player_weapon_dict.forEach(pw => {
 		player_weapon_list.push(new PlayerWeapon(pw["WeaponId"], pw["WeaponName"]))
 	});
@@ -49,21 +50,21 @@ function UpdateUiPlayerSoldWeapon(json_dict) {
 }
 
 function UpdateUiPlayerEquippedWeapon(weapon_dict) {
-	var weapon = CreateWeaponFromWeaponDict(weapon_dict);
+	const weapon = CreateWeaponFromWeaponDict(weapon_dict);
 	_player.weapon = weapon;
 	document.getElementById("player_equipped_weapon_name").innerHTML = _player.weapon.loot_name;
 	BlinkDiv("player_equipped_weapon_name");
 }
 
 function UpdateUiPlayerAttackedMonsterWithWeapon(summary_dict) {
-	var monster_dict = summary_dict["Monster"];
+	let monster_dict = summary_dict["Monster"];
 	UpdateUiActiveMonster(monster_dict);
-	var player_dict = summary_dict["Player"];
+	let player_dict = summary_dict["Player"];
 	ReadPlayerMessage(player_dict);
 	BlinkDiv("player_xp");
 	player_combat_log_message = CreateAttackSummaryMessage(summary_dict["Player"], summary_dict["Monster"], summary_dict["PlayerCrit"], summary_dict["PlayerTotalDamage"])
 	LogToCombatLog(player_combat_log_message);
-	var monster_message = summary_dict["MonsterRetaliateMessage"];
+	const monster_message = summary_dict["MonsterRetaliateMessage"];
 	if (monster_message != undefined && monster_message.length > 0) {
 		LogToCombatLog(monster_message);
 	}
@@ -71,14 +72,14 @@ function UpdateUiPlayerAttackedMonsterWithWeapon(summary_dict) {
 }
 
 function UpdateUiMonsterAttackedPlayer(summary_dict) {
-	var monster_dict = summary_dict["Monster"];
+	let monster_dict = summary_dict["Monster"];
 	UpdateUiActiveMonster(monster_dict);
-	var player_dict = summary_dict["Player"];
+	let player_dict = summary_dict["Player"];
 	ReadPlayerMessage(player_dict);
 	BlinkDiv("player_xp");
 	player_combat_log_message = CreateAttackSummaryMessage(summary_dict["Player"], summary_dict["Monster"], summary_dict["PlayerCrit"], summary_dict["MonsterTotalDamage"])
 	LogToCombatLog(player_combat_log_message);
-	var monster_message = summary_dict["MonsterRetaliateMessage"];
+	const monster_message = summary_dict["MonsterRetaliateMessage"];
 	if (monster_message != undefined && monster_message.length > 0) {
 		LogToCombatLog(monster_message);
 	}
@@ -133,11 +134,12 @@ function UpdateMonsterTierVoteBasedOnCurrentPlayerVote(vote_dict) {
 }
 
 function CreatePlayerclassTitleCardForShop(playerclass, row) {
+	const sprite_source = getPlayerClassSprite(playerclass.name);
 	const card_html = `<div style="border: solid; border-color: var(--border-colour); margin-left: 5px">
 		<table>
 			<tr>
 				<td style="width: 50%; float: left">
-					<img id="shop_menu_player_class${ playerclass.name }_sprite" src="./images/sprites/player_classes/${ playerclass.name }.png" width="75" height="75" style="object-fit: fill;">
+					<img id="shop_menu_player_class${ playerclass.name }_sprite" src="${ sprite_source.src }" width="75" height="75" style="object-fit: fill;">
 				</td>
 				<td>
 					<label>${ playerclass.description }</label>
