@@ -12,7 +12,7 @@ namespace BossFight.Models
     public class Player : Target<Player>
     {
         [JsonIgnore]
-        private static Random _random = new Random();
+        private static Random _random = new();
         
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(Player);
@@ -31,9 +31,6 @@ namespace BossFight.Models
 
         [PersistProperty]
         public int Mana { get; set; }
-
-        [PersistProperty]
-        public int CurentPlayerClassId { get; set; }
 
         [PersistProperty]
         public string UserName { get; set; }
@@ -67,7 +64,6 @@ namespace BossFight.Models
                 player.Name = reader.GetString(nameof(Name));
                 player.Hp = reader.GetInt(nameof(Hp));
                 player.Mana = reader.GetInt(nameof(Mana));
-                player.CurentPlayerClassId = reader.GetInt(nameof(CurentPlayerClassId));
                 player.WeaponId = reader.GetInt(nameof(WeaponId));
                 player.UserName = reader.GetString(nameof(UserName));
                 player.Password = reader.GetString(nameof(Password));

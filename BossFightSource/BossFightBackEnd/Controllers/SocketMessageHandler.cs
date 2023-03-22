@@ -34,6 +34,7 @@ namespace BossFight.Controllers
             methodDictionary[nameof(GetShopForPlayer)] = GetShopForPlayer;
             methodDictionary[nameof(BuyPlayerClass)] = BuyPlayerClass;
             methodDictionary[nameof(GetUnlockedClassesForPlayer)] = GetUnlockedClassesForPlayer;
+            methodDictionary[nameof(ChangePlayerClass)] = ChangePlayerClass;
             //methodDictionary[nameof(Example)] = Example;
         }
 
