@@ -197,6 +197,18 @@ function playerAttemptedToBuyAPlayerClass(params_dict) {
 	}
 }
 
+async function SendChangePlayerClassRequest(player_id, player_class_id) {
+	const obj = {
+		request_key: "ChangePlayerClass",
+		request_data: JSON.stringify({
+			player_id: parseInt(player_id),
+			player_class_id: parseInt(player_class_id)
+		})
+	};
+	const json_obj = JSON.stringify(obj);
+	socket.send(json_obj);
+}
+
 // TEST WebSocket button
 async function LoginTestUser() {
 	await SendSignInRequest("Demo", "A");

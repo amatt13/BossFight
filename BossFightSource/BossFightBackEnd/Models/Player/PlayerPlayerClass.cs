@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using BossFight.Extentions;
 using MySqlConnector;
 using System.Text.Json.Serialization;
@@ -24,7 +22,7 @@ namespace BossFight.Models
         
         [JsonIgnore]
         [PersistProperty]
-        public int PlayerClassId { get; set; }
+        public int? PlayerClassId { get; set; }
 
         [PersistProperty]
         public int XP { get; set; }
@@ -113,6 +111,9 @@ namespace BossFight.Models
 
             if (ppc.PlayerId.HasValue)
                 additionalSearchCriteriaText += $" AND { nameof(PlayerId) } = { ppc.PlayerId.Value }\n";
+
+            if (ppc.PlayerClassId.HasValue)
+                additionalSearchCriteriaText += $" AND { nameof(PlayerClassId) } = { ppc.PlayerClassId.Value }\n";
 
             return TrimAdditionalSearchCriteriaText(additionalSearchCriteriaText, pStartWithAnd);
         }

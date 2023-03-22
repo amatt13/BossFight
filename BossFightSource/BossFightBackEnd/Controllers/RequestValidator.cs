@@ -344,6 +344,21 @@ AND p.Password = {pPassword.ToDbString()}";
             return Enum.IsDefined(pEnum.GetType(), pValue);
         }
 
+        public static bool PlayerOwnsPlayerClass(int pPlayerId, int pPlayerClassId, out string pError)
+        {
+            var sql = $@"SELECT TRUE FROM { nameof(PlayerPlayerClass) } 
+                        WHERE { nameof(PlayerPlayerClass.PlayerId) } = @playerId
+                        AND { nameof(PlayerPlayerClass.PlayerClassId) } = @playerClassId";
+            var cmd = new MySqlCommand(sql);
+            cmd.Parameters.AddParameter(pPlayerId, "playerId");
+            cmd.Parameters.AddParameter(pPlayerClassId, "playerClassId");
+            var playerOwnsPlayerClass = GlobalConnection.SingleValue<bool>(cmd);
+
+            pError = playerOwnsPlayerClass ? String.Empty : "You don't own this class";
+
+            return playerOwnsPlayerClass;
+        }
+
         public static bool Example() {return false;}
     }
 }

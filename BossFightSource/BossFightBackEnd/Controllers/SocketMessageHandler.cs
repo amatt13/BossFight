@@ -380,14 +380,14 @@ namespace BossFight.Controllers
             if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
             {
                 var playerId = pJsonParameters["player_id"].GetInt32();
-                var player_class_id = pJsonParameters["player_class_id"].GetInt32();
+                var playerClassId = pJsonParameters["player_class_id"].GetInt32();
                 if (
                     RequestValidator.PlayerExists(playerId, out error) 
-                    && RequestValidator.PlayerClassExists(player_class_id, out error) 
-                    && RequestValidator.PlayerIsEligibleForPlayerClassAcquisition(playerId, player_class_id, out error))
+                    && RequestValidator.PlayerClassExists(playerClassId, out error) 
+                    && RequestValidator.PlayerIsEligibleForPlayerClassAcquisition(playerId, playerClassId, out error))
                 {
-                    Tuple<bool, string> result = ShopController.BuyPlayerClass(player_class_id, playerId);
-                    var updated_player = new Player{}.FindOne(playerId);
+                    Tuple<bool, string> result = ShopController.BuyPlayerClass(playerClassId, playerId);
+                    var updatedPlayer = new Player{}.FindOne(playerId);
                     var response = new Dictionary<string, Dictionary<string, object>>
                     {
                         { 
@@ -395,7 +395,7 @@ namespace BossFight.Controllers
                             {
                                 {"sucess", result.Item1},
                                 {"message", result.Item2},
-                                {"updated_player", updated_player}
+                                {"updated_player", updatedPlayer}
                             } 
                         }
                     };
@@ -410,6 +410,7 @@ namespace BossFight.Controllers
         }
 
         // takes: player_id: "int"
+        // return List of PlayerPlayerClass
         private async Task GetUnlockedClassesForPlayer(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id" });
@@ -431,6 +432,42 @@ namespace BossFight.Controllers
                 }
             }
 
+            if (!String.IsNullOrEmpty(error))
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        }
+
+        // takes: player_id: "int", player_class_id: "int"
+        private async Task ChangePlayerClass(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "player_class_id" });
+
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
+            {
+                var playerId = pJsonParameters["player_id"].GetInt32();
+                var player_class_id = pJsonParameters["player_class_id"].GetInt32();
+                if (
+                    RequestValidator.PlayerExists(playerId, out error) 
+                    && RequestValidator.PlayerClassExists(player_class_id, out error) 
+                    && RequestValidator.PlayerOwnsPlayerClass(playerId, player_class_id, out error))
+                {
+                    var oldPlayerPlayerClassRelation = new PlayerPlayerClass{ PlayerId = playerId, Active = true }.FindOne();
+                    oldPlayerPlayerClassRelation.Active = false;
+                    oldPlayerPlayerClassRelation.Persist();
+
+                    var newPlayerPlayerClassActiveRelation = new PlayerPlayerClass{ PlayerId = playerId, PlayerClassId = player_class_id }.FindOne();
+                    newPlayerPlayerClassActiveRelation.Active = true;
+                    newPlayerPlayerClassActiveRelation.Persist();
+                    
+                    var player = new Player().FindOne(playerId);
+                    var response = new Dictionary<string, Player>
+                    {
+                        { "update_player", player }
+                    };
+
+                    var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
+                    await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                }
+            }
             if (!String.IsNullOrEmpty(error))
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }

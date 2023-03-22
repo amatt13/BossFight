@@ -16,6 +16,10 @@ openUnlockedClassesButton.addEventListener('click', function onOpen() {
 	socket.send(json_obj);
 });
 
+playerClassMenuMasculineFeminineSliderCheckbox.addEventListener("change", function onChange() {
+	showPlayerClassesMenuHelper();
+});
+
 let __player_player_classes_instances = new Array();
 // Build the menu and make it visible
 function showPlayerClassesMenu(player_player_classes) {
@@ -25,7 +29,11 @@ function showPlayerClassesMenu(player_player_classes) {
         __player_player_classes_instances.push(player_player_class);
     });
 
-    PopulatePlayerClassList(__player_player_classes_instances);
+    showPlayerClassesMenuHelper();
+}
+
+function showPlayerClassesMenuHelper() {
+	PopulatePlayerClassList(__player_player_classes_instances);
 	const active_player_class = __player_player_classes_instances.find(pc => pc.active == true)
 	if (active_player_class != undefined) {
 		changePlayerClassSelectorCurrentlySelectedRow(active_player_class.player_class.player_class_id);
@@ -43,6 +51,24 @@ playerClassMenuBackground.addEventListener('click', function onOpen() {
     CloseMenu();
 });
 
+setToCurrentClassPlayerClassMenuButton.addEventListener('click', function onOpen() {
+    CloseMenu();
+	let player_class_id = -1;
+
+	const player_class_selector_row_selected_row = document.getElementsByClassName("playerClassSelectorRowSelectedRow");
+	let inspect_element = player_class_selector_row_selected_row[0];
+	while (inspect_element.parentElement != null) {
+		if (inspect_element.classList.contains("playerClassSelectorContainer")) {
+			player_class_id = inspect_element.attributes["playerclassid"].value;
+			break;
+		} else {
+			inspect_element = inspect_element.parentElement;
+		}
+	}
+
+	SendChangePlayerClassRequest(_player.player_id, player_class_id);
+});
+
 function CloseMenu() {
     playerClassMenu.style.display = 'none';
     playerClassMenuBackground.style.display = 'none';
@@ -50,7 +76,8 @@ function CloseMenu() {
 
 // This is the PlayerClass "cards"
 function CreatePlayerclassTitleCardForPlayerClassMenu(playerclass) {
-	const sprite_source = getPlayerClassSprite(playerclass.name).src;
+	const body_type = playerClassMenuMasculineFeminineSliderCheckbox.checked ? "feminine" : "masculine";
+	const sprite_source = getPlayerClassSprite(playerclass.name, body_type).src;
 	const card_html = `<table class="playerClassSelectorTable" id="playerClassSelectorTable">
 		<tr class="playerClassSelectorRow">
 			<td >
