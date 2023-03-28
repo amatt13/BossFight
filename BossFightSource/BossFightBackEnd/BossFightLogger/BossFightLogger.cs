@@ -59,7 +59,7 @@ namespace BossFight.BossFightBackEnd.BossFightLogger
                 }
 
                 using StreamWriter writer = new(_filePath, true);
-                writer.WriteLine($"[{DateTime.Now}] [{logLevel}] {message}");
+                writer.WriteLine($"[{DateTime.Now:yyyy/MM/dd HH:mm:ss}] [{logLevel}] {message}");
             }
         }
     }
