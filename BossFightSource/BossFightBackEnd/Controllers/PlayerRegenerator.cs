@@ -1,16 +1,25 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using BossFight;
 using BossFight.Extentions;
 using BossFight.Models;
+using Microsoft.Extensions.Logging;
 
 public class PlayerRegenerator
 {
+    private ILogger<PlayerRegenerator> _logger;
+
     private readonly int minuteInMilliseconds = 60_000;
     public readonly int HP_INTERVAL = 6000;
     public readonly int MANA_INTERVAL = 6000;
-    public PlayerRegenerator(){ }
+    
+    public PlayerRegenerator(ILogger<PlayerRegenerator> logger){ 
+        _logger = logger;
+        _logger.LogInformation("Started regen loop");
+    }
+
     public void Run()
     {
         new Thread(RegenLoop).Start();
@@ -27,7 +36,8 @@ public class PlayerRegenerator
         if (durationInMilliseconds > minuteInMilliseconds)
         {
             // should never happend...
-            Console.WriteLine($"Regen :  We are behind schedule!! It took { durationInMilliseconds/1000 } seconds to regen hp/mana...");
+            var durationIsSeconds  = durationInMilliseconds/1000;
+            _logger.LogInformation("Regen :  We are behind schedule!! It took {durationIsSeconds} seconds to regen hp/mana...", durationIsSeconds);
         }
         else
             Thread.Sleep(minuteInMilliseconds - durationInMilliseconds);
@@ -37,7 +47,7 @@ public class PlayerRegenerator
 
     private void Regen()
     {
-        var players = new Player().FindAll();
+        var git players = new Player().FindAll();
         foreach(var player in players)
         {
             var maxHp = player.PlayerPlayerClass.MaxHp;

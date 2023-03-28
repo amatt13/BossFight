@@ -1,7 +1,9 @@
+using BossFight.BossFightBackEnd.BossFightLogger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 
 namespace BossFight
@@ -12,7 +14,9 @@ namespace BossFight
         {
             Configuration = configuration;
         }
+        
         public IConfiguration Configuration { get; }
+        private ILoggerFactory _loggerFactory;
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -24,6 +28,15 @@ namespace BossFight
                          .AllowAnyMethod()
                          .AllowAnyHeader();
             }));
+
+            ILoggerProvider fileLoggerProvider = new BossFightLoggerProvider("log.txt");
+            _loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddConsole();
+                builder.AddDebug();
+                builder.AddProvider(fileLoggerProvider);
+                builder.SetMinimumLevel(LogLevel.Trace);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,7 +53,8 @@ namespace BossFight
 
             Console.WriteLine("Ready!");
 
-            var PlayerRegenerator = new PlayerRegenerator();
+            var playerRegeneratorLogger = _loggerFactory.CreateLogger<PlayerRegenerator>();
+            var PlayerRegenerator = new PlayerRegenerator(playerRegeneratorLogger);
             PlayerRegenerator.Run();
         }
     }
