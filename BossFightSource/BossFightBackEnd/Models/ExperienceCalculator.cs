@@ -63,5 +63,43 @@ namespace BossFight
             }
             return (int)Math.Ceiling(result);
         }
+        
+        public static int CalcXpPenaltySIMPLIFIED(int pXP, int pPlayerLevel, int? pMonsterLevel)
+        {
+            decimal monsterLevel = pMonsterLevel ?? pPlayerLevel;
+            decimal levelDiff = monsterLevel - pPlayerLevel;
+            decimal xpPenalty = levelDiff switch
+            {
+                _ when levelDiff >= 10 => 0.05m,
+                9 => 0.24m,
+                8 => 0.43m,
+                7 => 0.62m,
+                6 => 0.81m,
+                _ when levelDiff < -2 => pPlayerLevel / monsterLevel,
+                _ => 1m
+            };
+            return (int)Math.Ceiling(pXP * xpPenalty);
+        }
     }
 }
+/*
+[TestClass]
+public class CalcXpPenaltyTests
+{
+    [TestMethod]
+    public void CalcXpPenalty_ReturnsSameValueAsOriginalImplementation()
+    {
+        // Arrange
+        int xp = 1000;
+        int playerLevel = 10;
+        int? monsterLevel = 12;
+
+        // Act
+        var originalResult = OriginalImplementation.CalcXpPenalty(xp, playerLevel, monsterLevel);
+        var simplifiedResult = SimplifiedImplementation.CalcXpPenalty(xp, playerLevel, monsterLevel);
+
+        // Assert
+        Assert.AreEqual(originalResult, simplifiedResult);
+    }
+}
+*/
