@@ -3,10 +3,10 @@ function file_exists(path)
     let result = false; 
 
     var http = new XMLHttpRequest();
-    http.open('HEAD', path, false);
+    http.open('HEAD', "findfiles/" + path.split("/").at(-1), false);
     try {
         http.send();
-        result = http.status!=404;
+        result = http.status == 200;
     } catch (error) {
         result = false;
     }
