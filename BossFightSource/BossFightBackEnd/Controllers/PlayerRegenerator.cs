@@ -47,16 +47,10 @@ public class PlayerRegenerator
 
     private void Regen()
     {
-        var git players = new Player().FindAll();
-        foreach(var player in players)
-        {
-            var maxHp = player.PlayerPlayerClass.MaxHp;
-            var maxMana = player.PlayerPlayerClass.MaxMana;
-            var hpToRestore = player.PlayerPlayerClass.PlayerClass.HpRegenRate;
-            var manaToRestore = player.PlayerPlayerClass.PlayerClass.ManaRegenRate;
-            var playerId = player.PlayerId;
+        var players = new Player().FindAll();
+        using var connection = GlobalConnection.GetNewOpenConnection();
 
-            var hpRegenCmd = @"UPDATE Player p 
+        var hpRegenCmd = @"UPDATE Player p 
 SET p.Hp = p.Hp + @hpToRestore  
 WHERE p.PlayerId = @playerId
 AND p.Hp + @hpToRestore <= @maxHp";
@@ -66,23 +60,36 @@ SET p.Mana = p.Mana + @manaToRestore
 WHERE p.PlayerId = @playerId
 AND p.Mana + @manaToRestore <= @maxMana";
 
-            using var connection = GlobalConnection.GetNewOpenConnection();
+        foreach(var player in players)
+        {
+            var maxHp = player.PlayerPlayerClass.MaxHp;
+            var maxMana = player.PlayerPlayerClass.MaxMana;
+            var hpToRestore = player.PlayerPlayerClass.PlayerClass.HpRegenRate;
+            var manaToRestore = player.PlayerPlayerClass.PlayerClass.ManaRegenRate;
+            var playerId = player.PlayerId;
             
-            using var hpCmd = connection.CreateCommand();
-            hpCmd.CommandText = hpRegenCmd;
-            hpCmd.Parameters.AddParameter(hpToRestore.ToDbString(), "@hpToRestore");
-            hpCmd.Parameters.AddParameter(maxHp.ToDbString(), "@maxHp");
-            hpCmd.Parameters.AddParameter(playerId.ToDbString(), "@playerId");
-            hpCmd.ExecuteNonQuery();
+            try
+            {
+                using var hpCmd = connection.CreateCommand();
+                hpCmd.CommandText = hpRegenCmd;
+                hpCmd.Parameters.AddParameter(hpToRestore.ToDbString(), "@hpToRestore");
+                hpCmd.Parameters.AddParameter(maxHp.ToDbString(), "@maxHp");
+                hpCmd.Parameters.AddParameter(playerId.ToDbString(), "@playerId");
+                hpCmd.ExecuteNonQuery();
 
-            using var manaCmd = connection.CreateCommand();
-            manaCmd.CommandText = manaRegenCmd;
-            manaCmd.Parameters.AddParameter(manaToRestore.ToDbString(), "@manaToRestore");
-            manaCmd.Parameters.AddParameter(maxMana.ToDbString(), "@maxMana");
-            manaCmd.Parameters.AddParameter(playerId.ToDbString(), "@playerId");
-            manaCmd.ExecuteNonQuery();
-
-            connection.Close();
+                using var manaCmd = connection.CreateCommand();
+                manaCmd.CommandText = manaRegenCmd;
+                manaCmd.Parameters.AddParameter(manaToRestore.ToDbString(), "@manaToRestore");
+                manaCmd.Parameters.AddParameter(maxMana.ToDbString(), "@maxMana");
+                manaCmd.Parameters.AddParameter(playerId.ToDbString(), "@playerId");
+                manaCmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                // Log the error information and continue processing the remaining players
+                _logger.LogError("Error regenerating player's hp and mana for {playerId}: {ex.Message}", playerId, ex.Message);
+            }
         }
+        connection.Close();
     }
 }
