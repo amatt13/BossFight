@@ -460,6 +460,26 @@ namespace BossFight.Controllers
                     newPlayerPlayerClassActiveRelation.Persist();
                     
                     var player = new Player().FindOne(playerId);
+                    var updatePlayer = false;
+
+                    if (newPlayerPlayerClassActiveRelation.MaxHp < player.Hp)
+                    {
+                        player.Hp = newPlayerPlayerClassActiveRelation.MaxHp;
+                        updatePlayer = true;
+                    }
+
+                    if (newPlayerPlayerClassActiveRelation.MaxMana < player.Mana)
+                    {
+                        player.Mana = newPlayerPlayerClassActiveRelation.MaxMana;
+                        updatePlayer = true;
+                    }
+
+                    if (updatePlayer)
+                    {
+                        player.Persist();
+                        player = new Player().FindOne(player.PlayerId);
+                    }
+
                     var response = new Dictionary<string, Player>
                     {
                         { "update_player", player }
