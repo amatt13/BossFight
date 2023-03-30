@@ -67,17 +67,17 @@ class Monster {
 }
 
 class Player {
-	constructor(player_id, name, hp, mana, gold, weapon, player_player_class, player_weapon_list, user_name) {
+	constructor(player_id, name, hp, mana, gold, weapon, player_player_class, player_weapon_list, user_name, preferred_body_type) {
 		this.player_id = player_id
 		this.name = name;
 		this.hp = hp;
 		this.mana = mana;
 		this.gold = gold;
-		this.player_class = null;
 		this.weapon = weapon
 		this.player_player_class = player_player_class;
 		this.player_weapon_list = player_weapon_list
 		this.user_name = user_name;
+		this.preferred_body_type = preferred_body_type
 	}
 
 	static CreateFromDict(playerDict_dict) {
@@ -92,7 +92,8 @@ class Player {
 		player_weapon_dict.forEach(pw => {
 			player_weapon_list.push(new PlayerWeapon(pw["WeaponId"], pw["WeaponName"]))
 		});
-		const player = new Player(playerDict_dict["PlayerId"], playerDict_dict["Name"], playerDict_dict["Hp"], playerDict_dict["Mana"], playerDict_dict["Gold"], weapon, player_player_class, player_weapon_list, playerDict_dict["UserName"]);
+		const player = new Player(playerDict_dict["PlayerId"], playerDict_dict["Name"], playerDict_dict["Hp"], playerDict_dict["Mana"], playerDict_dict["Gold"], weapon, player_player_class, player_weapon_list, playerDict_dict["UserName"], 
+								  playerDict_dict["PreferredBodyType"]);
 		return player;
 	}
 
@@ -110,29 +111,48 @@ class ChatMessage {
 	}
 }
 
+class PlayerClassRequirement {
+	constructor(PlayerClassId, RequiredPlayerClassId, LevelRequirement, RequiredPlayerClassName) {
+		this.player_class_id = PlayerClassId;
+		this.required_player_class_id = RequiredPlayerClassId;
+		this.level_requirement = LevelRequirement;
+		this.required_player_class_name = RequiredPlayerClassName;
+	}
+
+	static CreateFromDict(player_class_requirement_dict) {
+		return new PlayerClassRequirement(player_class_requirement_dict["PlayerClassId"], player_class_requirement_dict["RequiredPlayerClassId"], player_class_requirement_dict["LevelRequirement"], player_class_requirement_dict["RequiredPlayerClassName"]);
+	}
+}
+
 class PlayerClass {
 	constructor(Abilities, AttackPowerBonus, BaseHealth, BaseMana, CritChance, HpRegenRate, HpScale, ManaRegenRate, ManaScale, Name, PlayerClassId, PlayerClassRequirementList, ProficientWeaponTypesList, PurchasePrice, SpellPowerBonus, Description) {
-		this.abilities = Abilities
-		this.attack_power_bonus = AttackPowerBonus
-		this.base_health = BaseHealth
-		this.base_mana = BaseMana
-		this.crit_chance = CritChance
-		this.hp_regen_rate = HpRegenRate
-		this.hp_scale = HpScale
-		this.mana_regen_rate = ManaRegenRate
-		this.mana_scale = ManaScale
-		this.name = Name
-		this.player_class_id = PlayerClassId
-		this.player_class_requirement_list = PlayerClassRequirementList  // TODO (currently just a dict)
-		this.proficient_weapon_types_list = ProficientWeaponTypesList  // TODO (currently just a dict)
-		this.purchase_price = PurchasePrice
-		this.spell_power_bonus = SpellPowerBonus
-		this.description = Description
+		this.abilities = Abilities;
+		this.attack_power_bonus = AttackPowerBonus;
+		this.base_health = BaseHealth;
+		this.base_mana = BaseMana;
+		this.crit_chance = CritChance;
+		this.hp_regen_rate = HpRegenRate;
+		this.hp_scale = HpScale;
+		this.mana_regen_rate = ManaRegenRate;
+		this.mana_scale = ManaScale;
+		this.name = Name;
+		this.player_class_id = PlayerClassId;
+		this.player_class_requirement_list = PlayerClassRequirementList;
+		this.proficient_weapon_types_list = ProficientWeaponTypesList;  // TODO (currently just a dict)
+		this.purchase_price = PurchasePrice;
+		this.spell_power_bonus = SpellPowerBonus;
+		this.description = Description;
 	}
 
 	static CreateFromDict(player_class_dict) {
+		let player_class_requirement_list = [];
+		const player_class_requirement_dict = player_class_dict["PlayerClassRequirementList"];
+		player_class_requirement_dict.forEach(pcr => {
+			player_class_requirement_list.push(new PlayerClassRequirement(pcr["PlayerClassId"], pcr["RequiredPlayerClassId"], pcr["LevelRequirement"], pcr["RequiredPlayerClassName"]))
+		});
+		
 		return new PlayerClass(player_class_dict["Abilities"], player_class_dict["AttackPowerBonus"], player_class_dict["BaseHealth"], player_class_dict["BaseMana"], player_class_dict["CritChance"], player_class_dict["HpRegenRate"], 
-			player_class_dict["HpScale"], player_class_dict["ManaRegenRate"], player_class_dict["ManaScale"], player_class_dict["Name"], player_class_dict["PlayerClassId"], player_class_dict["PlayerClassRequirementList"], 
+			player_class_dict["HpScale"], player_class_dict["ManaRegenRate"], player_class_dict["ManaScale"], player_class_dict["Name"], player_class_dict["PlayerClassId"], player_class_requirement_list, 
 			player_class_dict["ProficientWeaponTypesList"], player_class_dict["PurchasePrice"], player_class_dict["SpellPowerBonus"], player_class_dict["Description"])
 	}
 }

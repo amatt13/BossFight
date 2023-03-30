@@ -36,8 +36,11 @@ namespace BossFight.Models
         public string UserName { get; set; }
 
         [PersistProperty]
-        [JsonIgnore]
+        [JsonIgnore]  // please dont send me to the front end
         public string Password { get; set; }
+
+        [PersistProperty]
+        public string PreferredBodyType { get; set; }
         
         // From other tables
         public PlayerPlayerClass PlayerPlayerClass { get; set; }
@@ -67,6 +70,7 @@ namespace BossFight.Models
                 player.WeaponId = reader.GetInt(nameof(WeaponId));
                 player.UserName = reader.GetString(nameof(UserName));
                 player.Password = reader.GetString(nameof(Password));
+                player.PreferredBodyType = reader.GetString(nameof(PreferredBodyType ));
 
                 result.Add(player);
             }

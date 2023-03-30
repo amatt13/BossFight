@@ -134,9 +134,48 @@ function changePlayerClassSelectorCurrentlySelectedRow(player_class_id) {
 	};
 }
 
+function _setLeftPaneBasics(player_player_class) {
+	player_class = player_player_class.player_class;
+
+	let playerClassMenuRequiredClasses = document.getElementById("playerClassMenuRequiredClasses");
+	let requirements_list = [];
+	player_class.player_class_requirement_list.forEach(pcr => {
+		requirements_list.push(`${ pcr.required_player_class_name } level ${ pcr.level_requirement }`)
+	});
+	playerClassMenuRequiredClasses.textContent = "Class requirements: " + requirements_list.join("; ");
+
+	let playerClassMenuGoldCost = document.getElementById("playerClassMenuGoldCost");
+	playerClassMenuGoldCost.textContent = "Shop gold cost: " + player_class.purchase_price;
+
+	let playerClassMenuDescription = document.getElementById("playerClassMenuDescription");
+	playerClassMenuDescription.textContent = player_class.description;
+
+	// basics
+	let playerClassMenuAttackPowerBonus = document.getElementById("playerClassMenuAttackPowerBonus");
+	playerClassMenuAttackPowerBonus.textContent = "Attack power bonus: +" + player_class.attack_power_bonus;
+
+	let playerClassMenuCurrentLevel = document.getElementById("playerClassMenuCurrentLevel");
+	playerClassMenuCurrentLevel.textContent = "Current level: " + player_player_class.level;
+
+	let playerClassMenuMaxHealthPoints = document.getElementById("playerClassMenuMaxHealthPoints");
+	playerClassMenuMaxHealthPoints.textContent = "Max health points: " + player_player_class.max_hp;
+
+	let playerClassMenuHealthPointsGainedPerLevel = document.getElementById("playerClassMenuHealthPointsGainedPerLevel");
+	playerClassMenuHealthPointsGainedPerLevel.textContent = "Health points per level: " + player_class.hp_scale;
+
+	let playerClassMenuMaxManaPoints = document.getElementById("playerClassMenuMaxManaPoints");
+	playerClassMenuMaxManaPoints.textContent = "Max mana points: " + player_player_class.max_mana;
+
+	let playerClassMenuManaPointsGainedPerLevel = document.getElementById("playerClassMenuManaPointsGainedPerLevel");
+	playerClassMenuManaPointsGainedPerLevel.textContent = "Mana points per level: " + player_class.mana_scale;
+
+	let playerClassMenuCritChance = document.getElementById("playerClassMenuCritChance");
+	playerClassMenuCritChance.textContent = "Base critical chance: " + player_class.crit_chance;
+}
+
 __current_player_class = null;
-function setLeftPaneToSelectedClass(current_player_player_class) {
-	__current_player_class = current_player_player_class.player_class;
+function setLeftPaneToSelectedClass(player_player_class) {
+	__current_player_class = player_player_class.player_class;
 	title = document.getElementById("playerClassSelectorLeftPaneTitle");
 	title.innerHTML = __current_player_class.name;
 	sprite = document.getElementById("playerClassSelectorLeftPaneSprite");
@@ -149,4 +188,6 @@ function setLeftPaneToSelectedClass(current_player_player_class) {
 		sprite_source = getPlayerClassSprite(__current_player_class.name, "masculine");
 	}
 	sprite.src = sprite_source.src;
+
+	_setLeftPaneBasics(player_player_class);
 }

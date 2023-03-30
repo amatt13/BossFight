@@ -30,7 +30,7 @@ function UpdateUiPlayerStats(player) {
 	progress_player_mana.value = player.mana;
 
 	// set player sprite
-	const sprite_source = getPlayerClassSprite(player.player_player_class.player_class_name.toLowerCase());
+	const sprite_source = getPlayerClassSprite(player.player_player_class.player_class_name.toLowerCase(), player.preferred_body_type);
 	document.getElementById("playerSprite").src = sprite_source.src;
 }
 
