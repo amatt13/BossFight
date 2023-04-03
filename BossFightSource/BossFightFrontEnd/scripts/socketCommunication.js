@@ -20,11 +20,12 @@ else {
 socket = new WebSocket(conn_string);
     
 socket.onopen = function (e) {
-	LogToGeneralLog("[open] Connection established")
-	FetchActiveMonster()
-	FetchMostRecentMessages()
-	FetchMonsterVotesTotals()
+	LogToGeneralLog("[open] Connection established");
+	FetchMostRecentMessages();
+	FetchMonsterVotesTotals();
+	FetchActiveMonster();
 };
+
 
 socket.onmessage = function (event) {
 	var json_dict = JSON.parse(event.data);
