@@ -203,12 +203,13 @@
 						</label>
 						<p class="masculine-feminine-slider-symbol">feminine ♀️</p>
 					</div>
+					<label id="playerClassMenuDescription" style="grid-area: 4/1/4/-1;">Description</label>
 
-					<label id="playerClassMenuRequiredClasses" style="grid-area: 4/1/4/-1;">Class requirements:</label>
-					<label id="playerClassMenuDescription" style="grid-area: 5/1/5/-1;">Description</label>
-					<label id="playerClassMenuGoldCost" style="grid-area: 6/1/6/1;">Shop gold cost:</label>
+					<label class="player-class-section-title" style="grid-area: 5/1/5/-1;">Requirements</label>
+					<label id="playerClassMenuRequiredClasses" style="grid-area: 6/1/6/3;">Class requirements:</label>
+					<label id="playerClassMenuGoldCost" style="grid-area: 6/3/6/3;">Shop gold cost:</label>
 
-					<label style="grid-area: 7/1/7/-1;">Basics</label>
+					<label class="player-class-section-title" style="grid-area: 7/1/7/-1;">Basics</label>
 					<label id="playerClassMenuCurrentLevel" style="grid-area: 8/1/8/1;">Current level:</label>
 					<label id="playerClassMenuAttackPowerBonus" style="grid-area: 8/2/8/2;">Attack power bonus: +</label>
 					<label id="playerClassMenuCritChance" style="grid-area: 8/3/8/3;">Base critical chance:</label>
@@ -217,12 +218,12 @@
 					<label id="playerClassMenuMaxManaPoints" style="grid-area: 10/1/10/1;">max mana points:</label>
 					<label id="playerClassMenuManaPointsGainedPerLevel" style="grid-area: 10/2/10/2;">Mana points per level:</label>
 
-					<label style="grid-area: 11/1/11/-1;">Abilities</label>
+					<label class="player-class-section-title" style="grid-area: 11/1/11/-1;">Abilities</label>
 					<label style="grid-area: 12/1/12/1;">Ability 1:</label>
 					<label style="grid-area: 12/2/12/2;">Ability 2:</label>
 					<label style="grid-area: 12/3/12/3;">Ability 3:</label>
 
-					<label style="grid-area: 13/1/13/-1;">Statistics</label>
+					<label class="player-class-section-title" style="grid-area: 13/1/13/-1;">Statistics</label>
 					<label style="grid-area: 14/1/14/1;">Unlocked date:</label>
 					<label style="grid-area: 15/1/15/1;">Total damage dealt with class:</label>
 					<label style="grid-area: 15/2/15/2;">Monster kills:</label>
@@ -252,6 +253,7 @@
 <script type="text/javascript" src="scripts/formatter.js"></script>
 <script type="text/javascript" src="scripts/model.js"></script>
 <script type="text/javascript" src="scripts/chat.js"></script>
+<script type="text/javascript" src="scripts/updateUI.js" id="updateUIScript"></script>
 <script type="text/javascript" src="scripts/socketCommunication.js"></script>
 <script type="text/javascript" src="scripts/cf.js"></script>
 <script type="text/javascript" src="scripts/canvas.js"></script>
@@ -260,5 +262,4 @@
 <script type="text/javascript" src="scripts/shop_dialog.js"></script>
 <script type="text/javascript" src="scripts/playerClasses.js"></script>
 <script type="text/javascript" src="scripts/sign_in.js"></script>
-<script type="text/javascript" src="scripts/updateUI.js"></script>
 <script type="text/javascript" src="scripts/keyboard_listener_functions.js"></script>

@@ -76,3 +76,9 @@
 .masculine-feminine-slider-symbol {
 	float: left;
 }
+
+.player-class-section-title {
+	font-style: italic;
+	font-size: x-large;
+	text-decoration: underline;
+}

@@ -142,6 +142,8 @@ function _setLeftPaneBasics(player_player_class) {
 	player_class.player_class_requirement_list.forEach(pcr => {
 		requirements_list.push(`${ pcr.required_player_class_name } level ${ pcr.level_requirement }`)
 	});
+	if (requirements_list.length == 0)
+		requirements_list.push("None")
 	playerClassMenuRequiredClasses.textContent = "Class requirements: " + requirements_list.join("; ");
 
 	let playerClassMenuGoldCost = document.getElementById("playerClassMenuGoldCost");
