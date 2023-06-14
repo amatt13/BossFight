@@ -294,6 +294,17 @@ AND p.Password = {pPassword.ToDbString()}";
             return playerExists;
         }
 
+        public static bool BodyTypeNameExists(string pBodyTypeName, out string pError)
+        {
+            var sql = $@"SELECT TRUE FROM { nameof(BodyType) } WHERE { nameof(BodyType.Name) } = @{ nameof(BodyType.Name) }";
+            var cmd = new MySqlCommand(sql);
+            cmd.Parameters.AddParameter(pBodyTypeName.ToLower(), nameof(BodyType.Name));
+            var bodyTypeExists = GlobalConnection.SingleValue<bool>(cmd);
+            pError = bodyTypeExists ? String.Empty : "Could not find body type";
+
+            return bodyTypeExists;
+        }
+
         public static bool PlayerClassExists(int pPlayerClassId, out string pError)
         {
             var sql = $@"SELECT TRUE FROM { nameof(PlayerClass) } WHERE { nameof(PlayerClass.PlayerClassId) } = @{ nameof(PlayerClass.PlayerClassId) }";

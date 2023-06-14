@@ -1,17 +1,13 @@
-// everythin that involves the websocket should be placed here
-
 let socket = undefined; 
 let conn_string = "";
 
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-	conn_string = "ws://localhost:5000/ws";  // test
+	conn_string = "ws://localhost:5000/ws";
 	console.log("localhost");
 }
 else {
 	console.log("remote host");
-	conn_string = "ws://185.126.108.48:5000/ws"; // public IP
-	// conn_string = "ws://192.168.0.185:5000/ws"; // PI
-	// conn_string = "ws://192.168.0.183:5000/ws"; // PI ????
+	conn_string = "ws://185.126.108.184:5000/ws";
 }
 
 
@@ -198,12 +194,13 @@ function playerAttemptedToBuyAPlayerClass(params_dict) {
 	}
 }
 
-async function SendChangePlayerClassRequest(player_id, player_class_id) {
+async function SendChangePlayerClassRequest(player_id, player_class_id, preffered_body_type) {
 	const obj = {
 		request_key: "ChangePlayerClass",
 		request_data: JSON.stringify({
 			player_id: parseInt(player_id),
-			player_class_id: parseInt(player_class_id)
+			player_class_id: parseInt(player_class_id),
+			preffered_body_type: preffered_body_type,
 		})
 	};
 	const json_obj = JSON.stringify(obj);

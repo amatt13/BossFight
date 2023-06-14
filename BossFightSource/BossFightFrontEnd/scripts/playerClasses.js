@@ -66,7 +66,8 @@ setToCurrentClassPlayerClassMenuButton.addEventListener('click', function onOpen
 		}
 	}
 
-	SendChangePlayerClassRequest(_player.player_id, player_class_id);
+	const preffered_body_type = playerClassMenuMasculineFeminineSliderCheckbox.checked ? "feminine" : "masculine";
+	SendChangePlayerClassRequest(_player.player_id, player_class_id, preffered_body_type);
 });
 
 function CloseMenu() {

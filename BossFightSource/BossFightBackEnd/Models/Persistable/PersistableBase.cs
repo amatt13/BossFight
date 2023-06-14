@@ -62,7 +62,7 @@ namespace BossFight.Models
 
         /// <summary>
         /// Don't provide the "id" column if you want to find more than 1 result.
-        /// Set the childs parent foreign key property if you want those that reference the parent
+        /// Set the child's parent foreign key property if you want those that reference the parent
         /// </summary>
         public IEnumerable<T> FindAllForParent(int? id, MySqlConnection pConnection)
         {

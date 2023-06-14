@@ -9,6 +9,8 @@ using BossFight.Models;
 using BossFight.Models.DB;
 using Ganss.Xss;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using BossFight.BossFightBackEnd.BossFightLogger;
 
 namespace BossFight.Controllers
 {
@@ -16,10 +18,21 @@ namespace BossFight.Controllers
     {
         public static string REQUEST_KEY = "request_key";
         public static string REQUEST_DATA = "request_data";
+        private readonly ILogger<SocketMessageHandler> logger;
 
         private readonly Dictionary<string, Func<Dictionary<string, JsonElement>, WebSocketReceiveResult, WebSocket, Task>> methodDictionary = new();
         public SocketMessageHandler() 
-        { 
+        {
+            ILoggerProvider fileLoggerProvider = new BossFightLoggerProvider("SocketMessageHandler.txt");
+            ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddConsole();
+                builder.AddDebug();
+                builder.AddProvider(fileLoggerProvider);
+                builder.SetMinimumLevel(LogLevel.Trace);
+            });
+            logger = _loggerFactory.CreateLogger<SocketMessageHandler>();
+
             // Populate the dictionary with method delegates
             methodDictionary[nameof(FetchActiveMonster)] = FetchActiveMonster;
             methodDictionary[nameof(FetchPlayer)] = FetchPlayer;
@@ -47,6 +60,8 @@ namespace BossFight.Controllers
 
             if (methodDictionary.TryGetValue(handler, out var method))
             {
+                var methodName = method.Method.Name;
+                logger.LogDebug("Executing {methodName}", methodName);
                 await method(dataJsonDictionary, pWebSocketReceiveResult, pWebSocket);
             }
             else
@@ -437,7 +452,7 @@ namespace BossFight.Controllers
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
-        // takes: player_id: "int", player_class_id: "int"
+        // takes: player_id: "int", player_class_id: "int", preffered_body_type: "string"
         private async Task ChangePlayerClass(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "player_class_id" });
@@ -445,34 +460,49 @@ namespace BossFight.Controllers
             if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
             {
                 var playerId = pJsonParameters["player_id"].GetInt32();
-                var player_class_id = pJsonParameters["player_class_id"].GetInt32();
+                var playerClassId = pJsonParameters["player_class_id"].GetInt32();
+                var prefferedBodyTypeName = pJsonParameters["preffered_body_type"].GetString();
                 if (
                     RequestValidator.PlayerExists(playerId, out error) 
-                    && RequestValidator.PlayerClassExists(player_class_id, out error) 
-                    && RequestValidator.PlayerOwnsPlayerClass(playerId, player_class_id, out error))
+                    && RequestValidator.PlayerClassExists(playerClassId, out error) 
+                    && RequestValidator.PlayerOwnsPlayerClass(playerId, playerClassId, out error)
+                    && RequestValidator.BodyTypeNameExists(prefferedBodyTypeName, out error))
                 {
-                    var oldPlayerPlayerClassRelation = new PlayerPlayerClass{ PlayerId = playerId, Active = true }.FindOne();
-                    oldPlayerPlayerClassRelation.Active = false;
-                    oldPlayerPlayerClassRelation.Persist();
-
-                    var newPlayerPlayerClassActiveRelation = new PlayerPlayerClass{ PlayerId = playerId, PlayerClassId = player_class_id }.FindOne();
-                    newPlayerPlayerClassActiveRelation.Active = true;
-                    newPlayerPlayerClassActiveRelation.Persist();
-                    
                     var player = new Player().FindOne(playerId);
                     var updatePlayer = false;
 
-                    if (newPlayerPlayerClassActiveRelation.MaxHp < player.Hp)
+                    // Do we need to update the PlayerPlayerClass relation?
+                    var currentPlayerPlayerClassRelation = new PlayerPlayerClass{ PlayerId = playerId, Active = true }.FindOne();
+                    if (playerClassId != currentPlayerPlayerClassRelation.PlayerClassId)
                     {
-                        player.Hp = newPlayerPlayerClassActiveRelation.MaxHp;
+                        currentPlayerPlayerClassRelation.Active = false;
+                        currentPlayerPlayerClassRelation.Persist();
+                        
+                        var newPlayerPlayerClassActiveRelation = new PlayerPlayerClass{ PlayerId = playerId, PlayerClassId = playerClassId }.FindOne();
+                        newPlayerPlayerClassActiveRelation.Active = true;
+                        newPlayerPlayerClassActiveRelation.Persist();
+
+                        if (newPlayerPlayerClassActiveRelation.MaxHp < player.Hp)
+                        {
+                            player.Hp = newPlayerPlayerClassActiveRelation.MaxHp;
+                            updatePlayer = true;
+                        }
+                        
+                        if (newPlayerPlayerClassActiveRelation.MaxMana < player.Mana)
+                        {
+                            player.Mana = newPlayerPlayerClassActiveRelation.MaxMana;
+                            updatePlayer = true;
+                        }
+                    }
+                
+                    // Do we need to update the player's BodyType?
+                    var newBodyType = new BodyType{ Name = prefferedBodyTypeName }.FindOne();
+                    if (player.PreferredBodyTypeId != newBodyType.BodyTypeId)
+                    {
+                        player.PreferredBodyTypeId = newBodyType.BodyTypeId.Value;
                         updatePlayer = true;
                     }
 
-                    if (newPlayerPlayerClassActiveRelation.MaxMana < player.Mana)
-                    {
-                        player.Mana = newPlayerPlayerClassActiveRelation.MaxMana;
-                        updatePlayer = true;
-                    }
 
                     if (updatePlayer)
                     {

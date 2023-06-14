@@ -6,6 +6,7 @@ using BossFight.Extentions;
 using BossFight.Models.Loot;
 using MySqlConnector;
 using System.Text.Json.Serialization;
+using BossFight.Models.DB;
 
 namespace BossFight.Models
 {
@@ -40,8 +41,8 @@ namespace BossFight.Models
         public string Password { get; set; }
 
         [PersistProperty]
-        public string PreferredBodyType { get; set; }
-        
+        public int PreferredBodyTypeId { get; set; }
+
         // From other tables
         public PlayerPlayerClass PlayerPlayerClass { get; set; }
         public IEnumerable<PlayerPlayerClass> UnlockedPlayerPlayerClassList { get; set; }
@@ -52,6 +53,7 @@ namespace BossFight.Models
         public int BonusMagicDmg { get; set; }
         public int BonusMagicDmgDuration { get; set; }
         public IEnumerable<PlayerWeapon> PlayerWeaponList { get; set; }
+        public BodyType PrefferedBodyType { get; set; }
 
         public Player() { }
 
@@ -70,7 +72,7 @@ namespace BossFight.Models
                 player.WeaponId = reader.GetInt(nameof(WeaponId));
                 player.UserName = reader.GetString(nameof(UserName));
                 player.Password = reader.GetString(nameof(Password));
-                player.PreferredBodyType = reader.GetString(nameof(PreferredBodyType ));
+                player.PreferredBodyTypeId = reader.GetInt(nameof(PreferredBodyTypeId));
 
                 result.Add(player);
             }
@@ -82,6 +84,7 @@ namespace BossFight.Models
                 player.PlayerPlayerClass.Player = player;
                 player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{ PlayerId = player.PlayerId }.FindAllForParent(null, pConnection);
                 player.Weapon = new Weapon().FindOneForParent(player.WeaponId, pConnection);
+                player.PrefferedBodyType = new BodyType{ BodyTypeId= player.PreferredBodyTypeId }.FindOneForParent(null, pConnection);
 
                 player.PlayerWeaponList = new PlayerWeapon{ PlayerId =  player.PlayerId}.FindAllForParent(null, pConnection);
                 foreach(var x in player.PlayerWeaponList) { x.Player = player; }
@@ -133,7 +136,7 @@ namespace BossFight.Models
             return Name;
         }
 
-        public virtual object shopStr(int pLengthOfLongestPlayerName, int PengthOfLongestPlayerTotalGold)
+        public virtual object ShopStr(int pLengthOfLongestPlayerName, int PengthOfLongestPlayerTotalGold)
         {
             var goldStr = String.Format("{0:n0}", Gold);
             goldStr = $"{ goldStr.Replace(',', '.') }".PadLeft(PengthOfLongestPlayerTotalGold);
@@ -266,7 +269,7 @@ namespace BossFight.Models
             AddLoot(lootId);
         }
 
-        public string sellLoot(iLootItem pLootToSell)
+        public string SellLoot(iLootItem pLootToSell)
         {
             LootList.Remove(pLootToSell.LootId);
             var sellPrice = pLootToSell.GetSellPrice();

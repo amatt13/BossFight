@@ -67,7 +67,7 @@ class Monster {
 }
 
 class Player {
-	constructor(player_id, name, hp, mana, gold, weapon, player_player_class, player_weapon_list, user_name, preferred_body_type) {
+	constructor(player_id, name, hp, mana, gold, weapon, player_player_class, player_weapon_list, user_name, preffered_body_type) {
 		this.player_id = player_id
 		this.name = name;
 		this.hp = hp;
@@ -77,7 +77,7 @@ class Player {
 		this.player_player_class = player_player_class;
 		this.player_weapon_list = player_weapon_list
 		this.user_name = user_name;
-		this.preferred_body_type = preferred_body_type
+		this.preffered_body_type = preffered_body_type
 	}
 
 	static CreateFromDict(playerDict_dict) {
@@ -87,13 +87,16 @@ class Player {
 		const player_player_class_dict = playerDict_dict["PlayerPlayerClass"];
 		const player_player_class = PlayerPlayerClass.CreateFromDict(player_player_class_dict);
 
+		const preffered_body_type_dict = playerDict_dict["PrefferedBodyType"];
+		const preffered_body_type = BodyType.CreateFromDict(preffered_body_type_dict);
+
 		let player_weapon_list = [];
 		const player_weapon_dict = playerDict_dict["PlayerWeaponList"];
 		player_weapon_dict.forEach(pw => {
 			player_weapon_list.push(new PlayerWeapon(pw["WeaponId"], pw["WeaponName"]))
 		});
 		const player = new Player(playerDict_dict["PlayerId"], playerDict_dict["Name"], playerDict_dict["Hp"], playerDict_dict["Mana"], playerDict_dict["Gold"], weapon, player_player_class, player_weapon_list, playerDict_dict["UserName"], 
-								  playerDict_dict["PreferredBodyType"]);
+								  preffered_body_type);
 		return player;
 	}
 
@@ -157,10 +160,20 @@ class PlayerClass {
 	}
 }
 
+class BodyType {
+	constructor(body_type_id, name) {
+		this.body_type_id = body_type_id;
+		this.Name = name;
+	}
+
+	static CreateFromDict(body_type_dict) {
+		return new BodyType(body_type_dict["BodyTypeId"], body_type_dict["Name"]);
+	}
+}
 
 class MonsterTierVoteChoice
 {
-	static DECREASE_DIFFICULTY = -1
-	static UNCHANGED = 0
-	static INCREASE_DIFFICULTY = 1
+	static DECREASE_DIFFICULTY = -1;
+	static UNCHANGED = 0;
+	static INCREASE_DIFFICULTY = 1;
 }
