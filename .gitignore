@@ -359,3 +359,4 @@ BossFightBackEnd/appsettings.json
 *appsettings.Development.json
 BossFightFrontEnd/images/ui_icons/source/*
 log.txt
+SocketMessageHandler.txt
