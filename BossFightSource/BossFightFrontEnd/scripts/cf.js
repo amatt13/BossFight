@@ -31,6 +31,8 @@ function RepopulatePlayerInventory() {
 function BlinkDiv(div_id, color = 'yellow') {
 	let element = document.getElementById(div_id)
 	const origcolor = element.style.backgroundColor
+	if (origcolor == color)
+		return;
 	element.style.backgroundColor = color;
 	let t = setTimeout(function () {
 		element.style.backgroundColor = origcolor;

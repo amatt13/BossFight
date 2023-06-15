@@ -23,6 +23,7 @@ playerClassMenuMasculineFeminineSliderCheckbox.addEventListener("change", functi
 let __player_player_classes_instances = new Array();
 // Build the menu and make it visible
 function showPlayerClassesMenu(player_player_classes) {
+	playerClassMenuMasculineFeminineSliderCheckbox.checked = _player.preffered_body_type.Name == "feminine";
 	__player_player_classes_instances = new Array();
     player_player_classes.forEach(player_class_dict => {
         const player_player_class = PlayerPlayerClass.CreateFromDict(player_class_dict);

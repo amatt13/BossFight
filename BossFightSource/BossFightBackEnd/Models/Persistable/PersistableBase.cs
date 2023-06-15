@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using MySqlConnector;
 using BossFight.Extentions;
+using System.Diagnostics;
 
 namespace BossFight.Models
 {
@@ -110,6 +111,7 @@ namespace BossFight.Models
             var result = FindAllForParent(id, pConnection);
             if (result.Any())
                 fetched = result.First();
+                Debug.Assert(result.Count() == 1, "Fetched more than one record when only one were expected!");
             return fetched;
         }
 

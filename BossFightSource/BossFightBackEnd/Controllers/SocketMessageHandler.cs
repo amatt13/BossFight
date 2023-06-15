@@ -499,6 +499,7 @@ namespace BossFight.Controllers
                     var newBodyType = new BodyType{ Name = prefferedBodyTypeName }.FindOne();
                     if (player.PreferredBodyTypeId != newBodyType.BodyTypeId)
                     {
+                        player.PrefferedBodyType = newBodyType;
                         player.PreferredBodyTypeId = newBodyType.BodyTypeId.Value;
                         updatePlayer = true;
                     }

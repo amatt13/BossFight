@@ -21,9 +21,11 @@ function getPlayerClassSprite(class_name, preffered_body_type) {
     player_class_name_suffix = ""
     switch (preffered_body_type) {
         case "masculine":            
+        case 2:
             player_class_name_suffix = "_m"
             break;
         case "feminine":
+        case 1:
             player_class_name_suffix = "_f"
             break;
         default:

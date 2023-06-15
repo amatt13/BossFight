@@ -41,6 +41,7 @@ namespace BossFight.Models
         public string Password { get; set; }
 
         [PersistProperty]
+        [JsonIgnore]
         public int PreferredBodyTypeId { get; set; }
 
         // From other tables
@@ -84,7 +85,7 @@ namespace BossFight.Models
                 player.PlayerPlayerClass.Player = player;
                 player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{ PlayerId = player.PlayerId }.FindAllForParent(null, pConnection);
                 player.Weapon = new Weapon().FindOneForParent(player.WeaponId, pConnection);
-                player.PrefferedBodyType = new BodyType{ BodyTypeId= player.PreferredBodyTypeId }.FindOneForParent(null, pConnection);
+                player.PrefferedBodyType = new BodyType{}.FindOneForParent(player.PreferredBodyTypeId, pConnection);
 
                 player.PlayerWeaponList = new PlayerWeapon{ PlayerId =  player.PlayerId}.FindAllForParent(null, pConnection);
                 foreach(var x in player.PlayerWeaponList) { x.Player = player; }
