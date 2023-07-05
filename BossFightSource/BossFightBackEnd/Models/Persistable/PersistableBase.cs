@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace BossFight.Models
 {
-    public abstract class PersistableBase<T> : PeristableProperties<T> 
+    public abstract class PersistableBase<T> : PeristableProperties<T>
     where T : PeristableProperties<T>
     {
         public IEnumerable<T> FindAll(int? id = null)

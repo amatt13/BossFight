@@ -10,7 +10,7 @@ using BossFight.Models.DB;
 
 namespace BossFight.Models
 {
-    public class Player : Target<Player>
+    public class Player : PersistableBase<Player>, ITarget
     {
         [JsonIgnore]
         private static Random _random = new();
@@ -31,9 +31,6 @@ namespace BossFight.Models
         public int WeaponId { get; set; }
 
         [PersistProperty]
-        public int Mana { get; set; }
-
-        [PersistProperty]
         public string UserName { get; set; }
 
         [PersistProperty]
@@ -43,6 +40,15 @@ namespace BossFight.Models
         [PersistProperty]
         [JsonIgnore]
         public int PreferredBodyTypeId { get; set; }
+
+        [PersistProperty]
+        public int Hp { get; set; }
+
+        [PersistProperty]
+        public int Mana { get; set; }
+
+        [PersistProperty]
+        public string Name { get; set; }
 
         // From other tables
         public PlayerPlayerClass PlayerPlayerClass { get; set; }
@@ -144,7 +150,7 @@ namespace BossFight.Models
             return $"{ Name.PadLeft(pLengthOfLongestPlayerName, '.') } { goldStr } gold";
         }
 
-        public override int GetMaxHp()
+        public int GetMaxHp()
         {
             return PlayerPlayerClass.MaxHp;
         }
@@ -162,6 +168,33 @@ namespace BossFight.Models
         public bool IsKnockedOut()
         {
             return IsDead();
+        }
+
+        public bool IsDead()
+        {
+            return Hp <= 0;
+        }
+
+        public bool IsAlive()
+        {
+            return !IsDead();
+        }
+
+        public bool IsAtFullHealth()
+        {
+            return Hp >= GetMaxHp();
+        }
+
+        public string PossessiveName()
+        {
+            if (Name.Last() == 's')
+            {
+                return Name + "'";
+            }
+            else
+            {
+                return Name + "'s";
+            }
         }
 
         public void GainXp(int pGainedXp, int? pMonsterLevel = null)

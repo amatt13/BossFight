@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BossFight.CustemExceptions;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace BossFight.Models
 {
@@ -8,7 +10,7 @@ namespace BossFight.Models
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public Player Caster { get; set; }
+        public ITarget Caster { get; set; }
         public string UseAbilityText { get; set; }
         public bool OnlyTargetMonster { get; set; }
         public int ManaCost { get; set; }
@@ -38,7 +40,7 @@ namespace BossFight.Models
             return $"{ ManaCost } mana - **{ MagicWord }**/**{ Name }**{ onlyTargetMonsterString } -> { Description }";
         }
 
-        public virtual string UseAbility(Player pCaster, iTarget pTarget, bool pDontUseCasterEffect = false)
+        public virtual string UseAbility(Player pCaster, ITarget pTarget, bool pDontUseCasterEffect = false)
         {
             UseAbilityText = "";
             Caster = pCaster;
@@ -61,7 +63,7 @@ namespace BossFight.Models
         { }
 
         // The effect that will be executed on the target
-        public virtual void TargetEffect(iTarget pTarget)
+        public virtual void TargetEffect(ITarget pTarget)
         { }
 
         public virtual void AffectsAllPlayersEffect(List<Player> allPlayers)

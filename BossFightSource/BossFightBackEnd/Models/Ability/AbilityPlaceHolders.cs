@@ -2,13 +2,6 @@ using BossFight.Models;
 
 namespace BossFight.Models
 {
-    public class Heal : Ability
-    {
-        public Heal()
-        : base("Heal", "Restores some of the target's hp", 6, "heal")
-        { }
-    }
-
     public class Smite : Ability
     {
         public Smite()

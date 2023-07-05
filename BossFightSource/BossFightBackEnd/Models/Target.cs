@@ -1,55 +1,18 @@
-using System;
 using System.Linq;
 
 namespace BossFight.Models
 {
-    public interface iTarget
-    { }
-
-    public abstract class Target<T> : PersistableBase<T>, iTarget
-    where T: PersistableBase<T>
+    public interface ITarget
     {       
-        [PersistProperty]
-        public int Hp { get; set; }
+        int Hp { get; set; }
+        int Mana { get; set; }
+        string Name { get; set; }
+        int Level { get; }
 
-        public virtual string Name { get; set; }
-
-        public Target(int pHP = 1, string pName = "No name")
-        {
-            Hp = pHP;
-            Name = pName;
-        }
-
-        public virtual int GetMaxHp()
-        {
-            throw new NotImplementedException("get_max_hp() not implemented for class");
-        }
-
-        public virtual bool IsDead()
-        {
-            return Hp <= 0;
-        }
-
-        public virtual bool IsAlive()
-        {
-            return !IsDead();
-        }
-
-        public virtual bool IsAtFullHealth()
-        {
-            return Hp >= GetMaxHp();
-        }
-
-        public string PossessiveName()
-        {
-            if (Name.Last() == 's')
-            {
-                return Name + "'";
-            }
-            else
-            {
-                return Name + "'s";
-            }
-        }
+        abstract int GetMaxHp();
+        bool IsDead();
+        bool IsAlive();
+        bool IsAtFullHealth();
+        string PossessiveName();
     }
 }

@@ -9,7 +9,7 @@ using System.Text.Json.Serialization;
 
 namespace BossFight.Models
 {
-    public class MonsterInstance : Target<MonsterInstance>, IPersist<MonsterInstance>
+    public class MonsterInstance : PersistableBase<MonsterInstance>, ITarget
     {
         private static readonly Random _random = new Random();
         private const int TIER_DIVIDER = 5;
@@ -57,12 +57,22 @@ namespace BossFight.Models
         { 
             get
             {
-                if (_maxHp == null)
-                    _maxHp = CalcMaxHealth();
+                _maxHp ??= CalcMaxHealth();
                     
                 return _maxHp.Value;
             }
             set { _maxHp = value; }
+        }
+
+        [PersistProperty]
+        public int Hp { get; set; }
+
+        [PersistProperty]
+        public int Mana { get; set; }
+        public string Name 
+        { 
+            get { return MonsterTemplate.Name; }
+            set { MonsterTemplate.Name = value; }
         }
 
         // From other tables
@@ -80,17 +90,15 @@ namespace BossFight.Models
         // Calculated (not persisted) fields/properties
 
         public bool IsBossMonster { get { return MonsterTemplate.BossMonster.GetValueOrDefault(false); } }
-
-        public override string Name { get => MonsterTemplate?.Name; }
         
         public double AttackStrength { get => Level / 2; }
 
         public MonsterInstance () { }
 
-        public MonsterInstance (MonsterTemplate pMonsterTempalte) 
+        public MonsterInstance (MonsterTemplate pMonsterTemplate) 
         {
-            MonsterTemplate = pMonsterTempalte;
-            MonsterTemplateId = pMonsterTempalte.MonsterTemplateId.Value;
+            MonsterTemplate = pMonsterTemplate;
+            MonsterTemplateId = pMonsterTemplate.MonsterTemplateId.Value;
         }
 
         #region PersistableBase implementation
@@ -112,6 +120,7 @@ namespace BossFight.Models
                 monsterInstance.MonsterInstanceId = reader.GetInt(nameof(MonsterInstanceId));
                 monsterInstance.MonsterTemplateId = reader.GetInt(nameof(MonsterTemplateId));
                 monsterInstance.Hp = reader.GetInt(nameof(Hp));
+                monsterInstance.Mana = reader.GetInt(nameof(Mana));
                 monsterInstance.MaxHp = reader.GetInt(nameof(MaxHp));
                 monsterInstance.Active = reader.GetBoolean(nameof(Active));
                 monsterInstance.Level = reader.GetInt(nameof(Level));
@@ -169,9 +178,36 @@ namespace BossFight.Models
             CalcHealth();
         }
 
-        public override int GetMaxHp()
+        public int GetMaxHp()
         {
             return MaxHp;
+        }
+
+        public bool IsDead()
+        {
+            return Hp <= 0;
+        }
+
+        public bool IsAlive()
+        {
+            return !IsDead();
+        }
+
+        public bool IsAtFullHealth()
+        {
+            return Hp >= GetMaxHp();
+        }
+
+        public string PossessiveName()
+        {
+            if (Name.Last() == 's')
+            {
+                return Name + "'";
+            }
+            else
+            {
+                return Name + "'s";
+            }
         }
 
         public void CalcHealth()
