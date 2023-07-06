@@ -91,6 +91,23 @@
 						Attack Monster
 					</button>
 				</div>
+				<abilities style="grid-column: 1; width: 200px; row-gap: 50px;">
+					<button type="button" class="btn-ability">
+						<img src="./images/ui_icons/abilities/placeholder.png" class="max-size-100-percent">
+					</button>
+					<button type="button" class="btn-ability" onclick="PlayerCast('Heal')">
+						<img src="./images/ui_icons/abilities/heal.png" class="max-size-100-percent">
+					</button>
+					<button type="button" class="btn-ability">
+						<img src="./images/ui_icons/abilities/placeholder.png" class="max-size-100-percent">
+					</button>
+					<button type="button" class="btn-ability">
+						<img src="./images/ui_icons/abilities/placeholder.png" class="max-size-100-percent">
+					</button>
+					<button type="button" class="btn-ability">
+						<img src="./images/ui_icons/abilities/placeholder.png" class="max-size-100-percent">
+					</button>
+				</abilities>
 				<!-- Player inventory/classes -->
 				<div style="grid-column: 2; grid-row: 1/20;">
 					<select id="player_inventory" size="1" style="flex-grow:1; float:left; width: 100%;"></select>
@@ -263,3 +280,4 @@
 <script type="text/javascript" src="scripts/playerClasses.js"></script>
 <script type="text/javascript" src="scripts/sign_in.js"></script>
 <script type="text/javascript" src="scripts/keyboard_listener_functions.js"></script>
+<script type="text/javascript" src="scripts/ability.js"></script>

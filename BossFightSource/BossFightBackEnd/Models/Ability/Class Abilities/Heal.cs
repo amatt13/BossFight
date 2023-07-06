@@ -38,6 +38,7 @@ namespace BossFight.Models
             if (!target.IsAtFullHealth())
             {
                 int amountRestored = FloorHeal + (int)Math.Floor(this.Caster.Level * 1.5);
+                int overHeal = 0;
                 if (amountRestored > HealLimit)
                 {
                     amountRestored = HealLimit;
@@ -45,11 +46,15 @@ namespace BossFight.Models
 
                 if (target.Hp + amountRestored > target.GetMaxHp())
                 {
+                    overHeal = amountRestored;
                     amountRestored = target.GetMaxHp() - target.Hp;
+                    overHeal -= overHeal;
                 }
 
                 target.Hp += amountRestored;
                 UseAbilityText = $"You restored {amountRestored} of {target.PossessiveName()} HP ({target.Hp}/{target.GetMaxHp()} HP).";
+                if (overHeal > 0)
+                    UseAbilityText += $"\nYou over healed the target for {overHeal} HP";
 
                 if (this.Caster is Player playerCaster)
                 {

@@ -107,6 +107,12 @@ Body {
 	background-color: #DEF;
 }
 
+.btn-ability {
+	background-color: var(--border-colour);
+	color: var(--shadow-colour);
+	text-align: center;
+}
+
 .btn-primary {
 	background-color: var(--border-colour);
 	color: var(--shadow-colour);

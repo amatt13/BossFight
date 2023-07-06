@@ -48,6 +48,7 @@ namespace BossFight.Controllers
             methodDictionary[nameof(BuyPlayerClass)] = BuyPlayerClass;
             methodDictionary[nameof(GetUnlockedClassesForPlayer)] = GetUnlockedClassesForPlayer;
             methodDictionary[nameof(ChangePlayerClass)] = ChangePlayerClass;
+            methodDictionary[nameof(CastAbility)] = CastAbility;
             //methodDictionary[nameof(Example)] = Example;
         }
 
@@ -549,6 +550,32 @@ namespace BossFight.Controllers
             };
             var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
             await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+        }
+
+        // takes: player_id: "int", ability_name: "string"
+        private async Task CastAbility(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "ability_name" });
+
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
+            {
+                var playerId = pJsonParameters["player_id"].GetInt32();
+                var abilityName = pJsonParameters["ability_name"].GetString();
+                if (RequestValidator.PlayerExists(playerId, out error))
+                {
+                    var player = new Player().FindOne(playerId);
+                    var response = new Dictionary<string, string>
+                    {
+                        { "player_name", player.Name }
+                    };
+
+                    var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
+                    await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                }
+            }
+
+            if (!String.IsNullOrEmpty(error))
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
         // EXAMPLE/TEMPLATE FUNCTION
