@@ -86,7 +86,7 @@ namespace BossFight
 
         public void ApplyInstantEffect(Effect pEffect, ITarget pTarget)
         {
-            
+
         }
 
         public void RemoveEffect(Effect effect, ITarget target)

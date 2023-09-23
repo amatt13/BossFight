@@ -23,6 +23,10 @@ app.get('/findfiles/*', function (req, res) {
 	  }
 });
 
+app.get('/render/', function (req, res) {
+	res.sendFile(__dirname + 'render/index.html');
+});
+
 server.listen(port, () => {
 	console.log(`Boss Fight FE listening at http://localhost:${port}`)
 })
