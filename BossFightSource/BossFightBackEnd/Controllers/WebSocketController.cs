@@ -19,7 +19,7 @@ namespace BossFight.Controllers
     public class WebSocketController : ControllerBase
     {
         public WebSocketController()
-        { 
+        {
             Console.WriteLine("Init WebSocketController");
         }
 
@@ -40,13 +40,13 @@ namespace BossFight.Controllers
             }
         }
 
-        private async Task ReadMessage(HttpContext pContext, WebSocket pWebSocket)
+        private static async Task ReadMessage(HttpContext pContext, WebSocket pWebSocket)
         {
             Console.WriteLine($"ReadMessage. From '{pContext.Connection.RemoteIpAddress}'");
             var buffer = new byte[1024 * 4];
             var arraySegment = new ArraySegment<byte>(buffer);
-            string jsonString = String.Empty;
-            var jsonDictionary = new Dictionary<String, Object>();
+            string jsonString;
+            Dictionary<String, Object> jsonDictionary;
 
             WebSocketReceiveResult result = await pWebSocket.ReceiveAsync(arraySegment, CancellationToken.None);
             while (result.CloseStatus == null)
@@ -54,17 +54,17 @@ namespace BossFight.Controllers
                 arraySegment = new ArraySegment<byte>(buffer, 0, result.Count);
                 jsonString = Encoding.UTF8.GetString(arraySegment);
                 jsonDictionary = JsonSerializer.Deserialize<Dictionary<String, Object>>(jsonString);
-                
+
                 //await new SocketMessageHandler(Db).HandleMessage(jsonDictionary, result, pWebSocket);
                 await new SocketMessageHandler().HandleMessage(jsonDictionary, result, pWebSocket);
                 try
                 {
-                    result = await pWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);   
+                    result = await pWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
                 catch (WebSocketException e)
                 {
                     Console.WriteLine(e.Message);
-                } 
+                }
             }
         }
 

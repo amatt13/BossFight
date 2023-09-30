@@ -10,7 +10,7 @@ using System.Text.Json.Serialization;
 
 namespace BossFight.Models
 {
-    public class Weapon : LootItem<Weapon>, IPersist<Weapon>
+    public class Weapon : LootItem<Weapon>
     {
         [JsonIgnore]
         public const float DEFAULTWEAPONDROPCHANCE = 1.0f;
@@ -20,7 +20,7 @@ namespace BossFight.Models
 
         [JsonIgnore]
         public override string IdColumn { get; set; } = "WeaponId";
-        
+
         public WeaponType WeaponType { get; set; }
 
         [PersistProperty]
@@ -46,7 +46,7 @@ namespace BossFight.Models
 
         public Weapon() { }
 
-        public Weapon(int pWeaponId, string pName, string pAttackMessage, WeaponType pWeaponType = null, int pAttackPower = 1, int pCost = 0, int pAttackCritChance = 3, float pDropChance = Weapon.DEFAULTWEAPONDROPCHANCE, 
+        public Weapon(int pWeaponId, string pName, string pAttackMessage, WeaponType pWeaponType = null, int pAttackPower = 1, int pCost = 0, int pAttackCritChance = 3, float pDropChance = Weapon.DEFAULTWEAPONDROPCHANCE,
                       int pSpellPower = 0, int pSpellCritChance = 0, bool pBossWeapon = false, int pWeaponLvl = 1)
             : base(pWeaponId, pName, pDropChance, pCost)
         {
@@ -66,17 +66,19 @@ namespace BossFight.Models
 
             while (reader.Read())
             {
-                var weapon = new Weapon();
-                weapon.LootId = reader.GetInt32("WeaponId");
-                weapon.LootName = reader.GetString("Name");
-                weapon.AttackMessage = reader.GetString(nameof(AttackMessage));
-                weapon.BossWeapon = reader.GetBoolean(nameof(BossWeapon));
-                weapon.WeaponLevel = reader.GetInt32(nameof(WeaponLevel));
-                weapon.AttackPower = reader.GetInt32(nameof(AttackPower));
-                weapon.AttackCritChance = reader.GetInt32(nameof(AttackCritChance));
-                weapon.SpellPower = reader.GetInt32(nameof(SpellPower));
-                weapon.SpellCritChance = reader.GetInt32(nameof(SpellCritChance));
-                weapon.Cost = reader.GetInt32(nameof(Cost));
+                var weapon = new Weapon
+                {
+                    LootId = reader.GetInt32("WeaponId"),
+                    LootName = reader.GetString("Name"),
+                    AttackMessage = reader.GetString(nameof(AttackMessage)),
+                    BossWeapon = reader.GetBoolean(nameof(BossWeapon)),
+                    WeaponLevel = reader.GetInt32(nameof(WeaponLevel)),
+                    AttackPower = reader.GetInt32(nameof(AttackPower)),
+                    AttackCritChance = reader.GetInt32(nameof(AttackCritChance)),
+                    SpellPower = reader.GetInt32(nameof(SpellPower)),
+                    SpellCritChance = reader.GetInt32(nameof(SpellCritChance)),
+                    Cost = reader.GetInt32(nameof(Cost))
+                };
                 var weaponTypeId = reader.GetIntNullable("WeaponTypeId");
                 weapon.WeaponType = new WeaponType().FindOne(weaponTypeId.GetValueOrDefault(1));  // 1 == "Fists"
                 result.Add(weapon);

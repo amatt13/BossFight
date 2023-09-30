@@ -1,6 +1,7 @@
 using System;
 using MySqlConnector;
 using BossFight.Models.DB;
+using BossFight.Extentions;
 
 namespace BossFight
 {
@@ -9,10 +10,10 @@ namespace BossFight
         public static AppDb AppDb { get; set; }
 
 
-        public static string ConnString;
+        private static string _connectionString;
         public static MySqlConnection GetNewOpenConnection()
         {
-            var newCon = new MySqlConnection(ConnString);
+            var newCon = new MySqlConnection(_connectionString);
             newCon.Open();
 
             return newCon;
@@ -23,9 +24,9 @@ namespace BossFight
             using var connection = GetNewOpenConnection();
             using var cmd = connection.CreateCommand();
 
-            cmd.CommandText = pSql;            
+            cmd.CommandText = pSql;
             var reader = cmd.ExecuteReader();
-            if (reader.FieldCount > 1) 
+            if (reader.FieldCount > 1)
             {
                 var errorMessage = $"Too many columns in SingleValue (found reader.FieldCount).";
                 Console.WriteLine($"{errorMessage }{ Environment.NewLine }{ cmd.CommandText }");
@@ -36,8 +37,8 @@ namespace BossFight
             {
                 //var columnName = reader.GetSchemaTable().Columns[0].ColumnName;
                 var readValue = reader.GetValue(0);
-                if (!(readValue is DBNull))
-                {                    
+                if (readValue is not DBNull)
+                {
                     result = (T)readValue;
                 }
             }
@@ -49,10 +50,10 @@ namespace BossFight
 
         public static T SingleValue<T>(MySqlCommand pSqlCommand)
         {
-            using var connection = GetNewOpenConnection();           
+            using var connection = GetNewOpenConnection();
             pSqlCommand.Connection = connection;
             var reader = pSqlCommand.ExecuteReader();
-            if (reader.FieldCount > 1) 
+            if (reader.FieldCount > 1)
             {
                 var errorMessage = $"Too many columns in SingleValue (found reader.FieldCount).";
                 Console.WriteLine($"{errorMessage }{ Environment.NewLine }{ pSqlCommand.CommandText }");
@@ -60,7 +61,7 @@ namespace BossFight
             }
             var result = default(T);
             if (reader.Read())
-            {   
+            {
                 if (typeof(T) == typeof(bool))
                 {
                     result = (T)(object)reader.GetBoolean(0);
@@ -70,11 +71,23 @@ namespace BossFight
                     result = (T)reader.GetValue(0);
                 }
             }
-            
+
             reader.Close();
             connection.Close();
 
             return result;
+        }
+
+        public static void SetConnectionString(string pConnectionString)
+        {
+            if (_connectionString.HasText())
+            {
+                throw new Exception($"Tried to overwrite connection string! Existing value is '{_connectionString}' new value is '{pConnectionString}'");
+            }
+            else
+            {
+                _connectionString = pConnectionString;
+            }
         }
     }
 }

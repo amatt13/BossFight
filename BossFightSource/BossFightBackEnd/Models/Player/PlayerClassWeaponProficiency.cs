@@ -35,10 +35,12 @@ namespace BossFight.Models
             var result = new List<PlayerClassWeaponProficiency>();
 
             while (reader.Read())
-            {   
-                var playerClassWeaponProficiency = new PlayerClassWeaponProficiency();
-                playerClassWeaponProficiency.PlayerClassId = reader.GetInt(nameof(PlayerClassId));
-                playerClassWeaponProficiency.WeaponTypeId = reader.GetInt(nameof(WeaponTypeId));
+            {
+                var playerClassWeaponProficiency = new PlayerClassWeaponProficiency
+                {
+                    PlayerClassId = reader.GetInt(nameof(PlayerClassId)),
+                    WeaponTypeId = reader.GetInt(nameof(WeaponTypeId))
+                };
                 playerClassWeaponProficiency.WeaponType = new WeaponType().FindOne(playerClassWeaponProficiency.WeaponTypeId);
                 result.Add(playerClassWeaponProficiency);
             }

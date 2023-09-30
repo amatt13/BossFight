@@ -5,7 +5,7 @@ namespace BossFight
 {
     public class MonsterSpawner
     {
-        private static object _spawnNewMonsterLock = new object();
+        private static readonly object _spawnNewMonsterLock = new();
         public static readonly int MAX_MONSTER_TIER = 4;
 
         public static MonsterInstance SpawnNewMonster()
@@ -21,9 +21,11 @@ namespace BossFight
                     var randomMonsterTemplate = new MonsterTemplate{ SearchRandomTopOne = true, Tier = nextMonsterTier, BossMonster = false }.FindOne(null);
                     if (randomMonsterTemplate != null)
                     {
-                        newMonster = new MonsterInstance(randomMonsterTemplate);
-                        newMonster.Level = randomMonsterTemplate.Tier.Value * 5 + new Random().Next(1, 6);
-                        newMonster.Active = true;
+                        newMonster = new MonsterInstance(randomMonsterTemplate)
+                        {
+                            Level = randomMonsterTemplate.Tier.Value * 5 + new Random().Next(1, 6),
+                            Active = true
+                        };
                         newMonster.CalcHealth();
                         newMonster.Persist();
 
@@ -45,9 +47,9 @@ namespace BossFight
             var nextTier = pCurrentMonsterTier;
 
             var sql = $@"SELECT SUM(mtv.Vote)
-FROM MonsterInstance mi 
-JOIN MonsterTierVote mtv 
-	ON mtv.MonsterInstanceId = mi.MonsterInstanceId 
+FROM MonsterInstance mi
+JOIN MonsterTierVote mtv
+	ON mtv.MonsterInstanceId = mi.MonsterInstanceId
 WHERE mi.Active  = 1";
 
             var votes = GlobalConnection.SingleValue<decimal?>(sql).GetValueOrDefault(0);

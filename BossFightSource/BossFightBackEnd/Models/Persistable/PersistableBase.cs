@@ -49,7 +49,7 @@ namespace BossFight.Models
             var order = pOrderByDescending ? "DESC" : "ASC";
             var orderByString = $"ORDER BY `{ pOrderByColumn }` { order }\n";
             var limitString = $"LIMIT { pRowsToRetrieve }\n";
-            
+
             var additionalSearchCriteriaString = AdditionalSearchCriteria(this, pStartWithAnd: false);
             if (!String.IsNullOrEmpty(additionalSearchCriteriaString))
                 whereString += $"WHERE { additionalSearchCriteriaString }";
@@ -123,7 +123,7 @@ namespace BossFight.Models
         }
     }
 
-    public abstract class PeristableProperties<T> 
+    public abstract class PeristableProperties<T>
     where T: class
     {
         public abstract string TableName { get; set; }
@@ -140,7 +140,7 @@ namespace BossFight.Models
 
         protected string TrimAdditionalSearchCriteriaText(string pAdditionalSearchCriteriaText, bool pStartWithAnd)
         {
-            return pStartWithAnd || String.IsNullOrEmpty(pAdditionalSearchCriteriaText) ? pAdditionalSearchCriteriaText : pAdditionalSearchCriteriaText.Substring(4, pAdditionalSearchCriteriaText.Length- 4);
+            return pStartWithAnd || String.IsNullOrEmpty(pAdditionalSearchCriteriaText) ? pAdditionalSearchCriteriaText : pAdditionalSearchCriteriaText[4..];
         }
 
         public abstract IEnumerable<T> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader, MySqlConnection pConnection);
@@ -214,7 +214,7 @@ namespace BossFight.Models
 
         private int? GetNextId(MySqlConnection connection)
         {
-            int? nextId = null;
+            int? nextId;
             using var cmd = connection.CreateCommand();
 
             cmd.CommandText = $@"SELECT IFNULL(MAX({ IdColumn }) + 1, 0)

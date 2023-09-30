@@ -43,7 +43,7 @@ namespace BossFight.Models
 
         [PersistProperty]
         public int AttackPowerBonus { get; set; }
-        
+
         [PersistProperty]
         public int SpellPowerBonus { get; set; }
 
@@ -59,8 +59,8 @@ namespace BossFight.Models
         // From other tables
         public IEnumerable<PlayerClassWeaponProficiency> ProficientWeaponTypesList { get; set; }
         public IEnumerable<PlayerClassRequirement> PlayerClassRequirementList { get; set; }
-        public Dictionary<string, Ability> Abilities { get; set; }        
-        
+        public Dictionary<string, Ability> Abilities { get; set; }
+
         public PlayerClass() { }
 
         public override IEnumerable<PlayerClass> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
@@ -69,27 +69,29 @@ namespace BossFight.Models
 
             while (reader.Read())
             {
-                var playerClass = new PlayerClass();
-                playerClass.PlayerClassId = reader.GetInt(nameof(PlayerClassId));
-                playerClass.Name = reader.GetString(nameof(Name));
-                playerClass.HpScale = reader.GetDouble(nameof(HpScale));
-                playerClass.ManaScale = reader.GetDouble(nameof(ManaScale));
-                playerClass.PurchasePrice = reader.GetInt(nameof(PurchasePrice));
-                playerClass.CritChance = reader.GetInt(nameof(CritChance));
-                playerClass.HpRegenRate = reader.GetInt(nameof(HpRegenRate));
-                playerClass.ManaRegenRate = reader.GetInt(nameof(ManaRegenRate));
-                playerClass.AttackPowerBonus = reader.GetInt(nameof(AttackPowerBonus));
-                playerClass.SpellPowerBonus = reader.GetInt(nameof(SpellPowerBonus));
-                playerClass.BaseHealth = reader.GetInt(nameof(BaseHealth));
-                playerClass.BaseMana = reader.GetInt(nameof(BaseMana));
-                playerClass.Description = reader.GetString(nameof(Description));
-                
+                var playerClass = new PlayerClass
+                {
+                    PlayerClassId = reader.GetInt(nameof(PlayerClassId)),
+                    Name = reader.GetString(nameof(Name)),
+                    HpScale = reader.GetDouble(nameof(HpScale)),
+                    ManaScale = reader.GetDouble(nameof(ManaScale)),
+                    PurchasePrice = reader.GetInt(nameof(PurchasePrice)),
+                    CritChance = reader.GetInt(nameof(CritChance)),
+                    HpRegenRate = reader.GetInt(nameof(HpRegenRate)),
+                    ManaRegenRate = reader.GetInt(nameof(ManaRegenRate)),
+                    AttackPowerBonus = reader.GetInt(nameof(AttackPowerBonus)),
+                    SpellPowerBonus = reader.GetInt(nameof(SpellPowerBonus)),
+                    BaseHealth = reader.GetInt(nameof(BaseHealth)),
+                    BaseMana = reader.GetInt(nameof(BaseMana)),
+                    Description = reader.GetString(nameof(Description))
+                };
+
                 playerClass.ProficientWeaponTypesList = new PlayerClassWeaponProficiency().FindAll(playerClass.PlayerClassId);
                 foreach(var x in playerClass.ProficientWeaponTypesList) { x.PlayerClass = playerClass; }
-                
+
                 playerClass.PlayerClassRequirementList = new PlayerClassRequirement().FindAll(playerClass.PlayerClassId);
                 foreach(var x in playerClass.PlayerClassRequirementList) { x.PlayerClass = playerClass; }
-                
+
                 result.Add(playerClass);
             }
 

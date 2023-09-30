@@ -4,20 +4,24 @@ namespace BossFight.Extentions
 {
     public static class BossFightExtensions
     {
-        public static string ToDbString(this object pObject)
+        public static object ToDbString(this object pObject)
         {
-            string result;
-            if (pObject is String)
+            object result;
+            if (pObject is null)
+            {
+                result = "NULL";
+            }
+            else if (pObject is String)
             {
                 result = (pObject as string).ToDbString();
             }
-            else if (pObject is bool?)
+            else if (pObject is bool? )
             {
                 result = (pObject as bool?).ToDbString();
             }
-            else if (pObject is bool)
+            else if (pObject is bool boolValue)
             {
-                result = ((bool)pObject).ToDbString();
+                result = boolValue.ToDbString();
             }
             else if (pObject.GetType().IsEnum)
             {

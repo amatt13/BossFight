@@ -42,12 +42,14 @@ namespace BossFight.Models
             var result = new List<PlayerWeapon>();
 
             while (reader.Read())
-            {   
-                var playerWeapon = new PlayerWeapon();
-                playerWeapon.PlayerWeaponId = reader.GetInt(nameof(PlayerWeaponId));
-                playerWeapon.PlayerId = reader.GetInt(nameof(PlayerId));
-                playerWeapon.WeaponId = reader.GetInt(nameof(WeaponId));
-                playerWeapon.Weapon = new Weapon().FindOne(playerWeapon.WeaponId);
+            {
+                var playerWeapon = new PlayerWeapon
+                {
+                    PlayerWeaponId = reader.GetInt(nameof(PlayerWeaponId)),
+                    PlayerId = reader.GetInt(nameof(PlayerId)),
+                    WeaponId = reader.GetInt(nameof(WeaponId))
+                };
+                playerWeapon.Weapon = (Weapon)new Weapon().FindOne(playerWeapon.WeaponId);
                 result.Add(playerWeapon);
             }
 
@@ -70,7 +72,7 @@ namespace BossFight.Models
         public void Sell()
         {
             Player.Gold += Weapon.GetSellPrice();
-            Player.PlayerWeaponList = Player.PlayerWeaponList.Remove(x => x.PlayerWeaponId == this.PlayerWeaponId);
+            Player.PlayerWeaponList = Player.PlayerWeaponList.Where(x => x.PlayerWeaponId != this.PlayerWeaponId);
             Player.Persist();
             Delete(PlayerWeaponId.Value);
         }

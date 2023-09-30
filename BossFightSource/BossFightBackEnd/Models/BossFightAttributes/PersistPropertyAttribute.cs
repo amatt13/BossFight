@@ -1,9 +1,13 @@
-public sealed class PersistPropertyAttribute : System.Attribute
+namespace BossFight
 {
-    public bool IsIdProperty { get; set; }
-
-    public PersistPropertyAttribute(bool pIsIdProperty = false)
+    [System.AttributeUsage(System.AttributeTargets.Property)]
+    public sealed class PersistPropertyAttribute : System.Attribute
     {
-        IsIdProperty = pIsIdProperty;
+        public bool IsIdProperty { get; set; }
+
+        public PersistPropertyAttribute(bool pIsIdProperty = false)
+        {
+            IsIdProperty = pIsIdProperty;
+        }
     }
 }

@@ -18,7 +18,9 @@ namespace BossFight.BossFightBackEnd.BossFightLogger
             return new FileLogger(_filePath);
         }
 
-        public void Dispose() { }
+        public void Dispose() {
+            GC.SuppressFinalize(this);
+        }
 
         private class FileLogger : ILogger
         {

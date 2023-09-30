@@ -1,23 +1,17 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.WebSockets;
-using BossFight.CustemExceptions;
-using Microsoft.Identity.Client;
 
 namespace BossFight.Models
 {
-
     public class Heal: Ability
     {
         private const int HealLimit = 16;
         private const int FloorHeal = 3;
 
         public Heal()
-            : base("Heal", "Restores some of the target's HP", 6, "heal")
+            : base("Heal", "Restores some of the target's HP", pManaCost: 6)
         { }
 
-        public override string UseAbility(Player pCaster, ITarget pTarget, bool pDontUseCasterEffect = false)
+        public override string UseAbility(ITarget pCaster, ITarget pTarget, bool pDontUseCasterEffect = false)
         {
             var dontUseCasterEffect = pTarget != null;
             return base.UseAbility(pCaster, pTarget, dontUseCasterEffect);

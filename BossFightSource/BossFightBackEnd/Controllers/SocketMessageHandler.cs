@@ -16,12 +16,12 @@ namespace BossFight.Controllers
 {
     public class SocketMessageHandler
     {
-        public static string REQUEST_KEY = "request_key";
-        public static string REQUEST_DATA = "request_data";
-        private readonly ILogger<SocketMessageHandler> logger;
+        private static readonly string REQUEST_KEY = "request_key";
+        private static readonly string REQUEST_DATA = "request_data";
+        private readonly ILogger<SocketMessageHandler> _logger;
 
         private readonly Dictionary<string, Func<Dictionary<string, JsonElement>, WebSocketReceiveResult, WebSocket, Task>> methodDictionary = new();
-        public SocketMessageHandler() 
+        public SocketMessageHandler()
         {
             ILoggerProvider fileLoggerProvider = new BossFightLoggerProvider("SocketMessageHandler.txt");
             ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
@@ -31,7 +31,7 @@ namespace BossFight.Controllers
                 builder.AddProvider(fileLoggerProvider);
                 builder.SetMinimumLevel(LogLevel.Trace);
             });
-            logger = _loggerFactory.CreateLogger<SocketMessageHandler>();
+            _logger = _loggerFactory.CreateLogger<SocketMessageHandler>();
 
             // Populate the dictionary with method delegates
             methodDictionary[nameof(FetchActiveMonster)] = FetchActiveMonster;
@@ -62,7 +62,7 @@ namespace BossFight.Controllers
             if (methodDictionary.TryGetValue(handler, out var method))
             {
                 var methodName = method.Method.Name;
-                logger.LogDebug("Executing {methodName}", methodName);
+                _logger.LogDebug("Executing {methodName}", methodName);
                 await method(dataJsonDictionary, pWebSocketReceiveResult, pWebSocket);
             }
             else
@@ -336,7 +336,7 @@ namespace BossFight.Controllers
                 if (RequestValidator.ValidateVoteForMonsterTier(playerId, monsterInstanceId, vote, out error))
                 {
                     MonsterTierVoteUpdater.UpdatePlayersMonsterTierVote(playerId, monsterInstanceId, vote);
-                    
+
                     // update everyone else about the new vote totals
                     var votesTotal = MonsterTierVoteUpdater.CountMonsterTierVotesTotalForActiveMonster();
                     var response = new Dictionary<string, MonsterTierVoteUpdater.MonsterTierVotesTotal>
@@ -399,21 +399,21 @@ namespace BossFight.Controllers
                 var playerId = pJsonParameters["player_id"].GetInt32();
                 var playerClassId = pJsonParameters["player_class_id"].GetInt32();
                 if (
-                    RequestValidator.PlayerExists(playerId, out error) 
-                    && RequestValidator.PlayerClassExists(playerClassId, out error) 
+                    RequestValidator.PlayerExists(playerId, out error)
+                    && RequestValidator.PlayerClassExists(playerClassId, out error)
                     && RequestValidator.PlayerIsEligibleForPlayerClassAcquisition(playerId, playerClassId, out error))
                 {
                     Tuple<bool, string> result = ShopController.BuyPlayerClass(playerClassId, playerId);
                     var updatedPlayer = new Player{}.FindOne(playerId);
                     var response = new Dictionary<string, Dictionary<string, object>>
                     {
-                        { 
-                            "bought_player_class", new Dictionary<string, object> 
+                        {
+                            "bought_player_class", new Dictionary<string, object>
                             {
                                 {"sucess", result.Item1},
                                 {"message", result.Item2},
                                 {"updated_player", updatedPlayer}
-                            } 
+                            }
                         }
                     };
 
@@ -464,8 +464,8 @@ namespace BossFight.Controllers
                 var playerClassId = pJsonParameters["player_class_id"].GetInt32();
                 var prefferedBodyTypeName = pJsonParameters["preffered_body_type"].GetString();
                 if (
-                    RequestValidator.PlayerExists(playerId, out error) 
-                    && RequestValidator.PlayerClassExists(playerClassId, out error) 
+                    RequestValidator.PlayerExists(playerId, out error)
+                    && RequestValidator.PlayerClassExists(playerClassId, out error)
                     && RequestValidator.PlayerOwnsPlayerClass(playerId, playerClassId, out error)
                     && RequestValidator.BodyTypeNameExists(prefferedBodyTypeName, out error))
                 {
@@ -478,7 +478,7 @@ namespace BossFight.Controllers
                     {
                         currentPlayerPlayerClassRelation.Active = false;
                         currentPlayerPlayerClassRelation.Persist();
-                        
+
                         var newPlayerPlayerClassActiveRelation = new PlayerPlayerClass{ PlayerId = playerId, PlayerClassId = playerClassId }.FindOne();
                         newPlayerPlayerClassActiveRelation.Active = true;
                         newPlayerPlayerClassActiveRelation.Persist();
@@ -488,14 +488,14 @@ namespace BossFight.Controllers
                             player.Hp = newPlayerPlayerClassActiveRelation.MaxHp;
                             updatePlayer = true;
                         }
-                        
+
                         if (newPlayerPlayerClassActiveRelation.MaxMana < player.Mana)
                         {
                             player.Mana = newPlayerPlayerClassActiveRelation.MaxMana;
                             updatePlayer = true;
                         }
                     }
-                
+
                     // Do we need to update the player's BodyType?
                     var newBodyType = new BodyType{ Name = prefferedBodyTypeName }.FindOne();
                     if (player.PreferredBodyTypeId != newBodyType.BodyTypeId)
@@ -525,7 +525,7 @@ namespace BossFight.Controllers
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
-        private List<Tuple<object, string>> CreateValueList(Dictionary<string, JsonElement> pDict, List<string> pRequiredValues)
+        private static List<Tuple<object, string>> CreateValueList(Dictionary<string, JsonElement> pDict, List<string> pRequiredValues)
         {
             var valuesList = new List<Tuple<object, string>>();
             foreach (var key in pRequiredValues)
@@ -542,7 +542,7 @@ namespace BossFight.Controllers
             return valuesList;
         }
 
-        async private Task ReplyWithErrorMessage(WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket, string pError)
+        async static private Task ReplyWithErrorMessage(WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket, string pError)
         {
             var response = new Dictionary<string, string>
             {
@@ -564,9 +564,11 @@ namespace BossFight.Controllers
                 if (RequestValidator.PlayerExists(playerId, out error))
                 {
                     var player = new Player().FindOne(playerId);
-                    var response = new Dictionary<string, string>
+                    AbilityController.CastAbility(abilityName, player, null, _logger);
+                    player.Persist();
+                    var response = new Dictionary<string, Player>
                     {
-                        { "player_name", player.Name }
+                        { "update_player", player }
                     };
 
                     var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));

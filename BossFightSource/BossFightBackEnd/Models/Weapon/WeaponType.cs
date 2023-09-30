@@ -16,7 +16,7 @@ namespace BossFight.Models
 
         [PersistProperty(true)]
         public int? WeaponTypeId { get; private set; }
-        
+
         [PersistProperty]
         public string WeaponTypename { get; private set; }
 
@@ -33,10 +33,12 @@ namespace BossFight.Models
             var result = new List<WeaponType>();
 
             while (reader.Read())
-            {   
-                var weaponType = new WeaponType();
-                weaponType.WeaponTypeId = reader.GetInt(nameof(WeaponTypeId));
-                weaponType.WeaponTypename = reader.GetString(nameof(WeaponTypename));
+            {
+                var weaponType = new WeaponType
+                {
+                    WeaponTypeId = reader.GetInt(nameof(WeaponTypeId)),
+                    WeaponTypename = reader.GetString(nameof(WeaponTypename))
+                };
                 result.Add(weaponType);
             }
 

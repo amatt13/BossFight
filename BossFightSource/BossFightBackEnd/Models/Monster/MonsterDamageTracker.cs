@@ -17,10 +17,10 @@ namespace BossFight.Models
         // Persisted on MonsterDamageTracker table
         [PersistProperty(true)]
         public int? MonsterDamageTrackerId { get; set; }
-        
+
         [PersistProperty]
         public int PlayerId { get; set; }
-                
+
         [PersistProperty]
         public int? MonsterInstanceId { get; set; }
 
@@ -52,12 +52,14 @@ namespace BossFight.Models
             var result = new List<MonsterDamageTracker>();
 
             while (reader.Read())
-            {   
-                var monsterDamageTracker = new MonsterDamageTracker();
-                monsterDamageTracker.MonsterDamageTrackerId = reader.GetInt(nameof(MonsterDamageTrackerId));
-                monsterDamageTracker.PlayerId = reader.GetInt(nameof(PlayerId));
-                monsterDamageTracker.MonsterInstanceId = reader.GetInt(nameof(MonsterInstanceId));
-                monsterDamageTracker.DamageReceivedFromPlayer = reader.GetInt(nameof(DamageReceivedFromPlayer));
+            {
+                var monsterDamageTracker = new MonsterDamageTracker
+                {
+                    MonsterDamageTrackerId = reader.GetInt(nameof(MonsterDamageTrackerId)),
+                    PlayerId = reader.GetInt(nameof(PlayerId)),
+                    MonsterInstanceId = reader.GetInt(nameof(MonsterInstanceId)),
+                    DamageReceivedFromPlayer = reader.GetInt(nameof(DamageReceivedFromPlayer))
+                };
 
                 monsterDamageTracker.Player = new Player().FindOne(monsterDamageTracker.PlayerId);
                 result.Add(monsterDamageTracker);

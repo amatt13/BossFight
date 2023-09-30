@@ -10,8 +10,7 @@ namespace BossFight.Models.Loot
         int GetSellPrice();
     }
 
-    public abstract class LootItem<T> : PersistableBase<T>, iLootItem
-    where T: PersistableBase<T>
+    public abstract class LootItem<T> : PersistableBase<LootItem<T>>, iLootItem
     {
         [PersistProperty(true)]
         public int? LootId { get; set; }

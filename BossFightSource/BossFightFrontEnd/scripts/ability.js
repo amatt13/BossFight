@@ -13,11 +13,11 @@ function Heal() {
 }
 
 async function SendAbilityCastMessage(ability_name) {
-	const obj = { 
-		request_key: "CastAbility", 
+	const obj = {
+		request_key: "CastAbility",
 		request_data: JSON.stringify({
 			player_id: _player.player_id,
-            ability_name: ability_name
+            ability_name: ability_name.replace(" ", "")
 		})
 	};
 	const json_obj = JSON.stringify(obj);

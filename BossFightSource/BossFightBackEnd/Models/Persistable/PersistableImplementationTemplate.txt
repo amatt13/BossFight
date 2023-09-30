@@ -30,16 +30,18 @@ namespace BossFight.Models.DB
             var result = new List<PersistableImplementationTemplate>();
 
             while (reader.Read())
-            {   
-                var persistableImplementationTemplate = new PersistableImplementationTemplate();
-                persistableImplementationTemplate.PersistableImplementationTemplateId = reader.GetInt(nameof(PersistableImplementationTemplateId));
+            {
+                var persistableImplementationTemplate = new PersistableImplementationTemplate
+                {
+                    PersistableImplementationTemplateId = reader.GetInt(nameof(PersistableImplementationTemplateId))
+                };
                 result.Add(persistableImplementationTemplate);
             }
             reader.Close();
 
             foreach (var PersistableBase in result)
             {
-                //persistableBase.Player = new Player().FindOneForParent(persistableBase.PlayerId, pConnection);
+                persistableBase.Player = new Player().FindOneForParent(persistableBase.PlayerId, pConnection);
             }
 
             return result;

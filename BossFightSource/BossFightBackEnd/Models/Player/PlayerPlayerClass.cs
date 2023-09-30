@@ -19,7 +19,7 @@ namespace BossFight.Models
 
         [PersistProperty]
         public int? PlayerId { get; set; }
-        
+
         [JsonIgnore]
         [PersistProperty]
         public int? PlayerClassId { get; set; }
@@ -44,7 +44,7 @@ namespace BossFight.Models
 
         [JsonIgnore]
         public int SpellPowerBonus { get => PlayerClass.SpellPowerBonus; }
-        
+
         [JsonIgnore]
         public int CritChance { get => PlayerClass.CritChance; }
 
@@ -53,10 +53,9 @@ namespace BossFight.Models
         private int? _maxHp;
         public int MaxHp
         {
-            get 
+            get
             {
-                if (_maxHp == null)
-                    _maxHp = PlayerClass.CalculateMaxHp(Level);
+                _maxHp ??= PlayerClass.CalculateMaxHp(Level);
                 return _maxHp.Value;
             }
             private set { _maxHp = value; }
@@ -66,10 +65,9 @@ namespace BossFight.Models
         private int? _maxMana;
         public int MaxMana
         {
-            get 
+            get
             {
-                if (_maxMana == null)
-                    _maxMana = PlayerClass.CalculateMaxMana(Level);
+                _maxMana ??= PlayerClass.CalculateMaxMana(Level);
                 return _maxMana.Value;
             }
             private set { _maxMana = value; }
@@ -87,14 +85,16 @@ namespace BossFight.Models
 
             while (reader.Read())
             {
-                var playerPlayerClass = new PlayerPlayerClass();
-                playerPlayerClass.PlayerPlayerClassId = reader.GetInt(nameof(PlayerPlayerClassId));
-                playerPlayerClass.PlayerId = reader.GetInt(nameof(PlayerId));
-                playerPlayerClass.PlayerClassId = reader.GetInt(nameof(PlayerClassId));
-                playerPlayerClass.XP = reader.GetInt(nameof(XP));
-                playerPlayerClass.Level = reader.GetInt(nameof(Level));
-                playerPlayerClass.Active = reader.GetBooleanNullable(nameof(Active));
-                
+                var playerPlayerClass = new PlayerPlayerClass
+                {
+                    PlayerPlayerClassId = reader.GetInt(nameof(PlayerPlayerClassId)),
+                    PlayerId = reader.GetInt(nameof(PlayerId)),
+                    PlayerClassId = reader.GetInt(nameof(PlayerClassId)),
+                    XP = reader.GetInt(nameof(XP)),
+                    Level = reader.GetInt(nameof(Level)),
+                    Active = reader.GetBooleanNullable(nameof(Active))
+                };
+
                 playerPlayerClass.PlayerClass = new PlayerClass().FindOne(playerPlayerClass.PlayerClassId);
                 result.Add(playerPlayerClass);
             }

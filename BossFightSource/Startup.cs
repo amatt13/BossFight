@@ -14,13 +14,13 @@ namespace BossFight
         {
             Configuration = configuration;
         }
-        
+
         public IConfiguration Configuration { get; }
         private ILoggerFactory _loggerFactory;
 
         public void ConfigureServices(IServiceCollection services)
         {
-            GlobalConnection.ConnString = Configuration["ConnectionStrings:DefaultConnection"];
+            GlobalConnection.SetConnectionString(Configuration["ConnectionStrings:DefaultConnection"]);
             services.AddControllers();
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {

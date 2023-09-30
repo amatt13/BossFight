@@ -11,7 +11,7 @@ namespace BossFight.Models
 {
     public class MonsterInstance : PersistableBase<MonsterInstance>, ITarget
     {
-        private static readonly Random _random = new Random();
+        private static readonly Random _random = new();
         private const int TIER_DIVIDER = 5;
         private const float MONSTER_CRIT_MODIFIER = 1.5f;
 
@@ -33,32 +33,14 @@ namespace BossFight.Models
         [PersistProperty]
         public int Level { get; set; }
 
-        [PersistProperty]
-        public int BlindDuration { get; set; }
-
-        [PersistProperty]
-        public int StunDuration { get; set; }
-
-        [PersistProperty]
-        public int LowerAttackDuration { get; set; }
-
-        [PersistProperty]
-        public float LowerAttackPercentage { get; set; }
-
-        [PersistProperty]
-        public int EasierToCritDuration { get; set; }
-
-        [PersistProperty]
-        public int EasierToCritPercentage { get; set; }
-
         private int? _maxHp;
         [PersistProperty]
-        public int MaxHp 
-        { 
+        public int MaxHp
+        {
             get
             {
                 _maxHp ??= CalcMaxHealth();
-                    
+
                 return _maxHp.Value;
             }
             set { _maxHp = value; }
@@ -69,8 +51,8 @@ namespace BossFight.Models
 
         [PersistProperty]
         public int Mana { get; set; }
-        public string Name 
-        { 
+        public string Name
+        {
             get { return MonsterTemplate.Name; }
             set { MonsterTemplate.Name = value; }
         }
@@ -80,22 +62,27 @@ namespace BossFight.Models
         public Dictionary<int, DamageTrackerEntry> DamageOverTimeTracker { get; set; }  // key is player_id
 
         public IEnumerable<MonsterDamageTracker> MonsterDamageTrackerList { get; set; }
-        
+
         [JsonIgnore]
         public Dictionary<int, int> FrenzyStackTracker { get; set; }  // key is player_id, value is frenzy stack lvl/size
 
         [JsonIgnore]
         public MonsterTemplate MonsterTemplate { get; set; }
 
+        [JsonIgnore]
+        private EffectManager _effectManager {get; set;} = new EffectManager();
+
+        public IEnumerable<Effect> ActiveEffects { get; set; }
+
         // Calculated (not persisted) fields/properties
 
         public bool IsBossMonster { get { return MonsterTemplate.BossMonster.GetValueOrDefault(false); } }
-        
+
         public double AttackStrength { get => Level / 2; }
 
         public MonsterInstance () { }
 
-        public MonsterInstance (MonsterTemplate pMonsterTemplate) 
+        public MonsterInstance (MonsterTemplate pMonsterTemplate)
         {
             MonsterTemplate = pMonsterTemplate;
             MonsterTemplateId = pMonsterTemplate.MonsterTemplateId.Value;
@@ -115,22 +102,18 @@ namespace BossFight.Models
             var result = new List<MonsterInstance>();
 
             while (!reader.IsClosed && reader.Read())
-            {   
-                var monsterInstance = new MonsterInstance();
-                monsterInstance.MonsterInstanceId = reader.GetInt(nameof(MonsterInstanceId));
-                monsterInstance.MonsterTemplateId = reader.GetInt(nameof(MonsterTemplateId));
-                monsterInstance.Hp = reader.GetInt(nameof(Hp));
-                monsterInstance.Mana = reader.GetInt(nameof(Mana));
-                monsterInstance.MaxHp = reader.GetInt(nameof(MaxHp));
-                monsterInstance.Active = reader.GetBoolean(nameof(Active));
-                monsterInstance.Level = reader.GetInt(nameof(Level));
-                monsterInstance.BlindDuration = reader.GetInt(nameof(BlindDuration));
-                monsterInstance.StunDuration = reader.GetInt(nameof(StunDuration));
-                monsterInstance.LowerAttackDuration = reader.GetInt(nameof(LowerAttackDuration));
-                monsterInstance.LowerAttackPercentage = reader.GetFloat(nameof(LowerAttackPercentage));
-                monsterInstance.EasierToCritDuration = reader.GetInt(nameof(EasierToCritDuration));
-                monsterInstance.EasierToCritPercentage = reader.GetInt(nameof(EasierToCritPercentage));
-                result.Add(monsterInstance);               
+            {
+                var monsterInstance = new MonsterInstance
+                {
+                    MonsterInstanceId = reader.GetInt(nameof(MonsterInstanceId)),
+                    MonsterTemplateId = reader.GetInt(nameof(MonsterTemplateId)),
+                    Hp = reader.GetInt(nameof(Hp)),
+                    Mana = reader.GetInt(nameof(Mana)),
+                    MaxHp = reader.GetInt(nameof(MaxHp)),
+                    Active = reader.GetBoolean(nameof(Active)),
+                    Level = reader.GetInt(nameof(Level))
+                };
+                result.Add(monsterInstance);
             }
             reader.Close();
 
@@ -140,6 +123,7 @@ namespace BossFight.Models
 
                 monsterInstance.MonsterDamageTrackerList = new MonsterDamageTracker{MonsterInstanceId = monsterInstance.MonsterInstanceId}.FindAllForParent(null, pConnection);
                 monsterInstance.MonsterDamageTrackerList.ForEach(mdt => mdt.MonsterInstance = monsterInstance);
+                monsterInstance.ActiveEffects = new Effect{EffectHolderMonsterId = monsterInstance.MonsterInstanceId}.FindAllForParent(null, pConnection);
             }
 
             return result;
@@ -254,60 +238,6 @@ namespace BossFight.Models
             return (int)maxHp;
         }
 
-        public void DebuffBlind(int pDuration)
-        {
-            if (BlindDuration < pDuration)
-                throw new MyException("Cant blind monster. A stronger blind is already in effect");
-            BlindDuration = pDuration;
-        }
-
-        public void DebuffStun(int pDuration)
-        {
-            if (StunDuration < pDuration)
-                throw new MyException("Cant stun monster. A stronger stun is already in effect");
-            StunDuration = pDuration;
-        }
-
-        public void DebuffLowerDmg(int pDuration, float pLowerAttackPercentage)
-        {
-            if (LowerAttackDuration < pDuration || LowerAttackPercentage < pLowerAttackPercentage)
-                throw new MyException("Cant lower attack of monster. A stronger weaken is already in effect");
-            LowerAttackDuration = pDuration;
-            LowerAttackPercentage = pLowerAttackPercentage;
-        }
-
-        public void DebuffDmgOverTime(int pDuration, int pDamage, Player pPlayer)
-        {
-            foreach (var trackerPlayerId in DamageOverTimeTracker.Keys)
-            {
-                if (trackerPlayerId != pPlayer.PlayerId)
-                    throw new MyException("Each players is limited to a single damage over time effect");
-            }
-            //DamageOverTimeTracker[pPlayer.PlayerId] = new DamageTrackerEntry(pPlayer.PlayerId, pPlayer.Name, pDuration, pDamage);
-        }
-
-        public int DebuffApplyFrenzyStack(int pFrenzyStacksToApply, Player pPlayer)
-        {
-            // if (FrenzyStackTracker.Keys.Contains(pPlayer.PlayerId))
-            // {
-            //     FrenzyStackTracker[pPlayer.PlayerId] += pFrenzyStacksToApply;
-            // }
-            // else
-            //     FrenzyStackTracker[pPlayer.PlayerId] = pFrenzyStacksToApply;
-            
-            // // return current stack size for player
-            // return FrenzyStackTracker[pPlayer.PlayerId];
-            return 0;
-        }
-
-        public void DebuffEasierToCrit(int pDuration, int pExtraCritChance)
-        {
-            if (EasierToCritDuration < pDuration || EasierToCritPercentage < pExtraCritChance)
-                throw new MyException("Cant increase critical chance on monster. A stronger effect is already applied");
-            EasierToCritDuration = pDuration;
-            EasierToCritPercentage = pExtraCritChance;
-        }
-
         public void SubtractHealth(int pDamage, Player pAttackingPlayer)
         {
             var monsterDamageTrackerItem = MonsterDamageTrackerList.FirstOrDefault(mdt => mdt.PlayerId == pAttackingPlayer.PlayerId);
@@ -320,9 +250,9 @@ namespace BossFight.Models
             {
                 monsterDamageTrackerItem = new MonsterDamageTracker(pAttackingPlayer, this, pDamage);
                 monsterDamageTrackerItem.Persist();
-                MonsterDamageTrackerList.Append(monsterDamageTrackerItem);
+                _ = MonsterDamageTrackerList.Append(monsterDamageTrackerItem);
             }
-                
+
             Hp -= pDamage;
         }
 
@@ -333,54 +263,6 @@ namespace BossFight.Models
             return roll <= critChance;
         }
 
-        public bool HasActiveBlindDebuff()
-        {
-            return BlindDuration > 0;
-        }
-
-        public bool IsBlinded()
-        {
-            bool affectedByBlind = false;            
-            if (HasActiveBlindDebuff())
-            {
-                BlindDuration -= 1;
-                affectedByBlind = _random.Next(1, 101) > 33;
-            }
-            return affectedByBlind;
-        }
-
-        public bool HasActiveStunDebuff()
-        {
-            return StunDuration > 0;
-        }
-
-        public bool IsStunned()
-        {
-            bool isStunned = false;
-            if (HasActiveStunDebuff())
-            {
-                StunDuration -= 1;
-                isStunned = true;
-            }
-            return isStunned;
-        }
-
-        public bool HasLowerAttackDefuff()
-        {
-            return LowerAttackDuration > 0;
-        }
-
-        public int LowerAttackBecauseOfLowerAttackDebuff(int monsterDamage)
-        {
-            var newDamage = monsterDamage;
-            if (HasLowerAttackDefuff())
-            {
-                newDamage -= (int)(newDamage * LowerAttackPercentage);
-                LowerAttackDuration -= 1;
-            }
-            return newDamage;
-        }
-
         public int CalculateMonsterDamage(out bool pIsCrit)
         {
             double damageDealt = AttackStrength;
@@ -389,7 +271,7 @@ namespace BossFight.Models
             double variance = (Level / 5) - 1;
             if (variance > 0.0)
                 damageDealt += _random.Next((int)Math.Floor(-variance), (int)Math.Ceiling(variance) + 1);
-                
+
             // round up to 1
             if (damageDealt <= 0.0)
                 damageDealt = 1;
@@ -397,26 +279,35 @@ namespace BossFight.Models
             // bonus boss damage
             if (IsBossMonster)
                 damageDealt *= 1.25;
-                
+
             // crit bonus
             pIsCrit = MonsterAttackIsCrit();
             if (pIsCrit)
                 damageDealt *= MONSTER_CRIT_MODIFIER;
-                
+
 
             return (int)Math.Ceiling(damageDealt);
         }
 
         public bool AttackOnMonsterIsCrit(int pCritChance)
         {
-            if (EasierToCritDuration > 0)
-            {
-                pCritChance += EasierToCritPercentage;
-                EasierToCritDuration -= 1;
-            }
-
             var roll = _random.Next(0, 101);
             return roll <= pCritChance;
+        }
+
+        public bool AddEffect(Effect pEffect)
+        {
+            return _effectManager.AddEffect(ActiveEffects, pEffect);
+        }
+
+        public void RemoveEffect(EffectType pEffectType)
+        {
+            _effectManager.RemoveEffect(ActiveEffects, pEffectType);
+        }
+
+        public void RemoveExpiredEffects()
+        {
+           ActiveEffects = _effectManager.RemoveExpiredEffects(ActiveEffects);
         }
     }
 }

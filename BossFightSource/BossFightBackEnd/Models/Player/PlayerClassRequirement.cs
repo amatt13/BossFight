@@ -29,24 +29,26 @@ namespace BossFight.Models
 
         [JsonIgnore]
         public PlayerClass RequiredPlayerClass { get; set; }
-        
+
         public string RequiredPlayerClassName { get => RequiredPlayerClass.Name; }
 
         public PlayerClassRequirement () { }
 
 
         #region PersistableBase implementation
-        
+
         public override IEnumerable<PlayerClassRequirement> BuildObjectFromReader(MySqlDataReader reader, MySqlConnection pConnection)
         {
             var result = new List<PlayerClassRequirement>();
 
             while (reader.Read())
-            {   
-                var playerClassRequirement = new PlayerClassRequirement();
-                playerClassRequirement.PlayerClassId = reader.GetInt(nameof(PlayerClassId));
-                playerClassRequirement.RequiredPlayerClassId = reader.GetInt(nameof(RequiredPlayerClassId));
-                playerClassRequirement.LevelRequirement = reader.GetInt(nameof(LevelRequirement));
+            {
+                var playerClassRequirement = new PlayerClassRequirement
+                {
+                    PlayerClassId = reader.GetInt(nameof(PlayerClassId)),
+                    RequiredPlayerClassId = reader.GetInt(nameof(RequiredPlayerClassId)),
+                    LevelRequirement = reader.GetInt(nameof(LevelRequirement))
+                };
                 playerClassRequirement.RequiredPlayerClass = new PlayerClass().FindOne(playerClassRequirement.RequiredPlayerClassId);
                 result.Add(playerClassRequirement);
             }

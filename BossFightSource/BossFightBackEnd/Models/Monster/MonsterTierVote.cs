@@ -23,26 +23,24 @@ namespace BossFight.Models
         public MonsterTierVoteChoice? Vote { get; set; }
 
         [PersistProperty]
-        public int? PlayerId 
-        { 
+        public int? PlayerId
+        {
             get { return Player?.PlayerId; }
-            set 
-            { 
-                if (Player == null) 
-                    Player = new Player();
-                Player.PlayerId = value; 
+            set
+            {
+                Player ??= new Player();
+                Player.PlayerId = value;
             }
         }
 
         [PersistProperty]
-        public int? MonsterInstanceId 
-        { 
+        public int? MonsterInstanceId
+        {
             get { return MonsterInstance?.MonsterInstanceId; }
-            set 
-            { 
-                if (MonsterInstance == null) 
-                    MonsterInstance = new MonsterInstance();
-                MonsterInstance.MonsterInstanceId = value; 
+            set
+            {
+                MonsterInstance ??= new MonsterInstance();
+                MonsterInstance.MonsterInstanceId = value;
             }
         }
 
@@ -62,12 +60,14 @@ namespace BossFight.Models
             var result = new List<MonsterTierVote>();
 
             while (reader.Read())
-            {   
-                var MonsterTierVote = new MonsterTierVote();
-                MonsterTierVote.MonsterTierVoteId = reader.GetInt(nameof(MonsterTierVoteId));
-                MonsterTierVote.PlayerId = reader.GetInt(nameof(PlayerId));
-                MonsterTierVote.MonsterInstanceId = reader.GetInt(nameof(MonsterInstanceId));
-                MonsterTierVote.Vote = (MonsterTierVoteChoice)reader.GetInt(nameof(Vote));
+            {
+                var MonsterTierVote = new MonsterTierVote
+                {
+                    MonsterTierVoteId = reader.GetInt(nameof(MonsterTierVoteId)),
+                    PlayerId = reader.GetInt(nameof(PlayerId)),
+                    MonsterInstanceId = reader.GetInt(nameof(MonsterInstanceId)),
+                    Vote = (MonsterTierVoteChoice)reader.GetInt(nameof(Vote))
+                };
                 result.Add(MonsterTierVote);
             }
             reader.Close();
@@ -90,7 +90,7 @@ namespace BossFight.Models
 
             if (mtv.MonsterInstanceId.HasValue)
                 additionalSearchCriteriaText += $" AND { nameof(MonsterInstanceId) } = { mtv.MonsterInstanceId.ToDbString() }\n";
-            
+
             if (mtv.Vote.HasValue)
                 additionalSearchCriteriaText += $" AND { nameof(Vote) } = { mtv.Vote.ToDbString() }\n";
 

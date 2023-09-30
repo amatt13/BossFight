@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BossFight.CustemExceptions;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace BossFight.Models
 {
@@ -14,11 +13,10 @@ namespace BossFight.Models
         public string UseAbilityText { get; set; }
         public bool OnlyTargetMonster { get; set; }
         public int ManaCost { get; set; }
-        public string MagicWord { get; set; }
         public bool AffectsAllPlayers { get; set; }
         public string AffectsAllPlayersStr { get; set; }
 
-        public Ability(string pName, string pDescription, int pManaCost, string pMagicWord)
+        public Ability(string pName, string pDescription, int pManaCost)
         {
             Name = pName;
             Description = pDescription;
@@ -26,7 +24,6 @@ namespace BossFight.Models
             UseAbilityText = "";
             OnlyTargetMonster = false;
             ManaCost = pManaCost;
-            MagicWord = pMagicWord.ToLower();
             AffectsAllPlayers = false;
             AffectsAllPlayersStr = "";
         }
@@ -36,23 +33,23 @@ namespace BossFight.Models
             var onlyTargetMonsterString = "";
             if (OnlyTargetMonster)
                 onlyTargetMonsterString = "*";
-                
-            return $"{ ManaCost } mana - **{ MagicWord }**/**{ Name }**{ onlyTargetMonsterString } -> { Description }";
+
+            return $"{ ManaCost } mana - /**{ Name }**{ onlyTargetMonsterString } -> { Description }";
         }
 
-        public virtual string UseAbility(Player pCaster, ITarget pTarget, bool pDontUseCasterEffect = false)
+        public virtual string UseAbility(ITarget pCaster, ITarget pTarget, bool pDontUseCasterEffect = false)
         {
             UseAbilityText = "";
             Caster = pCaster;
             if (OnlyTargetMonster && pTarget is Player)
                 throw new MyException("Can only target monsters");
-                
+
             if (!pDontUseCasterEffect)
                 CasterEffect();
-                
+
             if (pTarget != null)
                 TargetEffect(pTarget);
-                
+
             SubtractManaCostFromCaster();
             AddManaText();
             return AffectsAllPlayersStr + UseAbilityText;
@@ -73,7 +70,7 @@ namespace BossFight.Models
         {
             if (Caster.Mana < ManaCost)
                 throw new WTFException($"caster mana: { Caster.Mana} mana cost: { ManaCost }");
-                
+
             Caster.Mana -= ManaCost;
         }
 
@@ -81,7 +78,7 @@ namespace BossFight.Models
         {
             if (UseAbilityText.Any() && !UseAbilityText.EndsWith('\n'))
                 UseAbilityText += "\n";
-                
+
             UseAbilityText += $"**Mana:** You have { Caster.Mana } mana left";
         }
 

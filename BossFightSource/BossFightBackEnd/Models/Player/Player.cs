@@ -1,20 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BossFight.CustemExceptions;
 using BossFight.Extentions;
 using BossFight.Models.Loot;
 using MySqlConnector;
 using System.Text.Json.Serialization;
-using BossFight.Models.DB;
 
 namespace BossFight.Models
 {
     public class Player : PersistableBase<Player>, ITarget
     {
         [JsonIgnore]
-        private static Random _random = new();
-        
+        private static readonly Random _random = new();
+
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(Player);
         [JsonIgnore]
@@ -48,7 +46,7 @@ namespace BossFight.Models
         public int Mana { get; set; }
 
         [PersistProperty]
-        public string Name { get; set; }
+        public string Name { get; set; } = "DEFAULT EFFECT";
 
         // From other tables
         public PlayerPlayerClass PlayerPlayerClass { get; set; }
@@ -61,6 +59,10 @@ namespace BossFight.Models
         public int BonusMagicDmgDuration { get; set; }
         public IEnumerable<PlayerWeapon> PlayerWeaponList { get; set; }
         public BodyType PrefferedBodyType { get; set; }
+        public IEnumerable<Effect> ActiveEffects { get; set; }
+
+        [JsonIgnore]
+        private EffectManager _effectManager {get; set;} = new EffectManager();
 
         public Player() { }
 
@@ -70,16 +72,18 @@ namespace BossFight.Models
 
             while (!reader.IsClosed && reader.Read())
             {
-                var player = new Player();
-                player.PlayerId = reader.GetInt(nameof(PlayerId));
-                player.Gold = reader.GetInt(nameof(Gold));
-                player.Name = reader.GetString(nameof(Name));
-                player.Hp = reader.GetInt(nameof(Hp));
-                player.Mana = reader.GetInt(nameof(Mana));
-                player.WeaponId = reader.GetInt(nameof(WeaponId));
-                player.UserName = reader.GetString(nameof(UserName));
-                player.Password = reader.GetString(nameof(Password));
-                player.PreferredBodyTypeId = reader.GetInt(nameof(PreferredBodyTypeId));
+                var player = new Player
+                {
+                    PlayerId = reader.GetInt(nameof(PlayerId)),
+                    Gold = reader.GetInt(nameof(Gold)),
+                    Name = reader.GetString(nameof(Name)),
+                    Hp = reader.GetInt(nameof(Hp)),
+                    Mana = reader.GetInt(nameof(Mana)),
+                    WeaponId = reader.GetInt(nameof(WeaponId)),
+                    UserName = reader.GetString(nameof(UserName)),
+                    Password = reader.GetString(nameof(Password)),
+                    PreferredBodyTypeId = reader.GetInt(nameof(PreferredBodyTypeId))
+                };
 
                 result.Add(player);
             }
@@ -87,11 +91,21 @@ namespace BossFight.Models
 
             foreach (var player in result)
             {
-                player.PlayerPlayerClass = new PlayerPlayerClass{ Active = true, PlayerId = player.PlayerId }.FindAllForParent(null, pConnection).First();
+                player.PlayerPlayerClass = new PlayerPlayerClass{Active = true, PlayerId = player.PlayerId}.FindAllForParent(null, pConnection).First();
                 player.PlayerPlayerClass.Player = player;
-                player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{ PlayerId = player.PlayerId }.FindAllForParent(null, pConnection);
-                player.Weapon = new Weapon().FindOneForParent(player.WeaponId, pConnection);
+                player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{PlayerId = player.PlayerId}.FindAllForParent(null, pConnection);
+                player.Weapon = (Weapon)new Weapon().FindOneForParent(player.WeaponId, pConnection);
                 player.PrefferedBodyType = new BodyType{}.FindOneForParent(player.PreferredBodyTypeId, pConnection);
+
+
+                var effects = new Effect{EffectHolderPlayerId = player.PlayerId}.FindAllForParent(null, pConnection);
+                var builtEffects = new List<Effect>();
+                foreach (var effect in effects)
+                {
+                    Effect newEffect = effect.BuildEffect();
+                    builtEffects.Add(newEffect);
+                }
+                player.ActiveEffects = builtEffects;
 
                 player.PlayerWeaponList = new PlayerWeapon{ PlayerId =  player.PlayerId}.FindAllForParent(null, pConnection);
                 foreach(var x in player.PlayerWeaponList) { x.Player = player; }
@@ -117,7 +131,7 @@ namespace BossFight.Models
         {
             var isCrit = pTargetMonster.AttackOnMonsterIsCrit(GetAttackCritChance());
             var dmg = Weapon.AttackPower + GetAttackBonus();
-            if (BonusMagicDmgDuration > 0) 
+            if (BonusMagicDmgDuration > 0)
                 BonusMagicDmgDuration -= 1;
 
             if (isCrit)
@@ -132,10 +146,13 @@ namespace BossFight.Models
 
         public void SubtractHealth(int pDamageToReceive)
         {
-            Hp -= pDamageToReceive;
+            if (pDamageToReceive > 0)
+            {
+                Hp -= pDamageToReceive;
 
-            if (Hp < -3)
-                Hp = -3;
+                if (Hp < -3)
+                    Hp = -3;
+            }
         }
 
         public override string ToString()
@@ -319,6 +336,21 @@ namespace BossFight.Models
         {
             Hp = GetMaxHp();
             Mana = GetMaxMana();
+        }
+
+        public bool AddEffect(Effect pEffect)
+        {
+            return _effectManager.AddEffect(ActiveEffects, pEffect);
+        }
+
+        public void RemoveEffect(EffectType pEffectType)
+        {
+            _effectManager.RemoveEffect(ActiveEffects, pEffectType);
+        }
+
+        public void RemoveExpiredEffects()
+        {
+           ActiveEffects = _effectManager.RemoveExpiredEffects(ActiveEffects);
         }
     }
 }

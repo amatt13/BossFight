@@ -4,24 +4,23 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 
-namespace BossFight 
+namespace BossFight
 {
     public class WebSocketConnections
     {
         private static WebSocketConnections _instance;
-        private List<WebSocket> _connections;
-        private readonly object _lock = new object();
+        private readonly List<WebSocket> _connections;
+        private readonly object _lock = new();
 
         private WebSocketConnections()
-        { 
+        {
             _connections = new List<WebSocket>();
         }
 
         public static WebSocketConnections GetInstance()
         {
-            if (_instance == null)
-                _instance = new WebSocketConnections();
-            
+            _instance ??= new WebSocketConnections();
+
             return _instance;
         }
 
@@ -37,7 +36,7 @@ namespace BossFight
         {
             lock (_lock)
             {
-                _connections.Remove(pNewWebSocket);                 
+                _connections.Remove(pNewWebSocket);
             }
         }
 
@@ -45,7 +44,7 @@ namespace BossFight
         {
             lock (_lock)
             {
-                return _connections.Contains(pebSocket);                 
+                return _connections.Contains(pebSocket);
             }
         }
 

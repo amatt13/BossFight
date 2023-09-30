@@ -30,10 +30,12 @@ namespace BossFight.Models
             var result = new List<BodyType>();
 
             while (reader.Read())
-            {   
-                var BodyType = new BodyType();
-                BodyType.BodyTypeId = reader.GetInt(nameof(BodyTypeId));
-                BodyType.Name = reader.GetString(nameof(Name));
+            {
+                var BodyType = new BodyType
+                {
+                    BodyTypeId = reader.GetInt(nameof(BodyTypeId)),
+                    Name = reader.GetString(nameof(Name))
+                };
                 result.Add(BodyType);
             }
             reader.Close();

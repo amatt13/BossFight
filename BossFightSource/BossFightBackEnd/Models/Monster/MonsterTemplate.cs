@@ -14,7 +14,7 @@ namespace BossFight.Models
         public override string TableName { get; set; } = nameof(MonsterTemplate);
         [JsonIgnore]
         public override string IdColumn { get; set; } = nameof(MonsterTemplateId);
-        
+
         [PersistProperty(true)]
         public int? MonsterTemplateId { get; set; }
 
@@ -43,12 +43,14 @@ namespace BossFight.Models
             var result = new List<MonsterTemplate>();
 
             while (reader.Read())
-            {   
-                var monsterTemplate = new MonsterTemplate();
-                monsterTemplate.MonsterTemplateId = reader.GetInt(nameof(MonsterTemplateId));
-                monsterTemplate.Tier = reader.GetInt(nameof(Tier));
-                monsterTemplate.Name = reader.GetString(nameof(Name));
-                monsterTemplate.BossMonster = reader.GetBoolean(nameof(BossMonster));
+            {
+                var monsterTemplate = new MonsterTemplate
+                {
+                    MonsterTemplateId = reader.GetInt(nameof(MonsterTemplateId)),
+                    Tier = reader.GetInt(nameof(Tier)),
+                    Name = reader.GetString(nameof(Name)),
+                    BossMonster = reader.GetBoolean(nameof(BossMonster))
+                };
                 result.Add(monsterTemplate);
             }
 
@@ -71,7 +73,7 @@ namespace BossFight.Models
                 additionalSearchCriteriaText += "ORDER BY RAND()\nLIMIT 1";
 
             // this is so fucking janky. Move "ORDY BY RAND" to PersistableBase?
-            return pStartWithAnd && !additionalSearchCriteriaText.StartsWith(" AND") ? additionalSearchCriteriaText : additionalSearchCriteriaText.Substring(4, additionalSearchCriteriaText.Length - 4);
+            return pStartWithAnd && !additionalSearchCriteriaText.StartsWith(" AND") ? additionalSearchCriteriaText : additionalSearchCriteriaText[4..];
         }
 
         public override string ToString()

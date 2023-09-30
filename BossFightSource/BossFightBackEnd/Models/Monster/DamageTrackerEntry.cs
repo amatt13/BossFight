@@ -2,15 +2,15 @@ namespace BossFight.Models
 {
     public class DamageTrackerEntry
     {
-        private int _player_id { get; set; }
-        private string _player_name { get; set; }
+        private int _playerId { get; set; }
+        private string _playerName { get; set; }
         private int _duration { get; set; }
         private int _damage { get; set; }
 
         public DamageTrackerEntry(int player_id, string player_name, int duration, int damage)
         {
-            _player_id = player_id;
-            _player_name = player_name;
+            _playerId = player_id;
+            _playerName = player_name;
             _duration = duration;
             _damage = damage;
         }
@@ -27,12 +27,12 @@ namespace BossFight.Models
 
         public int GetPlayerId()
         {
-            return _player_id;
+            return _playerId;
         }
 
         public string GetPlayerName()
         {
-            return _player_name;
+            return _playerName;
         }
 
         public int GetDamage()

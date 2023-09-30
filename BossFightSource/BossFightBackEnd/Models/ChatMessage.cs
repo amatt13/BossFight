@@ -20,14 +20,13 @@ namespace BossFight.Models.DB
 
         [JsonIgnore]
         [PersistProperty]
-        public int? PlayerId 
-        { 
+        public int? PlayerId
+        {
             get { return Player?.PlayerId; }
-            set 
-            { 
-                if (Player == null) 
-                    Player = new Player();
-                Player.PlayerId = value; 
+            set
+            {
+                Player ??= new Player();
+                Player.PlayerId = value;
             }
         }
 
@@ -41,7 +40,7 @@ namespace BossFight.Models.DB
         [JsonIgnore]
         public Player Player { get; set; }
 
-        public string PlayerName 
+        public string PlayerName
         {
             get { return Player.Name; }
         }
@@ -66,12 +65,14 @@ namespace BossFight.Models.DB
             var result = new List<ChatMessage>();
 
             while (reader.Read())
-            {   
-                var ChatMessage = new ChatMessage();
-                ChatMessage.ChatMessageId = reader.GetInt(nameof(ChatMessageId));
-                ChatMessage.PlayerId = reader.GetInt(nameof(PlayerId));
-                ChatMessage.MessageContent = reader.GetString(nameof(MessageContent));
-                ChatMessage.Timestamp = reader.GetDateTime(nameof(Timestamp));
+            {
+                var ChatMessage = new ChatMessage
+                {
+                    ChatMessageId = reader.GetInt(nameof(ChatMessageId)),
+                    PlayerId = reader.GetInt(nameof(PlayerId)),
+                    MessageContent = reader.GetString(nameof(MessageContent)),
+                    Timestamp = reader.GetDateTime(nameof(Timestamp))
+                };
 
                 result.Add(ChatMessage);
             }

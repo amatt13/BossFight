@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!-- Suppress IDE1006 warning for the entire project -->
+    <NoWarn>IDE1006</NoWarn>
+  </PropertyGroup>
+</Project>
