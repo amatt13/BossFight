@@ -1,15 +1,13 @@
+const { text } = require("express");
+
 function PlayerCast(ability_name) {
     current_player_id = _player.player_id;
-    client_side_evaluation(ability_name);
-    SendAbilityCastMessage(ability_name);
+    if (client_side_evaluation(ability_name))
+    	SendAbilityCastMessage(ability_name);
 }
 
 function client_side_evaluation(ability_name) {
-    //
-}
-
-function Heal() {
-
+    return true;
 }
 
 async function SendAbilityCastMessage(ability_name) {
@@ -22,4 +20,12 @@ async function SendAbilityCastMessage(ability_name) {
 	};
 	const json_obj = JSON.stringify(obj);
 	socket.send(json_obj);
+}
+
+function handleAbilityCastResult(json_dict) {
+	ReadPlayerMessage(json_dict["update_player"]);
+	const text = json_dict["ability_text_result"];
+	if (text.length > 0) {
+		LogToCombatLog(text);
+	}
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace BossFight.Models
 {
-    public interface ITarget
+    public interface ITarget: IEffectHolder
     {
         int Hp { get; set; }
         int Mana { get; set; }
@@ -15,10 +15,5 @@ namespace BossFight.Models
         bool IsAlive();
         bool IsAtFullHealth();
         string PossessiveName();
-        /// <summary>
-        /// Returns true if the effect was added to the ITarget
-        /// </summary>
-        bool AddEffect(Effect pEffect);
-        void RemoveEffect(EffectType pEffectType);
     }
 }

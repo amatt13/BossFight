@@ -1,4 +1,4 @@
-let socket = undefined; 
+let socket = undefined;
 let conn_string = "";
 
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
@@ -14,7 +14,7 @@ else {
 
 
 socket = new WebSocket(conn_string);
-    
+
 socket.onopen = function (e) {
 	LogToGeneralLog("[open] Connection established");
 	FetchMostRecentMessages();
@@ -57,8 +57,11 @@ socket.onmessage = function (event) {
 	else if ("bought_player_class" in json_dict) {
 		playerAttemptedToBuyAPlayerClass(json_dict["bought_player_class"])
 	}
-	else if ("unlocked_classes" in json_dict) 
+	else if ("unlocked_classes" in json_dict)
 		showPlayerClassesMenu(json_dict["unlocked_classes"]);
+	else if ("ability_cast_result" in json_dict) {
+		handleAbilityCastResult(json_dict["ability_cast_result"])
+	}
 	else if ("error_message" in json_dict) {
 		error_message = json_dict["error_message"]
 		show_custom_alert(error_message, "alarm")
@@ -66,7 +69,7 @@ socket.onmessage = function (event) {
 	}
 	else
 		LogToGeneralLog(`Unkown message received '${json_dict}'`, true);
-	
+
 };
 
 socket.onclose = function (event) {
@@ -134,8 +137,8 @@ async function SendSignInRequest(pUserName, pPassword) {
 }
 
 async function EquipWeapon(weapon_id_to_equip) {
-	const obj = { 
-		request_key: "EquipWeapon", 
+	const obj = {
+		request_key: "EquipWeapon",
 		request_data: JSON.stringify({
 			player_id: _player.player_id,
             weapon_id: weapon_id_to_equip
@@ -146,8 +149,8 @@ async function EquipWeapon(weapon_id_to_equip) {
 }
 
 async function SellWeapon(weapon_id_to_equip) {
-	const obj = { 
-		request_key: "SellWeapon", 
+	const obj = {
+		request_key: "SellWeapon",
 		request_data: JSON.stringify({
 			player_id: _player.player_id,
             weapon_id: weapon_id_to_equip
@@ -159,8 +162,8 @@ async function SellWeapon(weapon_id_to_equip) {
 
 async function FetchMostRecentMessages(messages_to_fetch=10) {
     if (messages_to_fetch <= 100) {
-        const obj = { 
-            request_key: "FetchMostRecentMessages", 
+        const obj = {
+            request_key: "FetchMostRecentMessages",
             request_data: JSON.stringify({
                 messages_to_fetch: messages_to_fetch
             })
@@ -171,7 +174,7 @@ async function FetchMostRecentMessages(messages_to_fetch=10) {
 }
 
 async function FetchMonsterVotesTotals() {
-	const obj = { 
+	const obj = {
 		request_key: "FetchMonsterVotesTotals",
 		request_data: null
 	};

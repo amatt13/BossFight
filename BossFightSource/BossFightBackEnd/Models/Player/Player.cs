@@ -62,7 +62,7 @@ namespace BossFight.Models
         public IEnumerable<Effect> ActiveEffects { get; set; }
 
         [JsonIgnore]
-        private EffectManager _effectManager {get; set;} = new EffectManager();
+        private EffectManager _effectManager {get; set;}
 
         public Player() { }
 
@@ -106,6 +106,7 @@ namespace BossFight.Models
                     builtEffects.Add(newEffect);
                 }
                 player.ActiveEffects = builtEffects;
+                player._effectManager = new EffectManager(player.ActiveEffects);
 
                 player.PlayerWeaponList = new PlayerWeapon{ PlayerId =  player.PlayerId}.FindAllForParent(null, pConnection);
                 foreach(var x in player.PlayerWeaponList) { x.Player = player; }
@@ -340,17 +341,22 @@ namespace BossFight.Models
 
         public bool AddEffect(Effect pEffect)
         {
-            return _effectManager.AddEffect(ActiveEffects, pEffect);
+            return _effectManager.AddEffect(pEffect);
         }
 
         public void RemoveEffect(EffectType pEffectType)
         {
-            _effectManager.RemoveEffect(ActiveEffects, pEffectType);
+            _effectManager.RemoveEffect(pEffectType);
+        }
+
+        public bool HasEffect(EffectType pEffectType)
+        {
+            return _effectManager.HasEffect(pEffectType);
         }
 
         public void RemoveExpiredEffects()
         {
-           ActiveEffects = _effectManager.RemoveExpiredEffects(ActiveEffects);
+           _effectManager.RemoveExpiredEffects();
         }
     }
 }

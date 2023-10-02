@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BossFight.CustemExceptions;
 
 namespace BossFight.Models
@@ -10,22 +11,22 @@ namespace BossFight.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public ITarget Caster { get; set; }
-        public string UseAbilityText { get; set; }
+        public ITarget Target { get; set; }
+        public StringBuilder UseAbilityText { get; set; }
         public bool OnlyTargetMonster { get; set; }
         public int ManaCost { get; set; }
         public bool AffectsAllPlayers { get; set; }
-        public string AffectsAllPlayersStr { get; set; }
 
         public Ability(string pName, string pDescription, int pManaCost)
         {
             Name = pName;
             Description = pDescription;
             Caster = null;
-            UseAbilityText = "";
+            Target = null;
+            UseAbilityText = new StringBuilder();
             OnlyTargetMonster = false;
             ManaCost = pManaCost;
             AffectsAllPlayers = false;
-            AffectsAllPlayersStr = "";
         }
 
         public override string ToString()
@@ -37,27 +38,42 @@ namespace BossFight.Models
             return $"{ ManaCost } mana - /**{ Name }**{ onlyTargetMonsterString } -> { Description }";
         }
 
-        public virtual string UseAbility(ITarget pCaster, ITarget pTarget, bool pDontUseCasterEffect = false)
+        public virtual string UseAbility(ITarget pCaster, ITarget pTarget)
         {
-            UseAbilityText = "";
+            string result;
+            var errors = new StringBuilder();
             Caster = pCaster;
-            if (OnlyTargetMonster && pTarget is Player)
-                throw new MyException("Can only target monsters");
+            Target = pTarget;
 
-            if (!pDontUseCasterEffect)
-                CasterEffect();
-
-            if (pTarget != null)
+            if (CanCastAbility(errors)) {
                 TargetEffect(pTarget);
+                SubtractManaCostFromCaster();
+                result = UseAbilityText.ToString();
+            }
+            else
+            {
+                result = $"Could not use ability {Name}";
+                if (errors.Length >= 1)
+                {
+                    result += Environment.NewLine;
+                    result += errors.ToString();
+                }
+            }
 
-            SubtractManaCostFromCaster();
-            AddManaText();
-            return AffectsAllPlayersStr + UseAbilityText;
+            return result.TrimEnd(new char[] { '\r', '\n' });
         }
 
-        // The effect that will be executed on the caster
-        public virtual void CasterEffect()
-        { }
+        public virtual bool CanCastAbility(StringBuilder pError)
+        {
+            var canCastAbility = true;
+            if (ManaCost >= Caster.Mana)
+            {
+                pError.AppendLine("You do not have enough mana");
+                canCastAbility = false;
+            }
+
+            return canCastAbility;
+        }
 
         // The effect that will be executed on the target
         public virtual void TargetEffect(ITarget pTarget)
@@ -68,23 +84,7 @@ namespace BossFight.Models
 
         public void SubtractManaCostFromCaster()
         {
-            if (Caster.Mana < ManaCost)
-                throw new WTFException($"caster mana: { Caster.Mana} mana cost: { ManaCost }");
-
             Caster.Mana -= ManaCost;
-        }
-
-        public void AddManaText()
-        {
-            if (UseAbilityText.Any() && !UseAbilityText.EndsWith('\n'))
-                UseAbilityText += "\n";
-
-            UseAbilityText += $"**Mana:** You have { Caster.Mana } mana left";
-        }
-
-        public string BoldNameWithColon()
-        {
-            return $"**{Name}:**";
         }
     }
 }

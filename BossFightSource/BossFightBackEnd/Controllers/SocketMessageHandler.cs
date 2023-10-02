@@ -564,11 +564,17 @@ namespace BossFight.Controllers
                 if (RequestValidator.PlayerExists(playerId, out error))
                 {
                     var player = new Player().FindOne(playerId);
-                    AbilityController.CastAbility(abilityName, player, null, _logger);
+                    var abilityCastResult = AbilityController.CastAbility(abilityName, player, player, _logger);
                     player.Persist();
-                    var response = new Dictionary<string, Player>
+                    var response = new Dictionary<string, object>
                     {
-                        { "update_player", player }
+                        {
+                            "ability_cast_result", new Dictionary<string, object>
+                            {
+                               {"update_player", player},
+                               {"ability_text_result", abilityCastResult}
+                            }
+                        }
                     };
 
                     var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));

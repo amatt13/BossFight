@@ -25,37 +25,41 @@ namespace BossFight.Models
         void OnDamageDealt(ITarget pBuffHolder, ITarget pDamageDealer, ref int pDamageToBeDealt);
     }
 
-    public class EffectManager
+    public class EffectManager: IEffectHolder
     {
-        public EffectManager()
-        { }
+        private IEnumerable<Effect> _effectList;
 
-        public bool AddEffect(IEnumerable<Effect> pEffectList, Effect pEffect)
+        public EffectManager(IEnumerable<Effect> pEffectList)
+        {
+            _effectList = pEffectList;
+        }
+
+        public bool AddEffect(Effect pEffect)
         {
             var effectAdded = false;
-            var effectAlreadyAppliedToPlayer = pEffectList.Any(effect => effect.EffectType == pEffect.EffectType);
-            if (effectAlreadyAppliedToPlayer)
+            if (!HasEffect(pEffect.EffectType))
             {
-                // don't do anything
-            }
-            else
-            {
-                _ = pEffectList.Append(pEffect);
+                _effectList = _effectList.Append(pEffect);
                 effectAdded = true;
             }
 
             return effectAdded;
         }
 
-        public void RemoveEffect(IEnumerable<Effect> pEffectList, EffectType pEffectType)
+        public void RemoveEffect(EffectType pEffectType)
         {
-            pEffectList = pEffectList.Where(effect => effect.EffectType != pEffectType);
+            _effectList = _effectList.Where(effect => effect.EffectType != pEffectType);
         }
 
-        public IEnumerable<Effect> RemoveExpiredEffects(IEnumerable<Effect> pEffectList)
+        public bool HasEffect(EffectType pEffectType)
+        {
+            return _effectList.NullSafeAny(e => e.EffectType == pEffectType);
+        }
+
+        public void RemoveExpiredEffects()
         {
             var toBeKeptEffects = new List<Effect>();
-            foreach (var effect in pEffectList)
+            foreach (var effect in _effectList)
             {
                 if (effect.Duration <= 0 || effect.Charges <= 0)
                 {
@@ -67,7 +71,7 @@ namespace BossFight.Models
                 }
             }
 
-            return toBeKeptEffects;
+            _effectList = toBeKeptEffects;
         }
     }
 

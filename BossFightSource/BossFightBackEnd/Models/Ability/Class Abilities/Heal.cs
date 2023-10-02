@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace BossFight.Models
 {
@@ -11,55 +12,52 @@ namespace BossFight.Models
             : base("Heal", "Restores some of the target's HP", pManaCost: 6)
         { }
 
-        public override string UseAbility(ITarget pCaster, ITarget pTarget, bool pDontUseCasterEffect = false)
-        {
-            var dontUseCasterEffect = pTarget != null;
-            return base.UseAbility(pCaster, pTarget, dontUseCasterEffect);
-        }
-
-        public override void CasterEffect()
-        {
-            CastHeal(this.Caster);
-        }
-
         public override void TargetEffect(ITarget pTarget)
         {
             CastHeal(pTarget);
         }
 
-        private void CastHeal(ITarget target)
+        public override bool CanCastAbility(StringBuilder pError)
         {
-            if (!target.IsAtFullHealth())
+            var canCast = base.CanCastAbility(pError);
+            if (canCast)
             {
-                int amountRestored = FloorHeal + (int)Math.Floor(this.Caster.Level * 1.5);
-                int overHeal = 0;
-                if (amountRestored > HealLimit)
+                if (Target.IsAtFullHealth())
                 {
-                    amountRestored = HealLimit;
-                }
-
-                if (target.Hp + amountRestored > target.GetMaxHp())
-                {
-                    overHeal = amountRestored;
-                    amountRestored = target.GetMaxHp() - target.Hp;
-                    overHeal -= overHeal;
-                }
-
-                target.Hp += amountRestored;
-                UseAbilityText = $"You restored {amountRestored} of {target.PossessiveName()} HP ({target.Hp}/{target.GetMaxHp()} HP).";
-                if (overHeal > 0)
-                    UseAbilityText += $"\nYou over healed the target for {overHeal} HP";
-
-                if (this.Caster is Player playerCaster)
-                {
-                    int xpGained = (int)Math.Ceiling(amountRestored / 2.0);
-                    playerCaster.GainXp(xpGained);
-                    UseAbilityText += "\nYou gained {xpGained} XP.";
+                    canCast = false;
+                    pError.AppendLine($"{Target.Name} is already at full health.");
                 }
             }
-            else
+
+            return canCast;
+        }
+
+        private void CastHeal(ITarget target)
+        {
+            int amountRestored = FloorHeal + (int)Math.Floor(Caster.Level * 1.5);
+            int overHeal = 0;
+            if (amountRestored > HealLimit)
             {
-                UseAbilityText = $"{target.Name} is already at full health.";
+                amountRestored = HealLimit;
+            }
+
+            if (target.Hp + amountRestored > target.GetMaxHp())
+            {
+                overHeal = amountRestored;
+                amountRestored = target.GetMaxHp() - target.Hp;
+                overHeal -= amountRestored;
+            }
+
+            target.Hp += amountRestored;
+            UseAbilityText.AppendLine($"You restored {amountRestored} of {target.PossessiveName()} HP ({target.Hp}/{target.GetMaxHp()} HP).");
+            if (overHeal > 0)
+                UseAbilityText.AppendLine($"You over healed the target for {overHeal} HP");
+
+            if (Caster is Player playerCaster)
+            {
+                int xpGained = (int)Math.Ceiling(amountRestored / 2.0);
+                playerCaster.GainXp(xpGained);
+                UseAbilityText.AppendLine($"You gained {xpGained} XP.");
             }
         }
     }

@@ -13,19 +13,22 @@ namespace BossFight.Controllers
             {nameof(DivineShield), new DivineShield()},
         };
 
-        public static void CastAbility(string pAbilityName, ITarget pCaster, ITarget pTarget, ILogger<SocketMessageHandler> pLogger)
+        public static string CastAbility(string pAbilityName, ITarget pCaster, ITarget pTarget, ILogger<SocketMessageHandler> pLogger)
         {
+            string result;
             try
             {
                 Ability ability = AbilityDictionary[pAbilityName];
-                ability.UseAbility(pCaster, pTarget);
+                result = ability.UseAbility(pCaster, pTarget);
             }
             catch (KeyNotFoundException e)
             {
                 #pragma warning disable CA2254
                 pLogger.LogError(e.Message);
-                
+                result = $"An internal server error occured when trying to cast {pAbilityName} on {pTarget.Name}";
             }
+
+            return result;
         }
     }
 }

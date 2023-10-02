@@ -70,7 +70,7 @@ namespace BossFight.Models
         public MonsterTemplate MonsterTemplate { get; set; }
 
         [JsonIgnore]
-        private EffectManager _effectManager {get; set;} = new EffectManager();
+        private EffectManager _effectManager {get; set;}
 
         public IEnumerable<Effect> ActiveEffects { get; set; }
 
@@ -123,7 +123,16 @@ namespace BossFight.Models
 
                 monsterInstance.MonsterDamageTrackerList = new MonsterDamageTracker{MonsterInstanceId = monsterInstance.MonsterInstanceId}.FindAllForParent(null, pConnection);
                 monsterInstance.MonsterDamageTrackerList.ForEach(mdt => mdt.MonsterInstance = monsterInstance);
-                monsterInstance.ActiveEffects = new Effect{EffectHolderMonsterId = monsterInstance.MonsterInstanceId}.FindAllForParent(null, pConnection);
+
+                var effects = new Effect{EffectHolderMonsterId = monsterInstance.MonsterInstanceId}.FindAllForParent(null, pConnection);
+                var builtEffects = new List<Effect>();
+                foreach (var effect in effects)
+                {
+                    Effect newEffect = effect.BuildEffect();
+                    builtEffects.Add(newEffect);
+                }
+                monsterInstance.ActiveEffects = builtEffects;
+                monsterInstance._effectManager = new EffectManager(monsterInstance.ActiveEffects);
             }
 
             return result;
@@ -297,17 +306,22 @@ namespace BossFight.Models
 
         public bool AddEffect(Effect pEffect)
         {
-            return _effectManager.AddEffect(ActiveEffects, pEffect);
+            return _effectManager.AddEffect(pEffect);
         }
 
         public void RemoveEffect(EffectType pEffectType)
         {
-            _effectManager.RemoveEffect(ActiveEffects, pEffectType);
+            _effectManager.RemoveEffect(pEffectType);
+        }
+
+        public bool HasEffect(EffectType pEffectType)
+        {
+            return _effectManager.HasEffect(pEffectType);
         }
 
         public void RemoveExpiredEffects()
         {
-           ActiveEffects = _effectManager.RemoveExpiredEffects(ActiveEffects);
+           _effectManager.RemoveExpiredEffects();
         }
     }
 }
