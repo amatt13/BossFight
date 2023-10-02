@@ -88,8 +88,7 @@ socket.onerror = function (error) {
 };
 function UpdateUiTargets(json_dict)
 {
-	UpdateUiPlayerAttackedMonsterWithWeapon(json_dict) // omskriv
-	UpdateUiMonsterAttackedPlayer(json_dict)
+	UpdateUiPlayerAttackedMonsterWithWeapon(json_dict)
 }
 async function FetchActiveMonster() {
 	const obj = {

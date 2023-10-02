@@ -12,7 +12,7 @@ app.get('/', function (req, res) {
 // check if a fille in "/images/sprites/player_classes/" exists
 app.get('/findfiles/*', function (req, res) {
 	let path = '.' + req["url"].replace("findfiles", "/images/sprites/player_classes/");
-	path = path.replace("%20", " ");
+	path = path.replace("%20", " ").toLowerCase();
 	console.log(path);
 	if (fs.existsSync(path)) {
 		res.status(200).send({"filefound": true});

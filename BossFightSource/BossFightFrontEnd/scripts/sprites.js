@@ -1,6 +1,6 @@
 function file_exists(path)
 {
-    let result = false; 
+    let result = false;
 
     var http = new XMLHttpRequest();
     http.open('HEAD', "findfiles/" + path.split("/").at(-1), false);
@@ -14,13 +14,10 @@ function file_exists(path)
     return result;
 }
 
-
-function getPlayerClassSprite(class_name, preffered_body_type) {
-    let img = new Image();
-    
+function buildPlayerSpriteName(class_name, preffered_body_type, include_file_ening) {
     player_class_name_suffix = ""
     switch (preffered_body_type) {
-        case "masculine":            
+        case "masculine":
         case 2:
             player_class_name_suffix = "_m"
             break;
@@ -32,7 +29,19 @@ function getPlayerClassSprite(class_name, preffered_body_type) {
             break;
     }
 
-    path = `./images/sprites/player_classes/${class_name}${player_class_name_suffix}.png`;
+    result = `${class_name}${player_class_name_suffix}`;
+    if (include_file_ening) {
+        result += ".png"
+    }
+
+    return result;
+}
+
+function getPlayerClassSprite(class_name, preffered_body_type) {
+    let img = new Image();
+
+    full_class_name_with_file_ending = buildPlayerSpriteName(class_name, preffered_body_type, true);
+    path = `./images/sprites/player_classes/${full_class_name_with_file_ending}`;
     const player_class_with_preffered_body_type_exists = file_exists(path);
     if (player_class_with_preffered_body_type_exists) {
         img.src = path;
