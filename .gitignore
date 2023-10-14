@@ -353,10 +353,8 @@ MigrationBackup/
 
 # CUSTOOM STUFF
 */.vscode/
-BossFight Rest/TodoApi/.vscode/*
-BossFightBackEnd/appsettings.Development.json
-BossFightBackEnd/appsettings.json
+BossFightSource/BossFightBackEnd/appsettings.Development.json
+BossFightSource/BossFightBackEnd/appsettings.json
 *appsettings.Development.json
-BossFightFrontEnd/images/ui_icons/source/*
-log.txt
-SocketMessageHandler.txt
+BossFightSource/BossFightFrontEnd/images/ui_icons/source/*
+BossFightSource/logs/*
