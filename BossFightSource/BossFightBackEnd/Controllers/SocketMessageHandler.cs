@@ -371,9 +371,9 @@ namespace BossFight.Controllers
             if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
             {
                 var playerId = pJsonParameters["player_id"].GetInt32();
-                if (RequestValidator.PlayerExists(playerId))
+                if (RequestValidator.PlayerExists(playerId, out Player player, out error))
                 {
-                    var shop = ShopController.GetShopForPlayer(playerId);
+                    var shop = ShopController.GetShopForPlayer(player);
                     var response = new Dictionary<string, object>
                     {
                         { "shopMenu", shop }
@@ -399,12 +399,12 @@ namespace BossFight.Controllers
                 var playerId = pJsonParameters["player_id"].GetInt32();
                 var playerClassId = pJsonParameters["player_class_id"].GetInt32();
                 if (
-                    RequestValidator.PlayerExists(playerId, out error)
-                    && RequestValidator.PlayerClassExists(playerClassId, out error)
-                    && RequestValidator.PlayerIsEligibleForPlayerClassAcquisition(playerId, playerClassId, out error))
+                    RequestValidator.PlayerExists(playerId, out Player player, out error)
+                    && RequestValidator.PlayerClassExists(playerClassId, out PlayerClass playerClass, out error)
+                    && RequestValidator.PlayerIsEligibleForPlayerClassAcquisition(player, playerClass, out error))
                 {
-                    Tuple<bool, string> result = ShopController.BuyPlayerClass(playerClassId, playerId);
-                    var updatedPlayer = new Player{}.FindOne(playerId);
+                    Tuple<bool, string> result = ShopController.BuyPlayerClass(playerClass, player);
+                    var updatedPlayer = new Player().FindOne(playerId);
                     var response = new Dictionary<string, Dictionary<string, object>>
                     {
                         {
@@ -465,8 +465,8 @@ namespace BossFight.Controllers
                 var prefferedBodyTypeName = pJsonParameters["preffered_body_type"].GetString();
                 if (
                     RequestValidator.PlayerExists(playerId, out error)
-                    && RequestValidator.PlayerClassExists(playerClassId, out error)
-                    && RequestValidator.PlayerOwnsPlayerClass(playerId, playerClassId, out error)
+                    && RequestValidator.PlayerClassExists(playerClassId, out PlayerClass playerClass, out error)
+                    && RequestValidator.PlayerOwnsPlayerClass(playerId, playerClass, out error)
                     && RequestValidator.BodyTypeNameExists(prefferedBodyTypeName, out error))
                 {
                     var player = new Player().FindOne(playerId);
@@ -474,12 +474,12 @@ namespace BossFight.Controllers
 
                     // Do we need to update the PlayerPlayerClass relation?
                     var currentPlayerPlayerClassRelation = new PlayerPlayerClass{ PlayerId = playerId, Active = true }.FindOne();
-                    if (playerClassId != currentPlayerPlayerClassRelation.PlayerClassId)
+                    if (playerClass.PlayerClassId != currentPlayerPlayerClassRelation.PlayerClass.PlayerClassId)
                     {
                         currentPlayerPlayerClassRelation.Active = false;
                         currentPlayerPlayerClassRelation.Persist();
 
-                        var newPlayerPlayerClassActiveRelation = new PlayerPlayerClass{ PlayerId = playerId, PlayerClassId = playerClassId }.FindOne();
+                        var newPlayerPlayerClassActiveRelation = new PlayerPlayerClass{ PlayerId = playerId, PlayerClass = playerClass, PlayerClassId = playerClass.PlayerClassId }.FindOne();
                         newPlayerPlayerClassActiveRelation.Active = true;
                         newPlayerPlayerClassActiveRelation.Persist();
 

@@ -1,5 +1,3 @@
-const { text } = require("express");
-
 function PlayerCast(ability_name) {
     current_player_id = _player.player_id;
     if (client_side_evaluation(ability_name))

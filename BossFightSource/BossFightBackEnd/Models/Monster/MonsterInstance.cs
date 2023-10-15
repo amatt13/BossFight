@@ -64,9 +64,6 @@ namespace BossFight.Models
         public IEnumerable<MonsterDamageTracker> MonsterDamageTrackerList { get; set; }
 
         [JsonIgnore]
-        public Dictionary<int, int> FrenzyStackTracker { get; set; }  // key is player_id, value is frenzy stack lvl/size
-
-        [JsonIgnore]
         public MonsterTemplate MonsterTemplate { get; set; }
 
         [JsonIgnore]

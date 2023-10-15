@@ -71,6 +71,11 @@ namespace BossFight.Models
                 pError.AppendLine("You do not have enough mana");
                 canCastAbility = false;
             }
+            else if (Caster.IsDead())
+            {
+                pError.AppendLine("You are knocked out");
+                canCastAbility = false;
+            }
 
             return canCastAbility;
         }

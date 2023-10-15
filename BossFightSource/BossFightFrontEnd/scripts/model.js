@@ -16,7 +16,7 @@ class Weapon {
 	}
 
 	static CreateFromDict(weapon_dict) {
-		const weapon = new Weapon(weapon_dict["WeaponType"], weapon_dict["AttackMessage"], weapon_dict["BossWeapon"], weapon_dict["WeaponLvl"], weapon_dict["AttackPower"], weapon_dict["AttackCritChance"], weapon_dict["SpellPower"], 
+		const weapon = new Weapon(weapon_dict["WeaponType"], weapon_dict["AttackMessage"], weapon_dict["BossWeapon"], weapon_dict["WeaponLvl"], weapon_dict["AttackPower"], weapon_dict["AttackCritChance"], weapon_dict["SpellPower"],
 			weapon_dict["SpellCritChance"], weapon_dict["LootId"], weapon_dict["LootName"], weapon_dict["LootDropChance"], weapon_dict["Cost"]);
 		return weapon;
 	}
@@ -49,20 +49,18 @@ class PlayerWeapon {
 }
 
 class Monster {
-	constructor(hp, max_hp, level, monster_name, is_boss_monster, monster_instance_id, blind_duration, easier_to_crit_duration, easier_to_crit_Percentage, lower_attack_duration, lower_attack_percentage, stun_duration, attack_strength) {
+	constructor(hp, max_hp, level, monster_name, is_boss_monster, monster_instance_id, attack_strength) {
 		this.hp = hp;
 		this.max_hp = max_hp;
 		this.level = level;
 		this.monster_name = monster_name;
 		this.is_boss_monster = is_boss_monster;
 		this.monster_instance_id = monster_instance_id;
-		this.blind_duration = blind_duration;
-		this.easier_to_crit_duration = easier_to_crit_duration;
-		this.easier_to_crit_Percentage = easier_to_crit_Percentage;
-		this.lower_attack_duration = lower_attack_duration;
-		this.lower_attack_percentage = lower_attack_percentage;
-		this.stun_duration = stun_duration;
 		this.attack_strength = attack_strength;
+	}
+
+	static CreateFromDict(monster_dict) {
+		return new Monster(monster_dict["Hp"], monster_dict["MaxHp"], monster_dict["Level"], monster_dict["Name"], monster_dict["IsBossMonster"], monster_dict["MonsterInstanceId"], monster_dict["AttackStrength"]);
 	}
 }
 
@@ -95,7 +93,7 @@ class Player {
 		player_weapon_dict.forEach(pw => {
 			player_weapon_list.push(new PlayerWeapon(pw["WeaponId"], pw["WeaponName"]))
 		});
-		const player = new Player(playerDict_dict["PlayerId"], playerDict_dict["Name"], playerDict_dict["Hp"], playerDict_dict["Mana"], playerDict_dict["Gold"], weapon, player_player_class, player_weapon_list, playerDict_dict["UserName"], 
+		const player = new Player(playerDict_dict["PlayerId"], playerDict_dict["Name"], playerDict_dict["Hp"], playerDict_dict["Mana"], playerDict_dict["Gold"], weapon, player_player_class, player_weapon_list, playerDict_dict["UserName"],
 								  preffered_body_type);
 		return player;
 	}
@@ -111,6 +109,10 @@ class ChatMessage {
 		this.player_name = player_name
 		this.message_content = message_content
 		this.timestamp = timestamp
+	}
+
+	static CreateFromDict(chat_message_dict) {
+		return new ChatMessage(chat_message_dict["ChatMessageId"], chat_message_dict["PlayerName"], chat_message_dict["MessageContent"], Date.parse(chat_message_dict["Timestamp"]));
 	}
 }
 
@@ -153,9 +155,9 @@ class PlayerClass {
 		player_class_requirement_dict.forEach(pcr => {
 			player_class_requirement_list.push(new PlayerClassRequirement(pcr["PlayerClassId"], pcr["RequiredPlayerClassId"], pcr["LevelRequirement"], pcr["RequiredPlayerClassName"]))
 		});
-		
-		return new PlayerClass(player_class_dict["Abilities"], player_class_dict["AttackPowerBonus"], player_class_dict["BaseHealth"], player_class_dict["BaseMana"], player_class_dict["CritChance"], player_class_dict["HpRegenRate"], 
-			player_class_dict["HpScale"], player_class_dict["ManaRegenRate"], player_class_dict["ManaScale"], player_class_dict["Name"], player_class_dict["PlayerClassId"], player_class_requirement_list, 
+
+		return new PlayerClass(player_class_dict["Abilities"], player_class_dict["AttackPowerBonus"], player_class_dict["BaseHealth"], player_class_dict["BaseMana"], player_class_dict["CritChance"], player_class_dict["HpRegenRate"],
+			player_class_dict["HpScale"], player_class_dict["ManaRegenRate"], player_class_dict["ManaScale"], player_class_dict["Name"], player_class_dict["PlayerClassId"], player_class_requirement_list,
 			player_class_dict["ProficientWeaponTypesList"], player_class_dict["PurchasePrice"], player_class_dict["SpellPowerBonus"], player_class_dict["Description"])
 	}
 }
@@ -168,6 +170,33 @@ class BodyType {
 
 	static CreateFromDict(body_type_dict) {
 		return new BodyType(body_type_dict["BodyTypeId"], body_type_dict["Name"]);
+	}
+}
+
+class PlayerAttackSummary {
+	constructor(player_instance, MonsterInstance, PlayerTotalDamage, PlayerCrit, MonsterCrit, PlayerExtraDamageFromBuffs, PlayerXpEarned, MonsterAffectedByDots, MonsterRetaliateMessage, PlayerKilledMonster, MonsterTotalDamage) {
+		this.player = player_instance;
+		this.monster = MonsterInstance;
+		this.player_total_damage = PlayerTotalDamage;
+		this.player_crit = PlayerCrit;
+		this.monster_crit = MonsterCrit;
+		this.player_extra_damage_from_buffs = PlayerExtraDamageFromBuffs;
+		this.player_xp_earned = PlayerXpEarned;
+		this.monster_affected_by_dots = MonsterAffectedByDots;  //TODO delete me?
+		this.monster_retaliate_message = MonsterRetaliateMessage;
+		this.player_killed_monster = PlayerKilledMonster;
+		this.monster_total_damage = MonsterTotalDamage;
+	}
+
+	static CreateFromDict(player_attack_summary_dict) {
+		const player_dict = player_attack_summary_dict["Player"];
+		const monster_dict = player_attack_summary_dict["Monster"];
+		const player = Player.CreateFromDict(player_dict);
+		const monster = Monster.CreateFromDict(monster_dict);
+
+		return new PlayerAttackSummary(player, monster, player_attack_summary_dict["PlayerTotalDamage"], player_attack_summary_dict["PlayerCrit"], player_attack_summary_dict["MonsterCrit"],
+			player_attack_summary_dict["PlayerExtraDamageFromBuffs"], player_attack_summary_dict["PlayerXpEarned"], player_attack_summary_dict["MonsterAffectedByDots"],
+			player_attack_summary_dict["MonsterRetaliateMessage"], player_attack_summary_dict["PlayerKilledMonster"], player_attack_summary_dict["MonsterTotalDamage"]);
 	}
 }
 

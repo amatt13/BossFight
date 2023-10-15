@@ -4,6 +4,8 @@
 	<link rel="stylesheet" href="css/stylesheet.css" type="text/css" charset="utf-8" />
 	<link rel="stylesheet" href="css/shop.css" type="text/css" charset="utf-8" />
 	<link rel="stylesheet" href="css/playerClassMenu.css" type="text/css" charset="utf-8" />
+	<link rel="stylesheet" href="css/toolTip.css" type="text/css" charset="utf-8" />
+	<link rel="stylesheet" href="css/abilities.css" type="text/css" charset="utf-8" />
 	<meta charset="utf-8">
 	<meta http-equiv="content_security_policy" content="script-src 'self'; script-src-elem 'self'">
 	<title>Boss Fight</title>
@@ -91,12 +93,14 @@
 						Attack Monster
 					</button>
 				</div>
-				<abilities style="grid-column: 1; width: 200px; row-gap: 50px;">
-					<button type="button" class="btn-ability" onclick="PlayerCast('Divine Shield')">
+				<abilities id="player_abilities_list" style="grid-column: 1; width: 200px; row-gap: 50px;">
+					<button id="ability_DivineShield" type="button" class="btn-ability" onclick="PlayerCast('Divine Shield')">
 						<img src="./images/ui_icons/abilities/divineshield.png" class="max-size-100-percent">
 					</button>
-					<button type="button" class="btn-ability" onclick="PlayerCast('Heal')">
+					<button id="ability_Heal" type="button" class="btn-ability toolTip" onclick="PlayerCast('Heal')">
 						<img src="./images/ui_icons/abilities/heal.png" class="max-size-100-percent">
+						<span class="toolTipText">Heal your target for up 16 HP
+							Costs 6 Mana</span>
 					</button>
 					<button type="button" class="btn-ability">
 						<img src="./images/ui_icons/abilities/placeholder.png" class="max-size-100-percent">
@@ -157,7 +161,7 @@
 </body>
 </html>
 
-<!-- context menu -->
+<!-- Inventory context menu -->
 <ul class='custom-menu context-menu'>
 	<li id=custom_menu_equip data-action = "equip" data-equip_id=none>Equip weapon</li>
 	<li id=custom_menu_sell data-action = "sell" data-sell_id=none>Sell weapon</li>

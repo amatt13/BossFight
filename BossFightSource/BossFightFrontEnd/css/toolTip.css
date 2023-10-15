@@ -1,0 +1,33 @@
+.toolTip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.toolTip .toolTipText {
+    visibility: hidden;
+    width: 200px;
+    color: var(--default-font-colour);
+	background-color: var(--wallpaper-background-colour);
+    color: var(--default-font-colour);
+    text-align: center;
+    border: 1px solid var(--menu-border-colour);
+    border-radius: 5px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 1;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px;
+
+    /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */
+    /* opacity: 0; */
+    /* transition: opacity 1s; */
+}
+
+.toolTip:hover .toolTipText {
+    visibility: visible;
+    opacity: 1;
+    transition-delay:0.5s;
+    cursor: help;
+ }

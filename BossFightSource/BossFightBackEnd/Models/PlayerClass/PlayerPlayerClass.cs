@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BossFight.Extentions;
 using MySqlConnector;
 using System.Text.Json.Serialization;
+using BossFight.BossFightEnums;
 
 namespace BossFight.Models
 {
@@ -22,7 +23,7 @@ namespace BossFight.Models
 
         [JsonIgnore]
         [PersistProperty]
-        public int? PlayerClassId { get; set; }
+        public PlayerClassEnum? PlayerClassId { get; set; }
 
         [PersistProperty]
         public int XP { get; set; }
@@ -89,13 +90,13 @@ namespace BossFight.Models
                 {
                     PlayerPlayerClassId = reader.GetInt(nameof(PlayerPlayerClassId)),
                     PlayerId = reader.GetInt(nameof(PlayerId)),
-                    PlayerClassId = reader.GetInt(nameof(PlayerClassId)),
+                    PlayerClassId = (PlayerClassEnum)reader.GetInt(nameof(PlayerClassId)),
                     XP = reader.GetInt(nameof(XP)),
                     Level = reader.GetInt(nameof(Level)),
                     Active = reader.GetBooleanNullable(nameof(Active))
                 };
 
-                playerPlayerClass.PlayerClass = new PlayerClass().FindOne(playerPlayerClass.PlayerClassId);
+                playerPlayerClass.PlayerClass = PlayerClassFactory.CreatePlayerClass(playerPlayerClass);
                 result.Add(playerPlayerClass);
             }
 

@@ -13,4 +13,9 @@ namespace BossFight.CustemExceptions
         public WTFException(string message) : base(message) { }
         public WTFException(string message, System.Exception inner) : base(message, inner) { }
     }
+
+    public class InvalidPlayerClassException : System.Exception
+    {
+        public InvalidPlayerClassException(string message) : base(message) { }
+    }
 }

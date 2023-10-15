@@ -9,6 +9,7 @@
 	--shadow-colour: hsl(256, 15%, 14%);
 	--text-background-colour: hsl(318, 11%, 35%);
 	--default-font-colour: hsl(349, 19%, 45%);
+	--menu-border-colour: hsl(0, 0%, 80%);
 }
 
 progress[value] {
@@ -64,11 +65,8 @@ Body {
 	z-index: 1000;
 	position: absolute;
 	overflow: hidden;
-	border: 1px solid #CCC;
+	border: 1px solid var(--menu-border-colour);
 	white-space: nowrap;
-	font-family: sans-serif;
-	background: #FFF;
-	color: #333;
 	border-radius: 5px;
 }
 
@@ -104,13 +102,8 @@ Body {
 }
 
 .custom-menu li:hover {
-	background-color: #DEF;
-}
-
-.btn-ability {
 	background-color: var(--border-colour);
-	color: var(--shadow-colour);
-	text-align: center;
+	font-style: italic;
 }
 
 .btn-primary {
@@ -119,11 +112,13 @@ Body {
 	height: 25px;
 	text-align: center;
 	padding-bottom: 7px;
+	cursor: pointer;
 }
 
 
 input:-webkit-autofill {
 	-webkit-box-shadow: 0 0 0 30px var(--text-background-colour) inset !important;
+	box-shadow: 0 0 0 30px var(--text-background-colour) inset !important;
 }
 
 @supports (-moz-appearance:none) {

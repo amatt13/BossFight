@@ -11,10 +11,10 @@ namespace BossFight.Controllers
 {
     public static class ShopController
     {
-        public static Dictionary<string, object> GetShopForPlayer(int pPlayerId)
+        public static Dictionary<string, object> GetShopForPlayer(Player pPlayer)
         {
             var shop = new Dictionary<string, object>();
-            var playerClasses = PlayerUnlocks.UnlockedClasses(pPlayerId, false);
+            var playerClasses = PlayerUnlocks.UnlockedClasses(pPlayer, false);
             shop["playerClasses"] = playerClasses;
 
             //TODO add weapons as well
@@ -22,31 +22,29 @@ namespace BossFight.Controllers
             return shop;
         }
 
-        public static Tuple<bool, string> BuyPlayerClass(int pPlayerClassId, int pPlayerId)
+        public static Tuple<bool, string> BuyPlayerClass(PlayerClass playerClassToPurchase, Player pPurchasingPlayer)
         {
             var resultText = "";
             var purchaseComplete = false;
-            var playerClassToPurchase = new PlayerClass{}.FindOne(pPlayerClassId);
-            var purchasingPlayer = new Player{}.FindOne(pPlayerId);
 
-            if (purchasingPlayer.Gold >= playerClassToPurchase.PurchasePrice)
+            if (pPurchasingPlayer.Gold >= playerClassToPurchase.PurchasePrice)
             {
                 using var connection = GlobalConnection.GetNewOpenConnection();
                 var transaction = connection.BeginTransaction();
                 try
                 {
-                    purchasingPlayer.Gold -= playerClassToPurchase.PurchasePrice;
+                    pPurchasingPlayer.Gold -= playerClassToPurchase.PurchasePrice;
                     var purchasedPlayerClass = new PlayerPlayerClass {
-                        PlayerId = purchasingPlayer.PlayerId, 
-                        PlayerClassId = playerClassToPurchase.PlayerClassId.Value, 
-                        Level = 1, 
+                        PlayerId = pPurchasingPlayer.PlayerId,
+                        PlayerClassId = playerClassToPurchase.PlayerClassId,
+                        Level = 1,
                         XP = 0,
                         Active = false};
-                    
-                    purchasingPlayer.Persist();
+
+                    pPurchasingPlayer.Persist();
                     purchasedPlayerClass.Persist();
                     transaction.Commit();
-                    
+
                     purchaseComplete = true;
                     resultText = $"You bough the {playerClassToPurchase.Name} for {playerClassToPurchase.PurchasePrice:n0} gold";
                 }
@@ -63,12 +61,12 @@ namespace BossFight.Controllers
             }
             else
             {
-                resultText = $"You can't afford '{playerClassToPurchase.Name}'. Current gold: {purchasingPlayer.Gold:n0}, item cost: {playerClassToPurchase.PurchasePrice:n0}";
+                resultText = $"You can't afford '{playerClassToPurchase.Name}'. Current gold: {pPurchasingPlayer.Gold:n0}, item cost: {playerClassToPurchase.PurchasePrice:n0}";
             }
 
             return new Tuple<bool, string>(purchaseComplete, resultText);
         }
-        
+
 
         // currently unused
         public static string AutoSellItem(string pLootName, string pClientId)
@@ -78,7 +76,7 @@ namespace BossFight.Controllers
             {
                 var autoSellingPlayer = new Player();
                 var weaponToUpdateAutoSellStatus = new Weapon(-1, "", "");
-                
+
                 if (autoSellingPlayer.LootIsInAutoSellList(weaponToUpdateAutoSellStatus.LootId))
                 {
                     autoSellingPlayer.AutoSellList.Remove(weaponToUpdateAutoSellStatus.LootId);
@@ -89,7 +87,7 @@ namespace BossFight.Controllers
                     autoSellingPlayer.AutoSellList.Add(weaponToUpdateAutoSellStatus.LootId);
                     mes = $"Added '{weaponToUpdateAutoSellStatus.LootName}' to auto-sell list";
                 }
-                
+
                 // else
                 // {
                 //     mes = "Loot could not be added/removed from auto-sell list";

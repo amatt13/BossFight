@@ -26,8 +26,10 @@ socket.onopen = function (e) {
 socket.onmessage = function (event) {
 	var json_dict = JSON.parse(event.data);
 
-	if ("fetch_active_monster" in json_dict)
-		UpdateUiActiveMonster(json_dict["fetch_active_monster"]);
+	if ("fetch_active_monster" in json_dict) {
+		const monster = Monster.CreateFromDict(json_dict["fetch_active_monster"]);
+		UpdateUiActiveMonster(monster);
+	}
 	else if ("update_player" in json_dict)
 		ReadPlayerMessage(json_dict["update_player"]);
 	else if ("update_player_sold_weapon" in json_dict)
@@ -88,7 +90,8 @@ socket.onerror = function (error) {
 };
 function UpdateUiTargets(json_dict)
 {
-	UpdateUiPlayerAttackedMonsterWithWeapon(json_dict)
+	summary = PlayerAttackSummary.CreateFromDict(json_dict);
+	UpdateUiPlayerAttackedMonsterWithWeapon(summary);
 }
 async function FetchActiveMonster() {
 	const obj = {

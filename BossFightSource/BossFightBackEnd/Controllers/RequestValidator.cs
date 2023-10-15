@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using BossFight.BossFightEnums;
+using BossFight.CustemExceptions;
 using BossFight.Extentions;
 using BossFight.Models;
 using Ganss.Xss;
@@ -24,16 +25,16 @@ namespace BossFight.Controllers
                 player owns at least two coppies of weapon and it is equipped
             */
             cmd.CommandText = @$"SELECT
-CASE 
-WHEN p.WeaponId != pw.WeaponId 
+CASE
+WHEN p.WeaponId != pw.WeaponId
     THEN TRUE
-WHEN COUNT(pw.WeaponId) > 1 
+WHEN COUNT(pw.WeaponId) > 1
     THEN TRUE
 ELSE FALSE
 END AS CanSell
 FROM { nameof(PlayerWeapon) } pw
-JOIN { nameof(Player) } p 
-ON p.PlayerId = pw.PlayerId 
+JOIN { nameof(Player) } p
+ON p.PlayerId = pw.PlayerId
 WHERE pw.PlayerId = @player_id
 AND pw.WeaponId = @weapon_id
 GROUP BY pw.WeaponId";
@@ -66,14 +67,14 @@ GROUP BY pw.WeaponId";
                 player owns weapon (and it is not equipped)
             */
             cmd.CommandText = @$"SELECT
-CASE 
-WHEN p.WeaponId != pw.WeaponId 
+CASE
+WHEN p.WeaponId != pw.WeaponId
     THEN TRUE
 ELSE FALSE
 END AS CanEquip
 FROM { nameof(PlayerWeapon) } pw
-JOIN { nameof(Player) } p 
-ON p.PlayerId = pw.PlayerId 
+JOIN { nameof(Player) } p
+ON p.PlayerId = pw.PlayerId
 WHERE pw.PlayerId = @player_id
 AND pw.WeaponId = @weapon_id
 GROUP BY pw.WeaponId";
@@ -104,9 +105,9 @@ GROUP BY pw.WeaponId";
             using var connection = GlobalConnection.GetNewOpenConnection();
             using var cmd = connection.CreateCommand();
 
-            cmd.CommandText = $@"SELECT 
+            cmd.CommandText = $@"SELECT
 p.Hp > 0 AND p.{ nameof(Player.WeaponId) } IS NOT NULL AND mi.{ nameof(MonsterInstance.MonsterInstanceId) } IS NOT NULL AND mi.Hp > 0 as ""can attack"",
-CASE 
+CASE
     WHEN p.Hp <= 0
         THEN 'Not enough health'
     WHEN p.WeaponId IS NULL
@@ -116,11 +117,11 @@ CASE
     WHEN mi.Hp <= 0
         THEN 'Monster is already dead'
 END AS error
-FROM Player p 
-LEFT JOIN MonsterInstance mi 
-ON mi.Active = TRUE 
+FROM Player p
+LEFT JOIN MonsterInstance mi
+ON mi.Active = TRUE
 WHERE p.PlayerId = @{ nameof(pPlayerId) }";
-            
+
             cmd.Parameters.AddParameter(pPlayerId, nameof(pPlayerId));
             var reader = cmd.ExecuteReader();
             if (reader.Read())
@@ -134,7 +135,7 @@ WHERE p.PlayerId = @{ nameof(pPlayerId) }";
             }
             reader.Close();
             connection.Close();
-            
+
             return playerCanAttackMonsterWithEquippedWeapon;
         }
 
@@ -202,7 +203,7 @@ AND p.Password = {pPassword.ToDbString()}";
                 {
                     try
                     {
-                        new HtmlSanitizer().Sanitize(pMessage);                     
+                        new HtmlSanitizer().Sanitize(pMessage);
                     }
                     catch (Exception e)
                     {
@@ -242,7 +243,7 @@ AND p.Password = {pPassword.ToDbString()}";
         public static bool ValidateVoteForMonsterTier(int pPlayerId, int pMonsterInstanceId, int pVote, out string pError)
         {
             var errors = new List<String>();
-            
+
             if (!PlayerExists(pPlayerId))
             {
                 errors.Add("Could not find player");
@@ -294,6 +295,15 @@ AND p.Password = {pPassword.ToDbString()}";
             return playerExists;
         }
 
+        public static bool PlayerExists(int pPlayerId, out Player pPlayer, out string pError)
+        {
+            pPlayer = new Player().FindOne(pPlayerId);
+            var playerExists = pPlayer != null && pPlayer.PlayerId.HasValue;
+            pError = playerExists? String.Empty : "Could not find player";
+
+            return playerExists;
+        }
+
         public static bool BodyTypeNameExists(string pBodyTypeName, out string pError)
         {
             var sql = $@"SELECT TRUE FROM { nameof(BodyType) } WHERE { nameof(BodyType.Name) } = @{ nameof(BodyType.Name) }";
@@ -305,13 +315,21 @@ AND p.Password = {pPassword.ToDbString()}";
             return bodyTypeExists;
         }
 
-        public static bool PlayerClassExists(int pPlayerClassId, out string pError)
+        public static bool PlayerClassExists(int pPlayerClassId, out PlayerClass pPlayerClass, out string pError)
         {
-            var sql = $@"SELECT TRUE FROM { nameof(PlayerClass) } WHERE { nameof(PlayerClass.PlayerClassId) } = @{ nameof(PlayerClass.PlayerClassId) }";
-            var cmd = new MySqlCommand(sql);
-            cmd.Parameters.AddParameter(pPlayerClassId, nameof(PlayerClass.PlayerClassId));
-            var playerClassExists = GlobalConnection.SingleValue<bool>(cmd);
-            pError = playerClassExists ? String.Empty : "Could not find class";
+            var playerClassExists = false;
+
+            try
+            {
+                pPlayerClass = PlayerClassFactory.CreatePlayerClass(pPlayerClassId);
+                pError = String.Empty;
+                playerClassExists = true;
+            }
+            catch (InvalidPlayerClassException e)
+            {
+                pPlayerClass = null;
+                pError = e.Message;
+            }
 
             return playerClassExists;
         }
@@ -327,11 +345,11 @@ AND p.Password = {pPassword.ToDbString()}";
             return monsterInstanceExists;
         }
 
-        public static bool PlayerIsEligibleForPlayerClassAcquisition(int pPlayerId, int pPlayerClassId, out string pError)
+        public static bool PlayerIsEligibleForPlayerClassAcquisition(Player pPlayer, PlayerClass pPlayerClass, out string pError)
         {
             pError = String.Empty;
-            var unlockStatusList = PlayerUnlocks.UnlockedClasses(pPlayerId, false);
-            var alreadyOwnedPlayerClass = unlockStatusList.FirstOrDefault(us => us.Aquired && us.PlayerClass.PlayerClassId == pPlayerClassId)?.PlayerClass;
+            var unlockStatusList = PlayerUnlocks.UnlockedClasses(pPlayer, false);
+            var alreadyOwnedPlayerClass = unlockStatusList.FirstOrDefault(us => us.Aquired && us.PlayerClass.PlayerClassId == pPlayerClass.PlayerClassId)?.PlayerClass;
 
             // have the player already bought this class?
             if (alreadyOwnedPlayerClass != null)
@@ -339,7 +357,7 @@ AND p.Password = {pPassword.ToDbString()}";
                 pError = $"You already own {alreadyOwnedPlayerClass.Name}";
             }
             // is the class even on the list of available classes? (sanity check)
-            else if (!unlockStatusList.Any(us => us.PlayerClass.PlayerClassId == pPlayerClassId))
+            else if (!unlockStatusList.Any(us => us.PlayerClass.PlayerClassId == pPlayerClass.PlayerClassId))
             {
                 pError = "You haven't unlocked this class yet";
             }
@@ -355,14 +373,14 @@ AND p.Password = {pPassword.ToDbString()}";
             return Enum.IsDefined(pEnum.GetType(), pValue);
         }
 
-        public static bool PlayerOwnsPlayerClass(int pPlayerId, int pPlayerClassId, out string pError)
+        public static bool PlayerOwnsPlayerClass(int pPlayerId, PlayerClass pPlayerClass, out string pError)
         {
-            var sql = $@"SELECT TRUE FROM { nameof(PlayerPlayerClass) } 
+            var sql = $@"SELECT TRUE FROM { nameof(PlayerPlayerClass) }
                         WHERE { nameof(PlayerPlayerClass.PlayerId) } = @playerId
                         AND { nameof(PlayerPlayerClass.PlayerClassId) } = @playerClassId";
             var cmd = new MySqlCommand(sql);
             cmd.Parameters.AddParameter(pPlayerId, "playerId");
-            cmd.Parameters.AddParameter(pPlayerClassId, "playerClassId");
+            cmd.Parameters.AddParameter(pPlayerClass.PlayerClassId, "playerClassId");
             var playerOwnsPlayerClass = GlobalConnection.SingleValue<bool>(cmd);
 
             pError = playerOwnsPlayerClass ? String.Empty : "You don't own this class";

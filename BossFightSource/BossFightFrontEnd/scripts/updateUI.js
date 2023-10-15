@@ -1,5 +1,5 @@
-function UpdateUiActiveMonster(monster_dict, monster_is_new = false) {
-	_monster1 = CreateMonsterFromDict(monster_dict);
+function UpdateUiActiveMonster(monster, monster_is_new = false) {
+	_monster1 = monster;
 	document.getElementById("monsterSprite").src = `./images/sprites/monsters/${_monster1.monster_name[0].toLowerCase() + _monster1.monster_name.substr(1, _monster1.monster_name.length-1).replaceAll(" ", "")}.png`
 	if (monster_is_new ) {
 		voteUpButton.classList.remove("highligtedButton")
@@ -56,51 +56,42 @@ function UpdateUiPlayerSoldWeapon(json_dict) {
 }
 
 function UpdateUiPlayerEquippedWeapon(weapon_dict) {
-	const weapon = CreateWeaponFromWeaponDict(weapon_dict);
+	const weapon = Weapon.CreateFromDict(weapon_dict);
 	_player.weapon = weapon;
 	document.getElementById("player_equipped_weapon_name").innerHTML = _player.weapon.loot_name;
 	BlinkDiv("player_equipped_weapon_name");
 }
 
-function UpdateUiPlayerAttackedMonsterWithWeapon(summary_dict) {
-	let monster_dict = summary_dict["Monster"];
-	UpdateUiActiveMonster(monster_dict);
-	let player_dict = summary_dict["Player"];
-	ReadPlayerMessage(player_dict);
+function UpdateUiPlayerAttackedMonsterWithWeapon(summary) {
+	UpdateUiActiveMonster(summary.monster);
+	UpdateUiPlayerStats(summary.player);
 	BlinkDiv("player_xp");
-	player_combat_log_message = CreateAttackSummaryMessage(summary_dict["Player"], summary_dict["Monster"], summary_dict["PlayerCrit"], summary_dict["PlayerTotalDamage"])
+	player_combat_log_message = CreateAttackSummaryMessage(summary)
 	LogToCombatLog(player_combat_log_message);
-	const monster_message = summary_dict["MonsterRetaliateMessage"];
-	if (monster_message != undefined && monster_message.length > 0) {
-		LogToCombatLog(monster_message);
+	if (summary.monster_retaliate_message != null && summary.monster_retaliate_message.length > 0) {
+		LogToCombatLog(summary.monster_retaliate_message);
 	}
-	CanvasShowDamageAnimationForPlayer(summary_dict["MonsterTotalDamage"]);
-	CanvasShowDamageAnimation(summary_dict["PlayerTotalDamage"]);
+	CanvasShowDamageAnimationForPlayer(summary.monster_total_damage);
+	CanvasShowDamageAnimation(summary.player_total_damage);
 }
 
-function CreateAttackSummaryMessage(playerDict, monsterDict, playerCritDict, totalDamage) {
+function CreateAttackSummaryMessage(summary) {
 	let player_combat_log_message = ""
-	const player_dict = playerDict;
-	const monster_dict = monsterDict;
-	const player = Player.CreateFromDict(player_dict);
-	const monster_name = monster_dict["Name"]
-	const player_attack_was_crit = playerCritDict
-	const monster_total_damage = totalDamage
 
-	if (player_attack_was_crit) {
+	if (summary.player_crit) {
 		player_combat_log_message += "Critical hit!\n"
 	}
 
 	let hit_message = "You hit";
-	if (player.weapon.attack_message != null && player.weapon.attack_message != "") {
-		hit_message = player.weapon.attack_message;
+	if (summary.player.weapon.attack_message != null && summary.player.weapon.attack_message != "") {
+		hit_message = summary.player.weapon.attack_message;
 		// if the last char is NOT '.', '?', or '!'
 		if (!/[.?!]/.test(hit_message.slice(-1))) {
 			hit_message += "."
 		}
 	} // recreate the function to use the same in the future
 
-	player_combat_log_message += `${hit_message} ${monster_name} takes ${monster_total_damage} damage`;
+	player_combat_log_message += `${hit_message} ${summary.monster.monster_name} takes ${summary.player_total_damage} damage`;
 	return player_combat_log_message
 }
 
