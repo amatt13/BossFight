@@ -114,7 +114,7 @@ namespace BossFight.Models
                 additionalSearchCriteriaText += $" AND { nameof(PlayerId) } = { ppc.PlayerId.Value }\n";
 
             if (ppc.PlayerClassId.HasValue)
-                additionalSearchCriteriaText += $" AND { nameof(PlayerClassId) } = { ppc.PlayerClassId.Value }\n";
+                additionalSearchCriteriaText += $" AND { nameof(PlayerClassId) } = { (int)ppc.PlayerClassId.Value }\n";
 
             return TrimAdditionalSearchCriteriaText(additionalSearchCriteriaText, pStartWithAnd);
         }

@@ -21,9 +21,16 @@ namespace BossFight.Extentions
                 string _ => DbType.StringFixedLength,
                 uint _ => DbType.UInt32,
                 ulong _ => DbType.UInt64,
+                Enum _ => DbType.Int32,
                 _ => DbType.Object,
             };
-            
+
+            var dbValue = pParameterValue switch
+            {
+                Enum _ => ((int)pParameterValue).ToString(),
+                _ => pParameterValue?.ToString()
+            };
+
             if (!pParameterName.StartsWith("@"))
                 pParameterName = '@' + pParameterName;
 
@@ -31,7 +38,7 @@ namespace BossFight.Extentions
             {
                 ParameterName = pParameterName,
                 DbType = dbType,
-                Value = pParameterValue?.ToString(),
+                Value = dbValue,
             };
 
             pMySqlParameterCollection.Add(sqlParam);
