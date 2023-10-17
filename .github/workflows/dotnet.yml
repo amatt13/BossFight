@@ -31,4 +31,5 @@ jobs:
     - name: Test
       run: |
         cd ./BossFight.Tests
-        dotnet test --no-build --verbosity normal
+        dotnet restore
+        dotnet test --no-build
