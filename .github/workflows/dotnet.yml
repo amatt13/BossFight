@@ -25,7 +25,9 @@ jobs:
         cd ./BossFightSource
         dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: |
+        cd ./BossFightSource
+        dotnet build --no-restore
     - name: Test
       run: |
         cd ./BossFight.Tests
