@@ -1,4 +1,5 @@
 # BossFight
+[![.NET](https://github.com/amatt13/BossFight/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/amatt13/BossFight/actions/workflows/dotnet.yml)
 
 using "dotnet add package MySqlConnector"
 
