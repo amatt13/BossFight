@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - name: go to test directory
-      run: cd BossFight.Tests
+      run: ls -la && cd BossFight.Tests
     - name: Restore dependencies
       run: dotnet restore
     - name: Test
