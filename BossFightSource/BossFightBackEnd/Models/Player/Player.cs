@@ -5,6 +5,7 @@ using BossFight.Extentions;
 using BossFight.Models.Loot;
 using MySqlConnector;
 using System.Text.Json.Serialization;
+using BossFight.BossFightEnums;
 
 namespace BossFight.Models
 {
@@ -47,6 +48,9 @@ namespace BossFight.Models
 
         [PersistProperty]
         public string Name { get; set; } = "DEFAULT EFFECT";
+
+        public List<MonsterType> MonsterTypeList { get; } = new List<MonsterType>{MonsterType.PLAYER};
+
 
         // From other tables
         public PlayerPlayerClass PlayerPlayerClass { get; set; }

@@ -1,14 +1,5 @@
-using BossFight.Models;
-
 namespace BossFight.Models
 {
-    public class Smite : Ability
-    {
-        public Smite()
-        : base("Smite", "Deals bonus damage to undead monsters", 6)
-        { }
-    }
-
     public class Execute : Ability
     {
         private const float _monster_health_percentage = 20.0f;
@@ -93,13 +84,6 @@ namespace BossFight.Models
     {
         public Sacrifice()
         : base("Sacrifice", "Sanctify weapon with your blood to deal bonus holy damage. Also deals additional damage to undead monsters", 8)
-        { }
-    }
-
-    public class GreaterHeal : Ability
-    {
-        public GreaterHeal()
-        : base("Greater Heal", "A potent healing spell", 15)
         { }
     }
 

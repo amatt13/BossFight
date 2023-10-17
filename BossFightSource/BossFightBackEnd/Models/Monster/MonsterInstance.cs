@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BossFight.BossFightEnums;
-using BossFight.CustemExceptions;
 using BossFight.Extentions;
 using MySqlConnector;
 using System.Text.Json.Serialization;
@@ -76,6 +75,11 @@ namespace BossFight.Models
         public bool IsBossMonster { get { return MonsterTemplate.BossMonster.GetValueOrDefault(false); } }
 
         public double AttackStrength { get => Level / 2; }
+
+        public List<MonsterType> MonsterTypeList
+        {
+            get { return MonsterTemplate.MonsterTypeList; }
+        }
 
         public MonsterInstance () { }
 
@@ -154,7 +158,7 @@ namespace BossFight.Models
 
         public bool HasMonsterType(List<MonsterType> pMonsterTypeList)
         {
-            return pMonsterTypeList.Any(mt => HasMonsterType(mt));
+            return pMonsterTypeList.Any(HasMonsterType);
         }
 
         public bool HasMonsterType(MonsterType monsterType)
