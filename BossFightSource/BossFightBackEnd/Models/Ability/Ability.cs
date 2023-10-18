@@ -2,19 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BossFight.CustemExceptions;
+using System.Text.Json.Serialization;
 
 namespace BossFight.Models
 {
     public class Ability
     {
-        public string Name { get; set; }
+        public string Name { get; private set; }
+
         public string Description { get; set; }
+
+        [JsonIgnore]
         public ITarget Caster { get; set; }
+
+        [JsonIgnore]
         public ITarget Target { get; set; }
+
+        [JsonIgnore]
         public StringBuilder UseAbilityText { get; set; }
+
         public bool OnlyTargetMonster { get; set; }
+
         public int ManaCost { get; set; }
+
         public bool AffectsAllPlayers { get; set; }
 
         public Ability(string pName, string pDescription, int pManaCost)
@@ -75,6 +85,12 @@ namespace BossFight.Models
             {
                 pError.AppendLine("You are knocked out");
                 canCastAbility = false;
+            }
+
+            if (Caster is Player player)
+            {
+                var playerPlayerClass = player.PlayerPlayerClass;
+                var playerClass = playerPlayerClass.PlayerClass.RecalculateUnlockedAbilities(playerPlayerClass.Level).Any(ability => ability.Name == this.Name);  // Just check for the name... should be good enough
             }
 
             return canCastAbility;

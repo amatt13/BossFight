@@ -54,13 +54,13 @@ namespace BossFight.Models
 
         // From other tables
         public PlayerPlayerClass PlayerPlayerClass { get; set; }
+        [JsonIgnore]
         public IEnumerable<PlayerPlayerClass> UnlockedPlayerPlayerClassList { get; set; }
         public List<int?> LootList { get; set; }  //TODO change to real loot list (combinded list -> see PlayerWeapon.cs)
         public Weapon Weapon { get; set; }
         public List<int?> AutoSellList { get; set; }
         public int Level { get => PlayerPlayerClass.Level; }
         public int BonusMagicDmg { get; set; }
-        public int BonusMagicDmgDuration { get; set; }
         public IEnumerable<PlayerWeapon> PlayerWeaponList { get; set; }
         public BodyType PrefferedBodyType { get; set; }
         public IEnumerable<Effect> ActiveEffects { get; set; }
@@ -97,6 +97,7 @@ namespace BossFight.Models
             {
                 player.PlayerPlayerClass = new PlayerPlayerClass{Active = true, PlayerId = player.PlayerId}.FindAllForParent(null, pConnection).First();
                 player.PlayerPlayerClass.Player = player;
+                player.PlayerPlayerClass.PlayerClass.RecalculateUnlockedAbilities(player.Level);
                 player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{PlayerId = player.PlayerId}.FindAllForParent(null, pConnection);
                 player.Weapon = (Weapon)new Weapon().FindOneForParent(player.WeaponId, pConnection);
                 player.PrefferedBodyType = new BodyType{}.FindOneForParent(player.PreferredBodyTypeId, pConnection);
@@ -136,8 +137,6 @@ namespace BossFight.Models
         {
             var isCrit = pTargetMonster.AttackOnMonsterIsCrit(GetAttackCritChance());
             var dmg = Weapon.AttackPower + GetAttackBonus();
-            if (BonusMagicDmgDuration > 0)
-                BonusMagicDmgDuration -= 1;
 
             if (isCrit)
             {
@@ -275,34 +274,6 @@ namespace BossFight.Models
             critChance += pBonusCritChance;
             var roll = _random.Next(0, 101);
             return roll <= critChance;
-        }
-
-        public bool BuffBonusDamageIfStronger(int bonusDamage, int duration)
-        {
-            var buffApplied = false;
-            if (bonusDamage > BonusMagicDmg || bonusDamage == BonusMagicDmg && duration > BonusMagicDmgDuration)
-            {
-                BonusMagicDmgDuration = duration;
-                BonusMagicDmg = bonusDamage;
-                buffApplied = true;
-            }
-            return buffApplied;
-        }
-
-        public bool SubtractBonusMagicDmgDuration(int n)
-        {
-            var durationSubtracted = false;
-            if (BonusMagicDmgDuration > 0)
-            {
-                BonusMagicDmgDuration -= n;
-                durationSubtracted = true;
-                if (BonusMagicDmgDuration <= 0)
-                {
-                    BonusMagicDmgDuration = 0;
-                    BonusMagicDmg = 0;
-                }
-            }
-            return durationSubtracted;
         }
 
         public void AddLoot(int? pLootToAdd)

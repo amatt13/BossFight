@@ -162,9 +162,10 @@ namespace BossFight.Controllers
         private async Task PlayerAttackMonsterWithEquippedWeapon(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id" });
-            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error) && RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(pJsonParameters["player_id"].GetInt32(), out error))
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error)
+            && RequestValidator.PlayerExists(pJsonParameters["player_id"].GetInt32(), out Player player, out error)
+            && RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(pJsonParameters["player_id"].GetInt32(), out error))
             {
-                var player = new Player().FindOne(pJsonParameters["player_id"].GetInt32());
                 var monster = new MonsterInstance { Active = true }.FindOne();
                 var summary = DamageDealer.PlayerAttackMonster(player, monster, true);
                 var response = new Dictionary<string, PlayerAttackSummary>

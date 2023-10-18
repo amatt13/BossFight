@@ -132,6 +132,7 @@ namespace BossFight.Models
             MaxHp = PlayerClass.CalculateMaxHp(Level);
             MaxMana = PlayerClass.CalculateMaxMana(Level);
             Player.RestoreAllHealthAndMana();
+            PlayerClass.RecalculateUnlockedAbilities(Level);
         }
     }
 }

@@ -25,9 +25,27 @@ namespace BossFight.Models
             PlayerClassRequirementList = BuildPlayerClassRequirementList();
         }
 
+        public Paladin(int pPlayerLevel)
+        :base()
+        {
+            RecalculateUnlockedAbilities(pPlayerLevel);
+        }
+
         protected static new List<PlayerClassRequirement> BuildPlayerClassRequirementList()
         {
             return new List<PlayerClassRequirement>{new PlayerClassRequirement(new Cleric(), 10)};
+        }
+
+        public override List<Ability> RecalculateUnlockedAbilities(int pPlayerLevel)
+        {
+            var unlockedAbilities = new List<Ability>{ new Heal() };
+            if (pPlayerLevel >= 3)
+            {
+                unlockedAbilities.Add(new Smite());
+            }
+
+            _unlockedAbilities = unlockedAbilities;
+            return unlockedAbilities;
         }
     }
 }

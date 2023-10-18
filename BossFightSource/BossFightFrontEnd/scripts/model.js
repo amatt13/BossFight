@@ -155,8 +155,13 @@ class PlayerClass {
 		player_class_requirement_dict.forEach(pcr => {
 			player_class_requirement_list.push(new PlayerClassRequirement(pcr["PlayerClassId"], pcr["RequiredPlayerClassId"], pcr["LevelRequirement"], pcr["RequiredPlayerClassName"]))
 		});
+		let abilities_list = [];
+		const unlocked_abilities_dict = player_class_dict["UnlockedAbilities"];
+		unlocked_abilities_dict.forEach(ability_dict => {
+			abilities_list.push(Ability.CreateFromDict(ability_dict));
+		});
 
-		return new PlayerClass(player_class_dict["Abilities"], player_class_dict["AttackPowerBonus"], player_class_dict["BaseHealth"], player_class_dict["BaseMana"], player_class_dict["CritChance"], player_class_dict["HpRegenRate"],
+		return new PlayerClass(abilities_list, player_class_dict["AttackPowerBonus"], player_class_dict["BaseHealth"], player_class_dict["BaseMana"], player_class_dict["CritChance"], player_class_dict["HpRegenRate"],
 			player_class_dict["HpScale"], player_class_dict["ManaRegenRate"], player_class_dict["ManaScale"], player_class_dict["Name"], player_class_dict["PlayerClassId"], player_class_requirement_list,
 			player_class_dict["ProficientWeaponTypesList"], player_class_dict["PurchasePrice"], player_class_dict["SpellPowerBonus"], player_class_dict["Description"])
 	}
@@ -197,6 +202,20 @@ class PlayerAttackSummary {
 		return new PlayerAttackSummary(player, monster, player_attack_summary_dict["PlayerTotalDamage"], player_attack_summary_dict["PlayerCrit"], player_attack_summary_dict["MonsterCrit"],
 			player_attack_summary_dict["PlayerExtraDamageFromBuffs"], player_attack_summary_dict["PlayerXpEarned"], player_attack_summary_dict["MonsterAffectedByDots"],
 			player_attack_summary_dict["MonsterRetaliateMessage"], player_attack_summary_dict["PlayerKilledMonster"], player_attack_summary_dict["MonsterTotalDamage"]);
+	}
+}
+
+class Ability {
+	constructor(name, description, only_target_monster, mana_cost, affects_all_players) {
+		this.Name = name;
+		this.Description = description;
+		this.OnlyTargetMonster = only_target_monster;
+		this.ManaCost = mana_cost;
+		this.AffectsAllPlayers = affects_all_players;
+	}
+
+	static CreateFromDict(ability_dict) {
+		return new Ability(ability_dict["Name"], ability_dict["Description"], ability_dict["OnlyTargetMonster"], ability_dict["ManaCost"], ability_dict["AffectsAllPlayers"]);
 	}
 }
 

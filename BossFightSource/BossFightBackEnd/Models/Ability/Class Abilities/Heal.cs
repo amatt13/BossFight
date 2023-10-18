@@ -22,7 +22,12 @@ namespace BossFight.Models
             var canCast = base.CanCastAbility(pError);
             if (canCast)
             {
-                if (Target.IsAtFullHealth())
+                if (Target.IsDead())
+                {
+                    canCast = false;
+                    pError.AppendLine($"{Target.Name} must be alive.");
+                }
+                else if (Target.IsAtFullHealth())
                 {
                     canCast = false;
                     pError.AppendLine($"{Target.Name} is already at full health.");

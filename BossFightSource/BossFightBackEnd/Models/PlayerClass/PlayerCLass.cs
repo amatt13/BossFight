@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text.Json.Serialization;
 using BossFight.BossFightEnums;
-using BossFight.CustemExceptions;
 
 namespace BossFight.Models
 {
@@ -23,10 +22,14 @@ namespace BossFight.Models
         public int BaseMana { get; set; }
         public string Description { get; set; }
 
+        [JsonIgnore]
+        protected List<Ability> _unlockedAbilities {get; set;}
+        public List<Ability> UnlockedAbilities {get { return _unlockedAbilities; }}
+
         // From other tables
         public List<PlayerClassWeaponProficiency> ProficientWeaponTypesList { get; set; } = new List<PlayerClassWeaponProficiency>();
         public List<PlayerClassRequirement> PlayerClassRequirementList { get; set; } = new List<PlayerClassRequirement>();
-        public Dictionary<string, Ability> Abilities { get; set; } = new Dictionary<string, Ability>();
+
 
         public override string ToString()
         {
@@ -50,5 +53,11 @@ namespace BossFight.Models
         {
             return new List<PlayerClassRequirement>();
         }
+
+        /// <summary>
+        /// Every Player Class must implement this method by only returning the abilties that
+        /// the player is eligible for with their current level.
+        /// </summary>
+        public abstract List<Ability> RecalculateUnlockedAbilities(int pPlayerLevel);
     }
 }

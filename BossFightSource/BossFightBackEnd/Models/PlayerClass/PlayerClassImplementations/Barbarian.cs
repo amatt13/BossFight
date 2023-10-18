@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using BossFight.BossFightEnums;
 
@@ -26,9 +27,20 @@ namespace BossFight.Models
             PlayerClassRequirementList = BuildPlayerClassRequirementList();
         }
 
+        public Barbarian(int pPlayerLevel)
+        :base()
+        {
+            RecalculateUnlockedAbilities(pPlayerLevel);
+        }
+
         protected static new List<PlayerClassRequirement> BuildPlayerClassRequirementList()
         {
             return new List<PlayerClassRequirement>{new PlayerClassRequirement(new Highwayman(), 10)};
+        }
+
+        public override List<Ability> RecalculateUnlockedAbilities(int pPlayerLevel)
+        {
+            return new List<Ability>();
         }
     }
 }
