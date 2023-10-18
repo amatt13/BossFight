@@ -21,15 +21,8 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: |
-        cd ./BossFightSource
-        dotnet restore
+      run: dotnet restore
     - name: Build
-      run: |
-        cd ./BossFightSource
-        dotnet build --no-restore
+      run: dotnet build --no-restore
     - name: Test
-      run: |
-        cd ./BossFight.Tests
-        dotnet restore
-        dotnet test --no-build
+      run: dotnet test --no-build

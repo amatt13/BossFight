@@ -1,3 +1,4 @@
+using Xunit;
 namespace BossFight.Tests;
 
 public class ExperienceCalculatorTests
