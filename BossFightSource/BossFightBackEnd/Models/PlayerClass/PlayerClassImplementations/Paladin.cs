@@ -38,10 +38,10 @@ namespace BossFight.Models
 
         public override List<Ability> RecalculateUnlockedAbilities(int pPlayerLevel)
         {
-            var unlockedAbilities = new List<Ability>{ new Heal() };
+            var unlockedAbilities = new List<Ability>{ new Heal(), new GreaterHeal(), new Smite() };
             if (pPlayerLevel >= 3)
             {
-                unlockedAbilities.Add(new Smite());
+                unlockedAbilities.Add(new DivineShield());
             }
 
             _unlockedAbilities = unlockedAbilities;

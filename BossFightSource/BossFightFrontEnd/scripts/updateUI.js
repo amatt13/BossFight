@@ -38,6 +38,16 @@ function UpdateUiPlayerStats(player) {
 		const sprite_source = getPlayerClassSprite(class_name, preffered_body_type);
 		document.getElementById("playerSprite").src = sprite_source.src;
 	}
+
+	// set abilities
+	let ability_list = document.getElementById("player_abilities_list");
+	new_abilities_list = "";
+	player.player_player_class.player_class.abilities.forEach(ability => {
+		ability_html = CreateAbilityForPlayerColumn(ability);
+		new_abilities_list += ability_html;
+	});
+	ability_list.innerHTML = new_abilities_list;
+
 }
 
 function UpdateUiPlayerSoldWeapon(json_dict) {
@@ -170,4 +180,16 @@ function UpdateUiShop(shop_dict) {
 	});
 
 	document.getElementById("playerclass_buy_options").innerHTML = player_class_html;
+}
+
+function CreateAbilityForPlayerColumn(ability)
+{
+	const ability_html = `<button id="ability_${ability.name}" type="button" class="btn-ability toolTip" onclick="PlayerCast('${ability.ability_cast_key}')">
+	<img src="./images/ui_icons/abilities/${ability.image_source}.png" class="max-size-100-percent">
+	<span class="toolTipText">${ability.description}
+		Costs ${ability.manaCost} Mana
+	</span>
+</button>`
+
+return ability_html;
 }

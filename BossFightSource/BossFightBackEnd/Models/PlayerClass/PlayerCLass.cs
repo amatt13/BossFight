@@ -23,7 +23,7 @@ namespace BossFight.Models
         public string Description { get; set; }
 
         [JsonIgnore]
-        protected List<Ability> _unlockedAbilities {get; set;}
+        protected List<Ability> _unlockedAbilities {get; set;} = new List<Ability>();
         public List<Ability> UnlockedAbilities {get { return _unlockedAbilities; }}
 
         // From other tables

@@ -10,6 +10,8 @@ namespace BossFight.Models
     {
         public string Name { get; private set; }
 
+        public string AbilityCastKey { get {return GetType().Name; }}
+
         public string Description { get; set; }
 
         [JsonIgnore]

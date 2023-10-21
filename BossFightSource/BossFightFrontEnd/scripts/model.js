@@ -206,16 +206,18 @@ class PlayerAttackSummary {
 }
 
 class Ability {
-	constructor(name, description, only_target_monster, mana_cost, affects_all_players) {
-		this.Name = name;
-		this.Description = description;
-		this.OnlyTargetMonster = only_target_monster;
-		this.ManaCost = mana_cost;
-		this.AffectsAllPlayers = affects_all_players;
+	constructor(name, description, only_target_monster, mana_cost, affects_all_players, ability_cast_key) {
+		this.name = name;
+		this.ability_cast_key = ability_cast_key;
+		this.image_source = name.toLowerCase().replace(" ", "");
+		this.description = description;
+		this.only_target_monster = only_target_monster;
+		this.manaCost = mana_cost;
+		this.affects_all_players = affects_all_players;
 	}
 
 	static CreateFromDict(ability_dict) {
-		return new Ability(ability_dict["Name"], ability_dict["Description"], ability_dict["OnlyTargetMonster"], ability_dict["ManaCost"], ability_dict["AffectsAllPlayers"]);
+		return new Ability(ability_dict["Name"], ability_dict["Description"], ability_dict["OnlyTargetMonster"], ability_dict["ManaCost"], ability_dict["AffectsAllPlayers"], ability_dict["AbilityCastKey"]);
 	}
 }
 
