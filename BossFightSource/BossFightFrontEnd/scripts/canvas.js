@@ -114,38 +114,36 @@ function AnimateMonster() {
 	monsterImageX = monsterImageMoveForward ? monsterImageX + 0.5 : monsterImageX - 0.5;
 	monsterImageY = monsterImageMoveDown ? monsterImageY + 0.5 : monsterImageY - 0.5;
 
-	montserBonusSize = _monster1?.level;
-	if (montserBonusSize === undefined) {
-		montserBonusSize = 0;
-	}
-	else {
-		montserBonusSize *= 3;
-	}
-	ctx.drawImage(monsterImage, monsterImageX, monsterImageY, 100 + montserBonusSize, 100 + montserBonusSize);
+	ctx.drawImage(monsterImage, monsterImageX, monsterImageY, 160, 160);
 }
 
 function AnimatePlayer() {
 	ctx.drawImage(playerImage, canvas.width-playerImage.width, initialMonsterImageY, 100, 100);
-	
 }
 
 function DrawMonsterStatus() {
 	let monster_hp = _monster1.hp ?? 0;
 	let monster_max_hp = _monster1.max_hp ?? 0;
-	ctx.fillText('Health:', 10, 30);
-	ctx.fillText(`${ monster_hp }/${ monster_max_hp }`, 100, 30);
+	let = monster_type_list = [];
+	if (_monster1.monster_template != undefined && _monster1.monster_template.monster_type_list != undefined) {
+		monster_type_list = _monster1.monster_template.monster_type_list ?? [""]
+	}
+	ctx.fillText(`${ _monster1.monster_name } <${ monster_type_list.join(' ') }>`, 10, 30)
+
+	ctx.fillText('Health:', 10, 60);
+	ctx.fillText(`${ monster_hp }/${ monster_max_hp }`, 100, 60);
 
 	var monster_strenfth = _monster1.attack_strength ?? "0";
-	ctx.fillText('Attack strength:', 10, 60);
-	ctx.fillText(monster_strenfth, 200, 60);
+	ctx.fillText('Attack strength:', 10, 90);
+	ctx.fillText(monster_strenfth, 200, 90);
 
-	ctx.fillText('Debuffs:', 10, 90);
+	ctx.fillText('Active Effects:', 10, 120);
 
-	var monster_name_y = monsterImageY + monsterImage.height + 30;
+	var monster_name_y = monsterImageY - 5;// - monsterImage.naturalHeight;
 	var monster_name_x = monsterImageX;
 	let monster_name = _monster1.monster_name ?? "?";
 	let monsterlevel = _monster1.level ?? "?";
-	ctx.fillText(`${ monster_name } lvl <${ monsterlevel }>`, monster_name_x, monster_name_y);
+	ctx.fillText(`${ monster_name } level ${ monsterlevel }`, monster_name_x, monster_name_y);
 }
 
 let _damage_to_show;
@@ -159,7 +157,7 @@ function DrawDamage() {
 
 function CanvasShowDamageAnimation(damage) {
 	_damage_to_show = damage;
-	_enable_damage_to_show = true;  
+	_enable_damage_to_show = true;
 	setInterval(() => {_enable_damage_to_show = false;}, 3000); // set to 5000 for crit
 }
 
@@ -173,7 +171,7 @@ function DrawDamageOnPlayer(){
 
 function CanvasShowDamageAnimationForPlayer(damage) {
 	_damage_to_showPlayer = damage;
-	_enable_damage_to_show = true;  
+	_enable_damage_to_show = true;
 	setInterval(() => {_enable_damage_to_show = false;}, 3000); // set to 5000 for crit
 }
 
@@ -194,45 +192,3 @@ function UpdateCanvasMonsterTierVotesTotal(monster_tier_votes_total) {
 	voteUpButton.innerHTML = vote_up_text;
 	voteDownButton.innerHTML = vote_down_text;
 }
-
-// function DebuffsString()
-//     {
-//         var debuffs = new List<object>();
-//         if (BlindDuration > 0)
-//             debuffs.Add($"blinded { BlindDuration }");
-
-//         if (LowerAttackDuration > 0)
-//             debuffs.Add($"lowered attack by { LowerAttackPercentage * 100 }% for { LowerAttackDuration } attacks");
-
-//         if (StunDuration > 0)
-//             debuffs.Add($"stunned { StunDuration }");
-
-//         if (EasierToCritDuration > 0)
-//             debuffs.Add($"easier to crit { EasierToCritPercentage }% for { EasierToCritDuration } attacks");
-
-//         var result = "";
-//         if (debuffs.Any())
-//             result += "\n";
-
-//         return result + String.Join("\n", debuffs);
-//     }
-
-// function MonsterTypesStr()
-// {
-//     var numberOfTypes = MonsterTypeList.Count;
-//     var typesStr = "";
-//     if (numberOfTypes == 1)
-//     {
-//         typesStr = MonsterTypeList[0].ToString();
-//     }
-//     else if (numberOfTypes == 2)
-//     {
-//         typesStr = $"{ MonsterTypeList[0] } and { MonsterTypeList[1] }";
-//     }
-//     else if (numberOfTypes > 2)
-//     {
-//         typesStr = String.Join(", ", (MonsterTypeList.Take(MonsterTypeList.Count - 1)));
-//         typesStr += $", and { MonsterTypeList.Last() }";
-//     }
-//     return typesStr;
-// }

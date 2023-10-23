@@ -93,7 +93,7 @@
 						Attack Monster
 					</button>
 				</div>
-				<abilities id="player_abilities_list" style="grid-column: 1; width: 200px; row-gap: 50px;">
+				<abilities id="player_abilities_list" class="abilities-list" style="grid-column: 1; width: 300px;">
 					<!-- Abilities goes here -->
 				</abilities>
 				<!-- Player inventory/classes -->
@@ -223,10 +223,13 @@
 					<label id="playerClassMenuMaxManaPoints" style="grid-area: 10/1/10/1;">max mana points:</label>
 					<label id="playerClassMenuManaPointsGainedPerLevel" style="grid-area: 10/2/10/2;">Mana points per level:</label>
 
-					<label class="player-class-section-title" style="grid-area: 11/1/11/-1;">Abilities</label>
-					<label style="grid-area: 12/1/12/1;">Ability 1:</label>
-					<label style="grid-area: 12/2/12/2;">Ability 2:</label>
-					<label style="grid-area: 12/3/12/3;">Ability 3:</label>
+					<label id="PlayerClassMenuAbilities" class="player-class-section-title" style="grid-area: 11/1/11/1;">
+						Abilities
+						<br>
+						<abilities id="PlayerClassMenuAbilitiesList" class="abilities-list">
+							<!-- Abilities goes here -->
+						</abilities>
+					</label>
 
 					<label class="player-class-section-title" style="grid-area: 13/1/13/-1;">Statistics</label>
 					<label style="grid-area: 14/1/14/1;">Unlocked date:</label>
@@ -234,7 +237,7 @@
 					<label style="grid-area: 15/2/15/2;">Monster kills:</label>
 					<label style="grid-area: 15/3/15/3;">Monster killing blows:</label>
 
-					<button style="grid-area: 16/2/16/2;" id="setToCurrentClassPlayerClassMenuButton">Set to current class</button>
+					<button style="grid-area: 16/2/16/2;" id="setToCurrentClassPlayerClassMenuButton" class="btn-primary">Set to current class</button>
 				</div>
 			</div>
 			<!-- list of unlocked classes -->
@@ -245,7 +248,7 @@
 				</div>
 			</div>
 		</div>
-		<menu style="position: sticky; bottom: 0px;">
+		<menu style="bottom: 0px;">
 			<button id="closeplayerClassMenuButton" value="default" class="btn-primary">Close</button>
 		</menu>
 	</form>

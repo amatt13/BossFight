@@ -6,6 +6,7 @@ using System.Reflection;
 using MySqlConnector;
 using BossFight.Extentions;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 
 namespace BossFight.Models
 {
@@ -18,20 +19,20 @@ namespace BossFight.Models
             using var cmd = connection.CreateCommand();
 
             var selectString = BuildSelectStatement();
+            var joinString = BuildJoinString();
             var whereString = String.Empty;
             if (id.HasValue)
             {
-                whereString = $"WHERE `{ IdColumn }` = @id \n";
+                whereString = $"WHERE { TableName }.{ IdColumn } = @id \n";
                 whereString += AdditionalSearchCriteria(this);
+                whereString += "\n";
             }
             else
             {
-                var additionalSearchCriteriaString = AdditionalSearchCriteria(this, pStartWithAnd: false);
-                if (!String.IsNullOrEmpty(additionalSearchCriteriaString))
-                    whereString += $"WHERE { additionalSearchCriteriaString }";
+                whereString = BuildGenericWhereStatement();
             }
 
-            cmd.CommandText = $"{ selectString }\n{ whereString }";
+            cmd.CommandText = selectString + joinString + whereString;
             cmd.Parameters.AddParameter(id, nameof(id));
             var reader = cmd.ExecuteReader();
             var result = BuildObjectFromReader(reader, connection);
@@ -45,16 +46,14 @@ namespace BossFight.Models
             using var cmd = connection.CreateCommand();
 
             var selectString = BuildSelectStatement();
-            var whereString = String.Empty;
+            var joinString = BuildJoinString();
+            var whereString = BuildGenericWhereStatement();
             var order = pOrderByDescending ? "DESC" : "ASC";
             var orderByString = $"ORDER BY `{ pOrderByColumn }` { order }\n";
             var limitString = $"LIMIT { pRowsToRetrieve }\n";
 
-            var additionalSearchCriteriaString = AdditionalSearchCriteria(this, pStartWithAnd: false);
-            if (!String.IsNullOrEmpty(additionalSearchCriteriaString))
-                whereString += $"WHERE { additionalSearchCriteriaString }";
 
-            cmd.CommandText = $"{ selectString } { whereString } { orderByString } { limitString }";
+            cmd.CommandText = $"{ selectString } { joinString } { whereString }{ orderByString } { limitString }";
             var reader = cmd.ExecuteReader();
             var result = BuildObjectFromReader(reader, connection);
             connection.Close();
@@ -69,11 +68,12 @@ namespace BossFight.Models
         {
             using var cmd = pConnection.CreateCommand();
 
-            var selectString = $"SELECT * FROM `{ TableName }`\n";
+            var selectString = BuildSelectStatement();
+            var joinString = BuildJoinString();
             var whereString = "";
             if (id.HasValue)
             {
-                whereString = $"WHERE `{ IdColumn }` = @id \n";
+                whereString = $"WHERE { TableName }.{ IdColumn } = @id \n";
                 whereString += AdditionalSearchCriteria(this);
             }
             else
@@ -83,7 +83,7 @@ namespace BossFight.Models
                     whereString += $"WHERE { additionalSearchCriteriaString }";
             }
 
-            cmd.CommandText = selectString + whereString;
+            cmd.CommandText = $"{ selectString } { joinString } { whereString }";
             cmd.Parameters.AddParameter(id, nameof(id));
             var reader = cmd.ExecuteReader();
             var result = BuildObjectFromReader(reader, pConnection);
@@ -113,6 +113,25 @@ namespace BossFight.Models
                 fetched = result.First();
                 Debug.Assert(result.Count() == 1, "Fetched more than one record when only one were expected!");
             return fetched;
+        }
+
+        protected virtual string BuildJoinString()
+        {
+            var joinString = String.Empty;
+            return joinString;
+        }
+
+        protected virtual string BuildGenericWhereStatement()
+        {
+            var whereString = String.Empty;
+            var additionalSearchCriteriaString = AdditionalSearchCriteria(this, pStartWithAnd: false);
+            if (!String.IsNullOrEmpty(additionalSearchCriteriaString))
+                whereString += $"WHERE { additionalSearchCriteriaString }";
+
+            if (whereString != String.Empty && !whereString.EndsWith("\n"))
+                whereString += "\n";
+
+            return whereString;
         }
 
         public virtual string AdditionalSearchCriteria(PersistableBase<T> pSearchObject, bool pStartWithAnd = true)

@@ -74,6 +74,7 @@ function UpdateUiPlayerEquippedWeapon(weapon_dict) {
 
 function UpdateUiPlayerAttackedMonsterWithWeapon(summary) {
 	UpdateUiActiveMonster(summary.monster);
+	_player = summary.player;
 	UpdateUiPlayerStats(summary.player);
 	BlinkDiv("player_xp");
 	player_combat_log_message = CreateAttackSummaryMessage(summary)

@@ -8,24 +8,19 @@ namespace BossFight.Models
             : base("Divine Shield", "Absorbs all incomming damage", pManaCost: 6)
         { }
 
-        public override string UseAbility(ITarget pCaster, ITarget pTarget)
+        public override void TargetEffect(ITarget pTarget, AbilityResult pAbilityResult)
         {
-            return base.UseAbility(pCaster, pTarget);
+            CastDivineShield(pTarget, pAbilityResult);
         }
 
-        public override void TargetEffect(ITarget pTarget)
+        public override bool CanCastAbility(ref string pError)
         {
-            CastDivineShield(pTarget);
-        }
-
-        public override bool CanCastAbility(StringBuilder pError)
-        {
-            var canCast = base.CanCastAbility(pError);
+            var canCast = base.CanCastAbility(ref pError);
             if (canCast)
             {
                 if (Target.HasEffect(EffectType.DivineShield))
                 {
-                    pError.AppendLine($"{Target.Name} is already affected by {Name}");
+                    pError += $"{Target.Name} is already affected by {Name}\n";
                     canCast = false;
                 }
             }
@@ -33,10 +28,10 @@ namespace BossFight.Models
             return canCast;
         }
 
-        private void CastDivineShield(ITarget pTarget)
+        private void CastDivineShield(ITarget pTarget, AbilityResult pAbilityResult)
         {
             new DivineShieldEffect(pTarget);
-            UseAbilityText.AppendLine($"You cast {Name} on {Target.Name}");
+            pAbilityResult.AbilityResultText = $"You cast {Name} on {Target.Name}";
         }
     }
 }

@@ -18,18 +18,41 @@ namespace BossFight.Controllers
             //{nameof(XXX), typeof(XXX)},
         };
 
-        public static string CastAbility(string pAbilityName, ITarget pCaster, ITarget pTarget, ILogger<SocketMessageHandler> pLogger)
+        public static AbilityResult CastAbility(string pAbilityName, ITarget pCaster, int pTargetId, ILogger<SocketMessageHandler> pLogger)
         {
-            string result;
+            Ability ability = null;
+            var result = new AbilityResult();
             try
             {
-                Ability ability = (Ability)Activator.CreateInstance(AbilityDictionary[pAbilityName]);
-                result = ability.UseAbility(pCaster, pTarget);
+                ability = (Ability)Activator.CreateInstance(AbilityDictionary[pAbilityName]);
             }
             catch (KeyNotFoundException e)
             {
                 pLogger.LogError(e.Message);
-                result = $"An internal server error occured when trying to cast {pAbilityName} on {pTarget.Name}";
+                result.Error = $"An internal server error occured when trying to cast {pAbilityName}";
+            }
+
+            if (ability != null)
+            {
+                ITarget target;
+                if (ability.OnlyTargetMonster)
+                {
+                    if (RequestValidator.MonsterInstanceExists(pTargetId, out MonsterInstance monsterTarget, out string error))
+                    {
+                        target = monsterTarget;
+                    }
+                    else
+                    {
+                        result.Error = error;
+                        return result;
+                    }
+                }
+                else
+                {
+                    target = pCaster;
+                }
+
+                result = ability.UseAbility(pCaster, target, result);
             }
 
             return result;

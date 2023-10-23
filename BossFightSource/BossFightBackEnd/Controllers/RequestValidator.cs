@@ -127,11 +127,11 @@ WHERE p.PlayerId = @{ nameof(pPlayerId) }";
             if (reader.Read())
             {
                 playerCanAttackMonsterWithEquippedWeapon = reader.GetBooleanNullable("can attack").GetValueOrDefault(false);
-                pError = reader.IsDBNull("error") ? String.Empty : reader.GetString("error");
+                pError = reader.IsDBNull("error") ? String.Empty : reader.GetString("error") + "\n";
             }
             else
             {
-                pError = "Could not attack monster for an unkown reason (try reloading the site)";
+                pError = "Could not attack monster for an unkown reason (try reloading the site)\n";
             }
             reader.Close();
             connection.Close();
@@ -299,9 +299,18 @@ AND p.Password = {pPassword.ToDbString()}";
         {
             pPlayer = new Player().FindOne(pPlayerId);
             var playerExists = pPlayer != null && pPlayer.PlayerId.HasValue;
-            pError = playerExists? String.Empty : "Could not find player";
+            pError = playerExists? String.Empty : $"Could not find player '{pPlayerId}'";
 
             return playerExists;
+        }
+
+        public static bool MonsterInstanceExists(int pMonsterId, out MonsterInstance pMonster, out string pError)
+        {
+            pMonster = new MonsterInstance().FindOne(pMonsterId);
+            var monsterExists = pMonster != null && pMonster.MonsterInstanceId.HasValue;
+            pError = monsterExists? String.Empty : $"Could not find monster '{pMonsterId}'";
+
+            return monsterExists;
         }
 
         public static bool BodyTypeNameExists(string pBodyTypeName, out string pError)

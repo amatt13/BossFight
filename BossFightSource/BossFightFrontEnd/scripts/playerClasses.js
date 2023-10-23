@@ -123,7 +123,7 @@ function PopulatePlayerClassList(player_player_classes) {
 // mark a new table row as the "active" row
 function changePlayerClassSelectorCurrentlySelectedRow(player_class_id) {
 	const all_player_class_selector_containers = document.getElementsByClassName("playerClassSelectorContainer")
-	
+
 	for (var i = 0; i != all_player_class_selector_containers.length; i++) {
 		var player_class_container = all_player_class_selector_containers[i];
 		if ("playerclassid" in player_class_container.attributes) {
@@ -139,42 +139,52 @@ function changePlayerClassSelectorCurrentlySelectedRow(player_class_id) {
 function _setLeftPaneBasics(player_player_class) {
 	player_class = player_player_class.player_class;
 
-	let playerClassMenuRequiredClasses = document.getElementById("playerClassMenuRequiredClasses");
+	let player_class_menu_required_classes = document.getElementById("playerClassMenuRequiredClasses");
 	let requirements_list = [];
 	player_class.player_class_requirement_list.forEach(pcr => {
 		requirements_list.push(`${ pcr.required_player_class_name } level ${ pcr.level_requirement }`)
 	});
 	if (requirements_list.length == 0)
 		requirements_list.push("None")
-	playerClassMenuRequiredClasses.textContent = "Class requirements: " + requirements_list.join("; ");
+	player_class_menu_required_classes.textContent = "Class requirements: " + requirements_list.join("; ");
 
-	let playerClassMenuGoldCost = document.getElementById("playerClassMenuGoldCost");
-	playerClassMenuGoldCost.textContent = "Shop gold cost: " + player_class.purchase_price;
+	let player_class_menu_gold_cost = document.getElementById("playerClassMenuGoldCost");
+	player_class_menu_gold_cost.textContent = "Shop gold cost: " + player_class.purchase_price;
 
-	let playerClassMenuDescription = document.getElementById("playerClassMenuDescription");
-	playerClassMenuDescription.textContent = player_class.description;
+	let player_class_menu_description = document.getElementById("playerClassMenuDescription");
+	player_class_menu_description.textContent = player_class.description;
 
 	// basics
-	let playerClassMenuAttackPowerBonus = document.getElementById("playerClassMenuAttackPowerBonus");
-	playerClassMenuAttackPowerBonus.textContent = "Attack power bonus: +" + player_class.attack_power_bonus;
+	let player_class_menu_attack_power_bonus = document.getElementById("playerClassMenuAttackPowerBonus");
+	player_class_menu_attack_power_bonus.textContent = "Attack power bonus: +" + player_class.attack_power_bonus;
 
-	let playerClassMenuCurrentLevel = document.getElementById("playerClassMenuCurrentLevel");
-	playerClassMenuCurrentLevel.textContent = "Current level: " + player_player_class.level;
+	let player_class_menu_current_level = document.getElementById("playerClassMenuCurrentLevel");
+	player_class_menu_current_level.textContent = "Current level: " + player_player_class.level;
 
-	let playerClassMenuMaxHealthPoints = document.getElementById("playerClassMenuMaxHealthPoints");
-	playerClassMenuMaxHealthPoints.textContent = "Max health points: " + player_player_class.max_hp;
+	let player_class_menu_max_health_points = document.getElementById("playerClassMenuMaxHealthPoints");
+	player_class_menu_max_health_points.textContent = "Max health points: " + player_player_class.max_hp;
 
-	let playerClassMenuHealthPointsGainedPerLevel = document.getElementById("playerClassMenuHealthPointsGainedPerLevel");
-	playerClassMenuHealthPointsGainedPerLevel.textContent = "Health points per level: " + player_class.hp_scale;
+	let player_class_menu_health_points_gained_per_level = document.getElementById("playerClassMenuHealthPointsGainedPerLevel");
+	player_class_menu_health_points_gained_per_level.textContent = "Health points per level: " + player_class.hp_scale;
 
-	let playerClassMenuMaxManaPoints = document.getElementById("playerClassMenuMaxManaPoints");
-	playerClassMenuMaxManaPoints.textContent = "Max mana points: " + player_player_class.max_mana;
+	let player_class_menu_max_mana_åoints = document.getElementById("playerClassMenuMaxManaPoints");
+	player_class_menu_max_mana_åoints.textContent = "Max mana points: " + player_player_class.max_mana;
 
-	let playerClassMenuManaPointsGainedPerLevel = document.getElementById("playerClassMenuManaPointsGainedPerLevel");
-	playerClassMenuManaPointsGainedPerLevel.textContent = "Mana points per level: " + player_class.mana_scale;
+	let player_class_menu_mana_points_gained_per_level = document.getElementById("playerClassMenuManaPointsGainedPerLevel");
+	player_class_menu_mana_points_gained_per_level.textContent = "Mana points per level: " + player_class.mana_scale;
 
-	let playerClassMenuCritChance = document.getElementById("playerClassMenuCritChance");
-	playerClassMenuCritChance.textContent = "Base critical chance: " + player_class.crit_chance;
+	let player_class_menu_crit_chance = document.getElementById("playerClassMenuCritChance");
+	player_class_menu_crit_chance.textContent = "Base critical chance: " + player_class.crit_chance;
+
+	let player_class_menu_abilities_list = document.getElementById("PlayerClassMenuAbilitiesList");
+	player_class_menu_abilities_list.innerHTML = "";
+	player_class.abilities.forEach(ability => {
+		const ability_html = `<button id="preview_ability_${ability.name}" type="button" class="preview-btn-ability" disabled="true">
+	<img src="./images/ui_icons/abilities/${ability.image_source}.png" class="max-size-100-percent">
+</button>`
+		player_class_menu_abilities_list.innerHTML += ability_html;
+	});
+
 }
 
 __current_player_class = null;

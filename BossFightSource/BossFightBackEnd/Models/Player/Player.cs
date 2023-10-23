@@ -99,6 +99,7 @@ namespace BossFight.Models
                 player.PlayerPlayerClass.Player = player;
                 player.PlayerPlayerClass.PlayerClass.RecalculateUnlockedAbilities(player.Level);
                 player.UnlockedPlayerPlayerClassList = new PlayerPlayerClass{PlayerId = player.PlayerId}.FindAllForParent(null, pConnection);
+                player.UnlockedPlayerPlayerClassList.ForEach(pc => pc.PlayerClass.RecalculateUnlockedAbilities(player.Level));
                 player.Weapon = (Weapon)new Weapon().FindOneForParent(player.WeaponId, pConnection);
                 player.PrefferedBodyType = new BodyType{}.FindOneForParent(player.PreferredBodyTypeId, pConnection);
 

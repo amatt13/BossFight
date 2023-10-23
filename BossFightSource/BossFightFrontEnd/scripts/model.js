@@ -48,8 +48,21 @@ class PlayerWeapon {
 	}
 }
 
+class MonsterTemplate {
+	constructor(tier, name, boss_monster, monster_type_list) {
+		this.tier = tier;
+		this.name = name;
+		this.boss_monster = boss_monster;
+		this.monster_type_list = monster_type_list;
+	}
+
+	static CreateFromDict(monster_template_dict) {
+		return new MonsterTemplate(monster_template_dict["Tier"], monster_template_dict["Name"], monster_template_dict["BossMonster"], monster_template_dict["MonsterTypeStringList"]);
+	}
+}
+
 class Monster {
-	constructor(hp, max_hp, level, monster_name, is_boss_monster, monster_instance_id, attack_strength) {
+	constructor(hp, max_hp, level, monster_name, is_boss_monster, monster_instance_id, attack_strength, monster_template) {
 		this.hp = hp;
 		this.max_hp = max_hp;
 		this.level = level;
@@ -57,10 +70,13 @@ class Monster {
 		this.is_boss_monster = is_boss_monster;
 		this.monster_instance_id = monster_instance_id;
 		this.attack_strength = attack_strength;
+		this.monster_template = monster_template;
 	}
 
 	static CreateFromDict(monster_dict) {
-		return new Monster(monster_dict["Hp"], monster_dict["MaxHp"], monster_dict["Level"], monster_dict["Name"], monster_dict["IsBossMonster"], monster_dict["MonsterInstanceId"], monster_dict["AttackStrength"]);
+		const monster_template_dict = monster_dict["MonsterTemplate"];
+		const monster_template = MonsterTemplate.CreateFromDict(monster_template_dict);
+		return new Monster(monster_dict["Hp"], monster_dict["MaxHp"], monster_dict["Level"], monster_dict["Name"], monster_dict["IsBossMonster"], monster_dict["MonsterInstanceId"], monster_dict["AttackStrength"], monster_template);
 	}
 }
 
@@ -212,7 +228,7 @@ class Ability {
 		this.image_source = name.toLowerCase().replace(" ", "");
 		this.description = description;
 		this.only_target_monster = only_target_monster;
-		this.manaCost = mana_cost;
+		this.mana_cost = mana_cost;
 		this.affects_all_players = affects_all_players;
 	}
 

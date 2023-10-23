@@ -62,7 +62,6 @@ namespace BossFight.Models
 
         public IEnumerable<MonsterDamageTracker> MonsterDamageTrackerList { get; set; }
 
-        [JsonIgnore]
         public MonsterTemplate MonsterTemplate { get; set; }
 
         [JsonIgnore]

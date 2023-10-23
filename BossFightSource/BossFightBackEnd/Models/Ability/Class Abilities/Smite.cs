@@ -8,25 +8,29 @@ namespace BossFight.Models
     {
         private bool _attackMonsterWithSmite = false;
         private bool _attacPlayerWithSmite = false;
+        private int _smiteBonus_damage = 13;
+
         public Smite()
             : base("Smite", "Deals bonus damage to undead monsters", pManaCost: 4)
-        { }
+        {
+            OnlyTargetMonster = true;
+        }
 
-        public override void TargetEffect(ITarget pTarget)
+        public override void TargetEffect(ITarget pTarget, AbilityResult pAbilityResult)
         {
             if (_attackMonsterWithSmite)
             {
-                AttackMonsterWithSmite((Player)Caster, (MonsterInstance)Target);
+                AttackMonsterWithSmite((Player)Caster, (MonsterInstance)Target, pAbilityResult);
             }
             else if (_attacPlayerWithSmite)
             {
-                AttacPlayerWithSmite((MonsterInstance)Caster, (Player)Target);
+                AttacPlayerWithSmite((MonsterInstance)Caster, (Player)Target, pAbilityResult);
             }
         }
 
-        public override bool CanCastAbility(StringBuilder pError)
+        public override bool CanCastAbility(ref string pError)
         {
-            var canCast = base.CanCastAbility(pError);
+            var canCast = base.CanCastAbility(ref pError);
             _attackMonsterWithSmite = false;
             _attacPlayerWithSmite = false;
 
@@ -35,12 +39,12 @@ namespace BossFight.Models
                 if (Target.IsDead())
                 {
                     canCast = false;
-                    pError.AppendLine($"{Target.Name} must be alive.");
+                    pError += $"{Target.Name} must be alive.\n";
                 }
                 else if (!Target.MonsterTypeList.Contains(MonsterType.UNDEAD))
                 {
                     canCast = false;
-                    pError.AppendLine($"Smite only works on undead targets. {Target.Name} is {EnumTextFormatter.EnumPrinter(Target.MonsterTypeList)}");
+                    pError += $"Smite only works on undead targets. {Target.Name} is {EnumTextFormatter.EnumPrinter(Target.MonsterTypeList)}\n";
                 }
 
                 if (canCast)
@@ -54,7 +58,7 @@ namespace BossFight.Models
                         else
                         {
                             canCast = false;
-                            pError.AppendLine(error);
+                            pError += error;
                         }
                     }
                     else if (Caster is MonsterInstance && Target is Player)
@@ -64,7 +68,7 @@ namespace BossFight.Models
                     else
                     {
                         canCast = false;
-                        pError.AppendLine("No valid targets");
+                        pError += "No valid targets\n";
                     }
                 }
             }
@@ -72,17 +76,21 @@ namespace BossFight.Models
             return canCast;
         }
 
-        private void AttackMonsterWithSmite(Player pPLayer, MonsterInstance pMonster)
+        private void AttackMonsterWithSmite(Player pPLayer, MonsterInstance pMonster, AbilityResult pAbilityResult)
         {
-            pPLayer.BonusMagicDmg += 13;  //TODO lol this is bad
-            DamageDealer.PlayerAttackMonster(pPLayer, pMonster, true);
-            pPLayer.BonusMagicDmg -= 13;
+            pPLayer.BonusMagicDmg += _smiteBonus_damage;
+            var summary = DamageDealer.PlayerAttackMonster(pPLayer, pMonster, true);
+            pAbilityResult.PlayerAttackSummary = summary;
+            pAbilityResult.ReloadMonster = true;
+            pAbilityResult.AbilityResultText = $"You used Smite to deal { _smiteBonus_damage } bonus damage";
+            pPLayer.BonusMagicDmg -= _smiteBonus_damage;
         }
 
-        private void AttacPlayerWithSmite(MonsterInstance pMonster, Player pPLayer)
+        private void AttacPlayerWithSmite(MonsterInstance pMonster, Player pPLayer, AbilityResult pAbilityResult)
         {
             var monsterAttackSummary = new PlayerAttackSummary(pPLayer, pMonster);
             DamageDealer.MonsterAttackPlayer(pMonster, pPLayer, monsterAttackSummary);
+            pAbilityResult.PlayerAttackSummary = monsterAttackSummary;
         }
     }
 }

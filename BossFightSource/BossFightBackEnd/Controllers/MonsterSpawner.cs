@@ -6,7 +6,7 @@ namespace BossFight
     public class MonsterSpawner
     {
         private static readonly object _spawnNewMonsterLock = new();
-        public static readonly int MAX_MONSTER_TIER = 4;
+        public static readonly int MAX_MONSTER_TIER = 5;
 
         public static MonsterInstance SpawnNewMonster()
         {

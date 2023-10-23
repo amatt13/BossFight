@@ -20,9 +20,6 @@ namespace BossFight.Models
         [JsonIgnore]
         public ITarget Target { get; set; }
 
-        [JsonIgnore]
-        public StringBuilder UseAbilityText { get; set; }
-
         public bool OnlyTargetMonster { get; set; }
 
         public int ManaCost { get; set; }
@@ -35,7 +32,6 @@ namespace BossFight.Models
             Description = pDescription;
             Caster = null;
             Target = null;
-            UseAbilityText = new StringBuilder();
             OnlyTargetMonster = false;
             ManaCost = pManaCost;
             AffectsAllPlayers = false;
@@ -43,63 +39,58 @@ namespace BossFight.Models
 
         public override string ToString()
         {
-            var onlyTargetMonsterString = "";
-            if (OnlyTargetMonster)
-                onlyTargetMonsterString = "*";
-
-            return $"{ ManaCost } mana - /**{ Name }**{ onlyTargetMonsterString } -> { Description }";
+            return Name;
         }
 
-        public virtual string UseAbility(ITarget pCaster, ITarget pTarget)
+        public virtual AbilityResult UseAbility(ITarget pCaster, ITarget pTarget, AbilityResult pAbilityResult)
         {
-            string result;
-            var errors = new StringBuilder();
+            var errors = String.Empty;
             Caster = pCaster;
             Target = pTarget;
 
-            if (CanCastAbility(errors)) {
-                TargetEffect(pTarget);
+            if (CanCastAbility(ref errors)) {
+                TargetEffect(pTarget, pAbilityResult);
                 SubtractManaCostFromCaster();
-                result = UseAbilityText.ToString();
+                pAbilityResult.AbilityResultText = pAbilityResult.AbilityResultText.TrimEnd(new char[] { '\r', '\n' });;
+                pAbilityResult.CastSuccess = true;
             }
             else
             {
-                result = $"Could not use ability {Name}";
-                if (errors.Length >= 1)
-                {
-                    result += Environment.NewLine;
-                    result += errors.ToString();
-                }
+                errors += $"Could not use ability {Name}\n";
+                pAbilityResult.CastSuccess = false;
             }
 
-            return result.TrimEnd(new char[] { '\r', '\n' });
+            errors = errors.TrimEnd(new char[] { '\r', '\n' });
+            pAbilityResult.Error = errors;
+
+            return pAbilityResult;
         }
 
-        public virtual bool CanCastAbility(StringBuilder pError)
+        public virtual bool CanCastAbility(ref string pError)
         {
             var canCastAbility = true;
             if (ManaCost >= Caster.Mana)
             {
-                pError.AppendLine("You do not have enough mana");
+                pError += "You do not have enough mana\n";
                 canCastAbility = false;
             }
             else if (Caster.IsDead())
             {
-                pError.AppendLine("You are knocked out");
+                pError += "You are knocked out\n";
                 canCastAbility = false;
             }
 
             if (Caster is Player player)
             {
                 var playerPlayerClass = player.PlayerPlayerClass;
-                var playerClass = playerPlayerClass.PlayerClass.RecalculateUnlockedAbilities(playerPlayerClass.Level).Any(ability => ability.Name == this.Name);  // Just check for the name... should be good enough
+                var playerClass = playerPlayerClass.PlayerClass.RecalculateUnlockedAbilities(playerPlayerClass.Level).Any(ability => ability.Name == Name);  // Just check for the name... should be good enough
             }
 
             return canCastAbility;
         }
 
         // The effect that will be executed on the target
-        public virtual void TargetEffect(ITarget pTarget)
+        public virtual void TargetEffect(ITarget pTarget, AbilityResult pAbilityResult)
         { }
 
         public virtual void AffectsAllPlayersEffect(List<Player> allPlayers)

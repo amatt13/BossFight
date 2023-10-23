@@ -1,6 +1,18 @@
-.btn-ability {
+.btn-ability, .preview-btn-ability {
 	background-color: var(--border-colour);
 	color: var(--shadow-colour);
 	text-align: center;
     cursor: pointer;
+}
+
+.preview-btn-ability {
+	margin-top: 10px;
+	cursor: default;
+}
+
+.abilities-list {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+    gap: 20px;
 }

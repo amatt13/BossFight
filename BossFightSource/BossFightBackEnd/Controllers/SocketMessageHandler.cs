@@ -163,8 +163,8 @@ namespace BossFight.Controllers
         {
             var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id" });
             if (RequestValidator.AllValuesAreFilled(requiredValues, out string error)
-            && RequestValidator.PlayerExists(pJsonParameters["player_id"].GetInt32(), out Player player, out error)
-            && RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(pJsonParameters["player_id"].GetInt32(), out error))
+                && RequestValidator.PlayerExists(pJsonParameters["player_id"].GetInt32(), out Player player, out error)
+                && RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(pJsonParameters["player_id"].GetInt32(), out error))
             {
                 var monster = new MonsterInstance { Active = true }.FindOne();
                 var summary = DamageDealer.PlayerAttackMonster(player, monster, true);
@@ -436,9 +436,8 @@ namespace BossFight.Controllers
             if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
             {
                 var playerId = pJsonParameters["player_id"].GetInt32();
-                if (RequestValidator.PlayerExists(playerId))
+                if (RequestValidator.PlayerExists(playerId, out Player player, out error))
                 {
-                    var player = new Player().FindOne(playerId);
                     IEnumerable<PlayerPlayerClass> unlockedClasses = player.UnlockedPlayerPlayerClassList;
                     var response = new Dictionary<string, object>
                     {
@@ -526,6 +525,80 @@ namespace BossFight.Controllers
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
+        // takes: player_id: "int", ability_name: "string", target_id: "int"
+        private async Task CastAbility(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        {
+            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "ability_name", "target_id" });
+
+            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
+            {
+                var playerId = pJsonParameters["player_id"].GetInt32();
+                var abilityName = pJsonParameters["ability_name"].GetString();
+                var targetId = pJsonParameters["target_id"].GetInt32();
+                if (RequestValidator.PlayerExists(playerId, out Player player, out error))
+                {
+                    var abilityCastResult = AbilityController.CastAbility(abilityName, player, targetId, _logger);
+                    if (abilityCastResult.CastSuccess)
+                    {
+                        player.Persist();
+                        var response = new Dictionary<string, object>
+                        {
+                            {
+                                "ability_cast_result", new Dictionary<string, object>
+                                {
+                                    {"cast_success", abilityCastResult.CastSuccess},
+                                    {"update_player", player},
+                                    {"ability_text_result", abilityCastResult.AbilityResultText},
+                                    {"attack_summary", abilityCastResult.PlayerAttackSummary}
+                                }
+                            }
+                        };
+
+                        var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
+                        await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+
+                        if (abilityCastResult.ReloadMonster && abilityCastResult.PlayerAttackSummary != null)
+                        {
+                            if (abilityCastResult.PlayerAttackSummary.PlayerKilledMonster)
+                            {
+                                await NewMonster(abilityCastResult.PlayerAttackSummary.Monster, player);
+                            }
+                            else
+                            {
+                                // monster is still alive. Update everyone with the new monster
+                                var monsterUpdate = new Dictionary<string, MonsterInstance>
+                                {
+                                    { "fetch_active_monster", abilityCastResult.PlayerAttackSummary.Monster }
+                                };
+                                string output = JsonSerializer.Serialize(monsterUpdate);
+                                var monsterUpdateByteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
+                                await WebSocketConnections.GetInstance().SendMessageToEveryOneElseAsync(pWebSocket, monsterUpdateByteArray);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var response = new Dictionary<string, object>
+                        {
+                            {
+                                "ability_cast_result", new Dictionary<string, object>
+                                {
+                                    {"cast_success", abilityCastResult.CastSuccess},
+                                    {"ability_text_result", abilityCastResult.Error}
+                                }
+                            }
+                        };
+
+                        var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
+                        await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                    }
+                }
+            }
+
+            if (!String.IsNullOrEmpty(error))
+                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
+        }
+
         private static List<Tuple<object, string>> CreateValueList(Dictionary<string, JsonElement> pDict, List<string> pRequiredValues)
         {
             var valuesList = new List<Tuple<object, string>>();
@@ -551,40 +624,6 @@ namespace BossFight.Controllers
             };
             var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
             await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
-        }
-
-        // takes: player_id: "int", ability_name: "string"
-        private async Task CastAbility(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
-        {
-            var requiredValues = CreateValueList(pJsonParameters, new List<string> { "player_id", "ability_name" });
-
-            if (RequestValidator.AllValuesAreFilled(requiredValues, out string error))
-            {
-                var playerId = pJsonParameters["player_id"].GetInt32();
-                var abilityName = pJsonParameters["ability_name"].GetString();
-                if (RequestValidator.PlayerExists(playerId, out error))
-                {
-                    var player = new Player().FindOne(playerId);
-                    var abilityCastResult = AbilityController.CastAbility(abilityName, player, player, _logger);
-                    player.Persist();
-                    var response = new Dictionary<string, object>
-                    {
-                        {
-                            "ability_cast_result", new Dictionary<string, object>
-                            {
-                               {"update_player", player},
-                               {"ability_text_result", abilityCastResult}
-                            }
-                        }
-                    };
-
-                    var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
-                    await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
-                }
-            }
-
-            if (!String.IsNullOrEmpty(error))
-                await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
         // EXAMPLE/TEMPLATE FUNCTION

@@ -6,6 +6,7 @@ using BossFight.Extentions;
 
 namespace BossFight.BossFightEnums
 {
+    // NB: remember to update the SQL table as well when making changes here
     public enum MonsterType
     {
         PLAYER = 0,  // Should only be used by player characters
