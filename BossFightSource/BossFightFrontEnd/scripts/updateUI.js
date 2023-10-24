@@ -183,12 +183,11 @@ function UpdateUiShop(shop_dict) {
 	document.getElementById("playerclass_buy_options").innerHTML = player_class_html;
 }
 
-function CreateAbilityForPlayerColumn(ability)
-{
+function CreateAbilityForPlayerColumn(ability) {
 	const ability_html = `<button id="ability_${ability.name}" type="button" class="btn-ability toolTip" onclick="PlayerCast('${ability.ability_cast_key}')">
 	<img src="./images/ui_icons/abilities/${ability.image_source}.png" class="max-size-100-percent">
-	<span class="toolTipText">${ability.description}
-		Costs ${ability.manaCost} Mana
+	<span class="toolTipText" onclick="event.stopPropagation();">${ability.description}
+		Costs ${ability.mana_cost} Mana
 	</span>
 </button>`
 

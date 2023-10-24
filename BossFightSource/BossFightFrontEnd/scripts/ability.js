@@ -54,9 +54,12 @@ function handleAbilityCastResult(json_dict) {
 	const cast_success = json_dict["cast_success"];
 	if (cast_success) {
 		ReadPlayerMessage(json_dict["update_player"]);
-		UpdateUiTargets(json_dict["attack_summary"]);
+		const summary_dict = json_dict["attack_summary"];
+		if (summary_dict != null) {
+			UpdateUiTargets();
+		}
 		const text = json_dict["ability_text_result"];
-		if (text.length > 0) {
+		if (text != null && text.length > 0) {
 			LogToCombatLog(text);
 		}
 	}
