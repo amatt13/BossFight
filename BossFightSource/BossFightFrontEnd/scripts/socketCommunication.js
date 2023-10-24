@@ -64,6 +64,9 @@ socket.onmessage = function (event) {
 	else if ("ability_cast_result" in json_dict) {
 		handleAbilityCastResult(json_dict["ability_cast_result"])
 	}
+	else if ("regen_health_and_mana" in json_dict) {
+		regenPlayerHealthAndMana(json_dict["regen_health_and_mana"]);
+	}
 	else if ("error_message" in json_dict) {
 		error_message = json_dict["error_message"]
 		show_custom_alert(error_message, "alarm")

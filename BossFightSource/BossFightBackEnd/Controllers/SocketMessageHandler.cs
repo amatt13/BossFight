@@ -229,8 +229,8 @@ namespace BossFight.Controllers
                 var voteByteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(monsterTierVotesTotalMessage)));
                 foreach (var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
                 {
-                    await ws.SendAsync(monsterByteArray, WebSocketMessageType.Text, true, CancellationToken.None);
-                    await ws.SendAsync(voteByteArray, WebSocketMessageType.Text, true, CancellationToken.None);
+                    await ws.WebSocket.SendAsync(monsterByteArray, WebSocketMessageType.Text, true, CancellationToken.None);
+                    await ws.WebSocket.SendAsync(voteByteArray, WebSocketMessageType.Text, true, CancellationToken.None);
                 }
             }
         }
@@ -261,6 +261,9 @@ namespace BossFight.Controllers
                     string output = JsonSerializer.Serialize(response);
                     var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
                     await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                    var bossFightWebSocket = WebSocketConnections.GetInstance().GetConnection(pWebSocket);
+                    if (bossFightWebSocket != null)
+                        bossFightWebSocket.PlayerId = player.PlayerId;
                 }
             }
             if (!String.IsNullOrEmpty(error))
@@ -292,7 +295,7 @@ namespace BossFight.Controllers
                     string output = JsonSerializer.Serialize(response);
                     var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
                     foreach (var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
-                        await ws.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
+                        await ws.WebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
                 }
             }
             if (!String.IsNullOrEmpty(error))

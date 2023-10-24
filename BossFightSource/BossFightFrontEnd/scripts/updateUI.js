@@ -194,3 +194,21 @@ function CreateAbilityForPlayerColumn(ability)
 
 return ability_html;
 }
+
+function regenPlayerHealthAndMana(regen_health_and_mana_dict) {
+	const hp = regen_health_and_mana_dict["health"];
+	const mana = regen_health_and_mana_dict["mana"];
+
+	_player.hp += hp;
+	_player.mana += mana;
+
+	// set HP bar
+	let progress_player_health = document.getElementById("progress_player_health");
+	progress_player_health.value = _player.hp;
+	document.getElementById("player_hp").innerHTML = `${numberToString(_player.hp)}/${numberToString(_player.player_player_class.max_hp)}`;
+
+	// set mana bar
+	let progress_player_mana = document.getElementById("progress_player_mana");
+	progress_player_mana.value = _player.mana;
+	document.getElementById("player_mana").innerHTML = `${numberToString(_player.mana)}/${numberToString(_player.player_player_class.max_mana)}`;
+}

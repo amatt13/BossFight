@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using BossFight;
@@ -51,6 +55,7 @@ namespace BossFight
         private void Regen()
         {
             var players = new Player().FindAll();
+            var openConnections = WebSocketConnections.GetInstance().GetAllOpenConnectionsWithPlayerId();
             using var connection = GlobalConnection.GetNewOpenConnection();
 
             var hpRegenCmd = @"UPDATE Player p
@@ -86,6 +91,9 @@ AND p.Mana + @manaToRestore <= @maxMana";
                     manaCmd.Parameters.AddParameter(maxMana.ToDbString(), "@maxMana");
                     manaCmd.Parameters.AddParameter(playerId.ToDbString(), "@playerId");
                     manaCmd.ExecuteNonQuery();
+
+                    var connectionsToPlayer = openConnections.Where(c => c.PlayerId == playerId);
+                    connectionsToPlayer.ForEach(c => SendRegenMessage(c.WebSocket, manaToRestore, hpToRestore));
                 }
                 catch (Exception ex)
                 {
@@ -94,6 +102,23 @@ AND p.Mana + @manaToRestore <= @maxMana";
                 }
             }
             connection.Close();
+        }
+
+        private void SendRegenMessage(WebSocket pWebSocket, int pMana, int pHp)
+        {
+            var response = new Dictionary<string, object>
+            {
+                {
+                    "regen_health_and_mana", new Dictionary<string, int>
+                    {
+                        {"mana", pMana},
+                        {"health", pHp}
+                    }
+                }
+            };
+            string output = JsonSerializer.Serialize(response);
+            var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
+            Task.Factory.StartNew(() => pWebSocket.SendAsync(byteArray, WebSocketMessageType.Text, true, CancellationToken.None));
         }
     }
 }
