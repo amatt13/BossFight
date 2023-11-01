@@ -190,7 +190,7 @@ namespace BossFight.Controllers
                     string output = JsonSerializer.Serialize(monsterUpdate);
                     var monsterUpdateByteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
                     // send to everyone but the current connection. They just got an update with player_attacked_monster_with_weapon
-                    await WebSocketConnections.GetInstance().SendMessageToEveryOneElseAsync(pWebSocket, monsterUpdateByteArray);
+                    await WebSocketConnections.GetInstance().SendMessageToEveryOneElseWhoAreLoggedInAsync(pWebSocket, monsterUpdateByteArray);
                 }
             }
             else
@@ -263,7 +263,7 @@ namespace BossFight.Controllers
                     await pWebSocket.SendAsync(byteArray, pWebSocketReceiveResult.MessageType, pWebSocketReceiveResult.EndOfMessage, CancellationToken.None);
                     var bossFightWebSocket = WebSocketConnections.GetInstance().GetConnection(pWebSocket);
                     if (bossFightWebSocket != null)
-                        bossFightWebSocket.PlayerId = player.PlayerId;
+                        bossFightWebSocket.Player = player;
                 }
             }
             if (!String.IsNullOrEmpty(error))
@@ -348,7 +348,7 @@ namespace BossFight.Controllers
                         { "monster_tier_votes_total", votesTotal }
                     };
                     var byteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response)));
-                    await WebSocketConnections.GetInstance().SendMessageToEveryOneElseAsync(pWebSocket, byteArray);
+                    await WebSocketConnections.GetInstance().SendMessageToEveryOneElseWhoAreLoggedInAsync(pWebSocket, byteArray);
                 }
             }
 
@@ -467,12 +467,11 @@ namespace BossFight.Controllers
                 var playerClassId = pJsonParameters["player_class_id"].GetInt32();
                 var prefferedBodyTypeName = pJsonParameters["preffered_body_type"].GetString();
                 if (
-                    RequestValidator.PlayerExists(playerId, out error)
+                    RequestValidator.PlayerExists(playerId, out Player player, out error)
                     && RequestValidator.PlayerClassExists(playerClassId, out PlayerClass playerClass, out error)
                     && RequestValidator.PlayerOwnsPlayerClass(playerId, playerClass, out error)
                     && RequestValidator.BodyTypeNameExists(prefferedBodyTypeName, out error))
                 {
-                    var player = new Player().FindOne(playerId);
                     var updatePlayer = false;
 
                     // Do we need to update the PlayerPlayerClass relation?
@@ -480,10 +479,13 @@ namespace BossFight.Controllers
                     if (playerClass.PlayerClassId != currentPlayerPlayerClassRelation.PlayerClass.PlayerClassId)
                     {
                         currentPlayerPlayerClassRelation.Active = false;
+                        currentPlayerPlayerClassRelation.Player = player;
                         currentPlayerPlayerClassRelation.Persist();
 
                         var newPlayerPlayerClassActiveRelation = new PlayerPlayerClass{ PlayerId = playerId, PlayerClass = playerClass, PlayerClassId = playerClass.PlayerClassId }.FindOne();
                         newPlayerPlayerClassActiveRelation.Active = true;
+                        player.PlayerPlayerClass = newPlayerPlayerClassActiveRelation;
+                        newPlayerPlayerClassActiveRelation.Player = player;
                         newPlayerPlayerClassActiveRelation.Persist();
 
                         if (newPlayerPlayerClassActiveRelation.MaxHp < player.Hp)
@@ -575,7 +577,7 @@ namespace BossFight.Controllers
                                 };
                                 string output = JsonSerializer.Serialize(monsterUpdate);
                                 var monsterUpdateByteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
-                                await WebSocketConnections.GetInstance().SendMessageToEveryOneElseAsync(pWebSocket, monsterUpdateByteArray);
+                                await WebSocketConnections.GetInstance().SendMessageToEveryOneElseWhoAreLoggedInAsync(pWebSocket, monsterUpdateByteArray);
                             }
                         }
                     }

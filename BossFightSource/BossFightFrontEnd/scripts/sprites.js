@@ -1,5 +1,6 @@
 function file_exists(path)
 {
+    path = path.toLowerCase();
     let result = false;
 
     var http = new XMLHttpRequest();
@@ -14,7 +15,7 @@ function file_exists(path)
     return result;
 }
 
-function buildPlayerSpriteName(class_name, preffered_body_type, include_file_ening) {
+function buildPlayerSpriteName(class_name, preffered_body_type, include_file_ending) {
     player_class_name_suffix = ""
     switch (preffered_body_type) {
         case "masculine":
@@ -29,8 +30,8 @@ function buildPlayerSpriteName(class_name, preffered_body_type, include_file_eni
             break;
     }
 
-    result = `${class_name}${player_class_name_suffix}`;
-    if (include_file_ening) {
+    result = `${class_name}${player_class_name_suffix}`.toLocaleLowerCase();
+    if (include_file_ending) {
         result += ".png"
     }
 
@@ -39,6 +40,7 @@ function buildPlayerSpriteName(class_name, preffered_body_type, include_file_eni
 
 function getPlayerClassSprite(class_name, preffered_body_type) {
     let img = new Image();
+    class_name = class_name.toLocaleLowerCase();
 
     full_class_name_with_file_ending = buildPlayerSpriteName(class_name, preffered_body_type, true);
     path = `./images/sprites/player_classes/${full_class_name_with_file_ending}`;

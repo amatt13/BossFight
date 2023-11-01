@@ -6,6 +6,7 @@ using BossFight.Models.Loot;
 using MySqlConnector;
 using System.Text.Json.Serialization;
 using BossFight.BossFightEnums;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 namespace BossFight.Models
 {
@@ -70,6 +71,14 @@ namespace BossFight.Models
 
         public Player() { }
 
+        #region PersistableBase implementation
+
+        public override void BeforePersist()
+        {
+            base.BeforePersist();
+            UpdateBossFightConnectionWithPlayer();
+        }
+
         public override IEnumerable<Player> BuildObjectFromReader(MySqlConnector.MySqlDataReader reader, MySqlConnection pConnection)
         {
             var result = new List<Player>();
@@ -132,6 +141,17 @@ namespace BossFight.Models
                 additionalSearchCriteriaText += $" AND { nameof(Password) } = { p.Password.ToDbString() }\n";
 
             return TrimAdditionalSearchCriteriaText(additionalSearchCriteriaText, pStartWithAnd);
+        }
+
+        #endregion PersistableBase implementation
+
+        public void UpdateBossFightConnectionWithPlayer()
+        {
+            var bossFightConnection = WebSocketConnections.GetInstance().GetConnection(this);
+            if (bossFightConnection != null)
+            {
+                bossFightConnection.Player = this;
+            }
         }
 
         public int CalckWeaponAttackDamage(MonsterInstance pTargetMonster, PlayerAttackSummary pPlayerAttackSummary)

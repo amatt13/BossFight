@@ -1,0 +1,55 @@
+.window {
+	position: fixed;
+	width: fit-content;
+	height: fit-content;
+	border-radius: 10px;
+	border: none;
+	box-shadow: 1px 1px 4px rgba(0,0,0,0,0.9), -1px 1px 4px rgba(0,0,0,0,0.9);
+	background: #fff;
+}
+
+.window-content {
+	background: #000;
+	color: #fff;
+	height: 100%;
+	font-family: monospace;
+	padding: 5px;
+}
+
+#otherPlayersWindow {
+	z-index: 999;
+}
+
+.window-top, .window-top-no-bind {
+	cursor: move;
+	text-align: right;
+	height: 20px;
+	border-bottom: 1px solid rgba(0,0,0,0.5);
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	padding: 5px;
+	background-color: #ddd;
+}
+
+.other-players-window-table {
+    width: 100%;
+    max-width: 500px;
+    border-spacing: 0px;
+}
+
+.other-players-window-row {
+    float: auto;
+}
+
+.other-players-window-row:hover {
+	background-color: var(--border-colour);
+	font-style: italic;
+}
+
+.other-players-window-table-image {
+    object-fit: fill;
+    width: 75px;
+}
+.other-players-window-table-paragraph {
+
+}

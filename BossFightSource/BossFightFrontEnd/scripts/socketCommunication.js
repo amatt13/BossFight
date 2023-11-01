@@ -67,13 +67,16 @@ socket.onmessage = function (event) {
 	else if ("regen_health_and_mana" in json_dict) {
 		regenPlayerHealthAndMana(json_dict["regen_health_and_mana"]);
 	}
+	else if ("other_players_info_updates" in json_dict) {
+		addPlayersToCanvas(json_dict["other_players_info_updates"]);
+	}
 	else if ("error_message" in json_dict) {
 		error_message = json_dict["error_message"]
 		show_custom_alert(error_message, "alarm")
 		LogToGeneralLog(error_message, true);
 	}
 	else
-		LogToGeneralLog(`Unkown message received '${json_dict}'`, true);
+		LogToGeneralLog(`Unkown message received '${JSON.stringify(json_dict)}'`, true);
 
 };
 

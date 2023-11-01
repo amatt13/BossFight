@@ -186,7 +186,8 @@ class PlayerClass {
 class BodyType {
 	constructor(body_type_id, name) {
 		this.body_type_id = body_type_id;
-		this.Name = name;
+		this.Name = name;  //TODO remove me
+		this.name = name;
 	}
 
 	static CreateFromDict(body_type_dict) {
@@ -234,6 +235,26 @@ class Ability {
 
 	static CreateFromDict(ability_dict) {
 		return new Ability(ability_dict["Name"], ability_dict["Description"], ability_dict["OnlyTargetMonster"], ability_dict["ManaCost"], ability_dict["AffectsAllPlayers"], ability_dict["AbilityCastKey"]);
+	}
+}
+
+class PlayerInformation {
+	constructor(player_name, player_level, player_id, player_class_name, current_hp, max_hp, current_mana, max_mana, preffered_body_type) {
+		this.name = player_name;
+		this.level = player_level;
+		this.player_id = player_id;
+		this.player_class_name = player_class_name;
+		this.current_hp = current_hp;
+		this.max_hp = max_hp;
+		this.current_mana = current_mana;
+		this.max_mana = max_mana;
+		this.preffered_body_type = preffered_body_type;
+		this.image_source = getPlayerClassSprite(player_class_name, preffered_body_type.Name);
+	}
+
+	static CreateFromDict(info_dict) {
+		const body_type = BodyType.CreateFromDict(info_dict["PrefferedBodyType"])
+		return new PlayerInformation(info_dict["Name"], info_dict["Level"], info_dict["PlayerId"], info_dict["PlayerClassName"], info_dict["CurrentHp"], info_dict["MaxHp"], info_dict["CurrentMana"], info_dict["MaxMana"], body_type);
 	}
 }
 

@@ -123,6 +123,7 @@ namespace BossFight.Models
         {
             base.BeforePersist();
             Active ??= false;
+            Player.UpdateBossFightConnectionWithPlayer();
         }
 
         public void LevelUp()

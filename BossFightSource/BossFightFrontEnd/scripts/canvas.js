@@ -1,20 +1,35 @@
 const canvas = document.getElementById('mainCanvas');
-const ctx = canvas.getContext('2d');
+const _ctx = canvas.getContext('2d');
 let playerImage = document.getElementById("playerSprite");
 let monsterImage = document.getElementById("monsterSprite");
 const voteUpButton = document.getElementById("voteMonsterTierUpButton");
 const voteDownButton = document.getElementById("voteMonsterTierDownButton");
 let initialMonsterImageX = 30, initialMonsterImageY = -1;
 let playerWidthPlacement = 0;
+let _player_info_list = [];
 
 monsterImage.addEventListener("load", () => {
 	initialMonsterImageY = canvas.height / 2;
-	ctx.drawImage(monsterImage, initialMonsterImageX, initialMonsterImageY);
+	_ctx.drawImage(monsterImage, initialMonsterImageX, initialMonsterImageY);
 });
 
 playerImage.addEventListener("load", () => {
-	ctx.drawImage(playerImage, canvas.width-playerImage.width, initialMonsterImageY);
+	_ctx.drawImage(playerImage, canvas.width-playerImage.width, initialMonsterImageY);
 });
+
+canvas.addEventListener("mouseup", function(e) {
+	const x = e.pageX-$(canvas).offset().left;
+	const y = e.pageY-$(canvas).offset().top;
+	const playerx0 = canvas.width-playerImage.width;
+	const playery0 = initialMonsterImageY;
+	const playerx1 = playerx0 + 100;
+	const playery1 = playery0 + 100;
+	const hit = x >= playerx0 && x <= playerx1
+				&& y >= playery0 && y <= playery1;
+	if (hit) {
+		alert(`x: ${x} y: ${y}\n${hit}`);
+	}
+})
 
 function Vote(vote) {
 	if (_player != undefined) {
@@ -53,17 +68,43 @@ voteDownButton.addEventListener("click", () => {
 	Vote(-1)
 });
 
+function addPlayersToCanvas(json_player_info_list) {
+	_player_info_list = [];
+	json_player_info_list.forEach(info_dict => {
+		_player_info_list.push(PlayerInformation.CreateFromDict(info_dict));
+	});
+	populateOtherPlayersWindow(_player_info_list);
+}
+
+function getCircleX(radians, radius) {
+	return Math.cos(radians) * radius;
+  }
+
+  function getCircleY(radians, radius) {
+	return Math.sin(radians) * radius;
+  }
+
+  function degreesToRad(deg) {
+	return deg * Math.PI / 180;
+  }
+
+  function radToDegrees(rad) {
+	return rad * 180 / Math.PI;
+  }
+
+// Only drawing stuff below
 window.requestAnimationFrame(Draw);
 
 function Draw() {
 	ReSizeCanvas();  // MUST be the first thing that happens
-	ctx.fillStyle = "hsl(349, 19%, 45%)"
+	_ctx.fillStyle = "hsl(349, 19%, 45%)"
 	ResetFont();
-	ctx.globalCompositeOperation = 'destination-over';
-	ctx.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
+	_ctx.globalCompositeOperation = 'destination-over';
+	_ctx.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
 	AnimateMonster();
 	DrawMonsterStatus();
 	AnimatePlayer();
+	AnimateOtherPlayers();
 	WriteToVariables();
 	if (_enable_damage_to_show) {
 		DrawDamage();
@@ -88,7 +129,7 @@ function ReSizeCanvas() {
 }
 
 function ResetFont() {
-	ctx.font = "30px myFirstFont";
+	_ctx.font = "30px myFirstFont";
 }
 
 let monsterImageX = initialMonsterImageX, monsterImageY = initialMonsterImageY;
@@ -114,11 +155,55 @@ function AnimateMonster() {
 	monsterImageX = monsterImageMoveForward ? monsterImageX + 0.5 : monsterImageX - 0.5;
 	monsterImageY = monsterImageMoveDown ? monsterImageY + 0.5 : monsterImageY - 0.5;
 
-	ctx.drawImage(monsterImage, monsterImageX, monsterImageY, 160, 160);
+	_ctx.drawImage(monsterImage, monsterImageX, monsterImageY, 160, 160);
+
+	var monster_name_y = monsterImageY - 5;// - monsterImage.naturalHeight;
+	var monster_name_x = monsterImageX;
+	let monster_name = _monster1.monster_name ?? "?";
+	let monsterlevel = _monster1.level ?? "?";
+	_ctx.fillText(`${ monster_name } level ${ monsterlevel }`, monster_name_x, monster_name_y);
 }
 
 function AnimatePlayer() {
-	ctx.drawImage(playerImage, canvas.width-playerImage.width, initialMonsterImageY, 100, 100);
+	const player_x = canvas.width-playerImage.width;
+	const player_y = initialMonsterImageY;
+	_ctx.drawImage(playerImage, player_x, player_y, 100, 100);
+}
+
+function AnimateOtherPlayers() {
+	_ctx.font = "15px myFirstFont";
+
+	const number_of_players_to_draw = _player_info_list.length;
+	if (number_of_players_to_draw > 0) {
+		const r = 150;
+		const circle_start = -90;
+		const circle_end = -270;
+		const available_degrees = circle_end - circle_start;
+		const move_distance = available_degrees / number_of_players_to_draw;
+
+		const player_x = canvas.width-playerImage.width;
+		const player_y = initialMonsterImageY;
+
+		for (let index = 0; index < number_of_players_to_draw; index++) {
+			const degs = circle_start + move_distance * (index + 1) - move_distance / 2;
+			const rads = degreesToRad(degs)
+			const x_rads = Math.round(getCircleX(rads, r) * 100) / 100 + (player_x);
+			const y_rads = Math.round(getCircleY(rads, r) * 100) / 100 + (player_y);
+
+			const other_player = _player_info_list[index];
+			_ctx.drawImage(other_player.image_source, x_rads, y_rads, 100, 100);
+
+			_ctx.fillText(`${ other_player.name } level ${ other_player.level }`, x_rads, y_rads + 100);
+			_ctx.fillText(`${ other_player.current_hp }/${ other_player.max_hp } HP - ${ other_player.current_mana }/${ other_player.max_mana } mana`, x_rads, y_rads + 115);
+		}
+
+		// The great debug circle that shows where other players should be shown on the canvas
+		// ctx.beginPath();
+		// ctx.arc(player_x + playerImage.width / 3, player_y + playerImage.height / 3, 200, 0, 2 * Math.PI);
+		// ctx.stroke();
+
+		ResetFont();
+	}
 }
 
 function DrawMonsterStatus() {
@@ -128,22 +213,16 @@ function DrawMonsterStatus() {
 	if (_monster1.monster_template != undefined && _monster1.monster_template.monster_type_list != undefined) {
 		monster_type_list = _monster1.monster_template.monster_type_list ?? [""]
 	}
-	ctx.fillText(`${ _monster1.monster_name } <${ monster_type_list.join(' ') }>`, 10, 30)
+	_ctx.fillText(`${ _monster1.monster_name } <${ monster_type_list.join(' ') }>`, 10, 30)
 
-	ctx.fillText('Health:', 10, 60);
-	ctx.fillText(`${ monster_hp }/${ monster_max_hp }`, 100, 60);
+	_ctx.fillText('Health:', 10, 60);
+	_ctx.fillText(`${ monster_hp }/${ monster_max_hp }`, 100, 60);
 
 	var monster_strenfth = _monster1.attack_strength ?? "0";
-	ctx.fillText('Attack strength:', 10, 90);
-	ctx.fillText(monster_strenfth, 200, 90);
+	_ctx.fillText('Attack strength:', 10, 90);
+	_ctx.fillText(monster_strenfth, 200, 90);
 
-	ctx.fillText('Active Effects:', 10, 120);
-
-	var monster_name_y = monsterImageY - 5;// - monsterImage.naturalHeight;
-	var monster_name_x = monsterImageX;
-	let monster_name = _monster1.monster_name ?? "?";
-	let monsterlevel = _monster1.level ?? "?";
-	ctx.fillText(`${ monster_name } level ${ monsterlevel }`, monster_name_x, monster_name_y);
+	_ctx.fillText('Active Effects:', 10, 120);
 }
 
 let _damage_to_show;
@@ -151,8 +230,8 @@ let _enable_damage_to_show = false;
 function DrawDamage() {
 	var monster_name_y = monsterImageY + monsterImage.height - 100;
 	var monster_name_x = monsterImageX;
-	ctx.font = "60px myFirstFont";
-	ctx.fillText(`${ _damage_to_show }!`, monster_name_x, monster_name_y);
+	_ctx.font = "60px myFirstFont";
+	_ctx.fillText(`${ _damage_to_show }!`, monster_name_x, monster_name_y);
 }
 
 function CanvasShowDamageAnimation(damage) {
@@ -165,8 +244,8 @@ let _damage_to_showPlayer;
 function DrawDamageOnPlayer(){
 	var Player_y = initialMonsterImageY - 20;
 	var player_x = playerWidthPlacement + 72 / 2 - 5;
-	ctx.font = "60px myFirstFont";
-	ctx.fillText(`${ _damage_to_showPlayer }!`, player_x, Player_y);
+	_ctx.font = "60px myFirstFont";
+	_ctx.fillText(`${ _damage_to_showPlayer }!`, player_x, Player_y);
 }
 
 function CanvasShowDamageAnimationForPlayer(damage) {

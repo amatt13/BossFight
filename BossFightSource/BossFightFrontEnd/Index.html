@@ -1,11 +1,12 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-	<link rel="stylesheet" href="css/stylesheet.css" type="text/css" charset="utf-8" />
-	<link rel="stylesheet" href="css/shop.css" type="text/css" charset="utf-8" />
-	<link rel="stylesheet" href="css/playerClassMenu.css" type="text/css" charset="utf-8" />
-	<link rel="stylesheet" href="css/toolTip.css" type="text/css" charset="utf-8" />
-	<link rel="stylesheet" href="css/abilities.css" type="text/css" charset="utf-8" />
+	<link rel="stylesheet" href="css/stylesheet.css" type="text/css" charset="utf-8"/>
+	<link rel="stylesheet" href="css/shop.css" type="text/css" charset="utf-8"/>
+	<link rel="stylesheet" href="css/playerClassMenu.css" type="text/css" charset="utf-8"/>
+	<link rel="stylesheet" href="css/toolTip.css" type="text/css" charset="utf-8"/>
+	<link rel="stylesheet" href="css/abilities.css" type="text/css" charset="utf-8"/>
+	<link rel="stylesheet" href="css/dragablewindow.css" type="text/css" charset="utf-8"/>
 	<meta charset="utf-8">
 	<meta http-equiv="content_security_policy" content="script-src 'self'; script-src-elem 'self'">
 	<title>Boss Fight</title>
@@ -254,6 +255,13 @@
 	</form>
 </div>
 
+<div hidden id="otherPlayersWindow" class="window">
+	<div class="window-top">
+	</div>
+		<div class="window-content">
+	</div>
+</div>
+
 <img id="monsterSprite" src="./images/sprites/monsters/goblin.png" alt="Current monster sprite" class="hidden">
 
 <!-- not to self... the order of these scripts matter -->
@@ -272,3 +280,4 @@
 <script type="text/javascript" src="scripts/sign_in.js"></script>
 <script type="text/javascript" src="scripts/keyboard_listener_functions.js"></script>
 <script type="text/javascript" src="scripts/ability.js"></script>
+<script type="text/javascript" src="scripts/other_players_window.js"></script>

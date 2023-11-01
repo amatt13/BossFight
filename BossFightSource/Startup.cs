@@ -54,8 +54,12 @@ namespace BossFight
             Console.WriteLine("Ready!");
 
             var playerRegeneratorLogger = _loggerFactory.CreateLogger<PlayerRegenerator>();
-            var PlayerRegenerator = new PlayerRegenerator(playerRegeneratorLogger);
-            PlayerRegenerator.Run();
+            var playerRegenerator = new PlayerRegenerator(playerRegeneratorLogger);
+            playerRegenerator.Run();
+
+            var playerConnectivityInformationLogger = _loggerFactory.CreateLogger<PlayerConnectivityInformation>();
+            var playerConnectivityInformation = new PlayerConnectivityInformation(playerConnectivityInformationLogger);
+            playerConnectivityInformation.Run();
         }
     }
 }

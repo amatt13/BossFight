@@ -3,24 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
+using BossFight.Models;
 
 namespace BossFight
 {
     public class BossFightWebSocket
     {
         public WebSocket WebSocket {get; set;}
-        public int? PlayerId {get; set;}
+        public Player Player {get; set;}
+        public int? PlayerId
+        {
+            get
+            {
+                return this.Player?.PlayerId;
+            }
+        }
 
         public BossFightWebSocket(WebSocket pWebSocket)
         {
             WebSocket = pWebSocket;
-            PlayerId = null;
+            Player = null;
         }
 
-        public BossFightWebSocket(WebSocket pWebSocket, int pPlayerID)
+        public BossFightWebSocket(WebSocket pWebSocket, Player pPlayer)
         {
             WebSocket = pWebSocket;
-            PlayerId = pPlayerID;
+            Player = pPlayer;
         }
     }
 
@@ -102,6 +110,14 @@ namespace BossFight
             }
         }
 
+        public BossFightWebSocket GetConnection(Player pPlayer)
+        {
+            lock (_lock)
+            {
+                return _connections.FirstOrDefault(elem => elem.PlayerId == pPlayer.PlayerId.Value);
+            }
+        }
+
         public List<BossFightWebSocket> GetAllConnections()
         {
             lock (_lock)
@@ -142,9 +158,9 @@ namespace BossFight
             }
         }
 
-        public async Task SendMessageToEveryOneElseAsync(WebSocket pWebSocket, ArraySegment<Byte> pMessage)
+        public async Task SendMessageToEveryOneElseWhoAreLoggedInAsync(WebSocket pWebSocket, ArraySegment<Byte> pMessage)
         {
-            var otherConnections = GetAllOpenConnections().Where(con => con.WebSocket != pWebSocket);
+            var otherConnections = GetAllOpenConnectionsWithPlayerId().Where(con => con.WebSocket != pWebSocket);
             foreach (var ws in otherConnections)
                 await ws.WebSocket.SendAsync(pMessage, WebSocketMessageType.Text, true, System.Threading.CancellationToken.None);
         }
