@@ -7,7 +7,7 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
 }
 else {
 	console.log("remote host");
-	conn_string = "ws://185.126.108.184:5000/ws";
+	conn_string = "wss://185.126.108.184:5000/ws";
 }
 
 
