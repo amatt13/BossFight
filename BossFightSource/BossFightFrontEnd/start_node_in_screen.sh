@@ -1,1 +1,1 @@
-screen -s node_server -d -m node app.js
+screen -S node -t node -d -m node app.js
