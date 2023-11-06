@@ -2,7 +2,7 @@ let socket = undefined;
 let conn_string = "";
 
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-	conn_string = "ws://localhost:5000/ws";
+	conn_string = "ws://localhost:5000/Echo";
 	console.log("unsecure localhost");
 }
 else {

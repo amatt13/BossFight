@@ -13,6 +13,6 @@
   "license": "ISC",
   "private": "true",
   "dependencies": {
-    "express": "*"
+    "express": "^4.18.2"
   }
 }
