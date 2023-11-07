@@ -22,7 +22,15 @@ namespace BossFight
             httpsv.Log.Level = LogLevel.Trace;
 
             // To provide the secure connection.
-            httpsv.SslConfiguration.ServerCertificate = new X509Certificate2("/etc/letsencrypt/live/bossfight.ix.tc/fullchain.pem");
+            var cert = X509Certificate2.CreateFromPemFile("/etc/letsencrypt/live/bossfight.ix.tc/fullchain.pem", "/etc/letsencrypt/live/bossfight.ix.tc/privkey.pem");
+
+            if (cert == null)
+            {
+                throw new Exception("FAILED TO CREATE CERTIFICATE");
+            }
+            httpsv.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls13;
+            httpsv.SslConfiguration.ServerCertificate = cert;
+            Console.WriteLine(httpsv.SslConfiguration.EnabledSslProtocols);
 
 
             // Set the HTTP GET request event.
