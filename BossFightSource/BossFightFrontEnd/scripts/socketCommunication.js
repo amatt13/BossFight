@@ -2,14 +2,14 @@ let socket = undefined;
 let conn_string = "";
 
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-	conn_string = "ws://localhost:5000/Echo";
+	conn_string = "ws://localhost:5000/ws";
 	console.log("unsecure localhost");
 }
 else {
 	console.log("secure remote host");
-	conn_string = "wss://bossfight.ix.tc:5000/Echo";
+	conn_string = "wss://bossfight.ix.tc:5000/ws";
 }
-//socket = new WebSocket("wss://bossfight.ix.tc:5000/Echo");
+//socket = new WebSocket("wss://bossfight.ix.tc:5000/ws");
 
 socket = new WebSocket(conn_string);
 
