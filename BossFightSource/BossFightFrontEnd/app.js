@@ -1,38 +1,8 @@
 ﻿const express = require('express');
 const app = express();
-
 const fs = require('fs');
 const https = require('https');
 const WebSocket = require('ws');
-
-/*
-const server = new https.createServer({
-  cert: fs.readFileSync('/etc/letsencrypt/live/bossfight.ix.tc/fullchain.pem'),
-  key: fs.readFileSync('/etc/letsencrypt/live/bossfight.ix.tc/privkey.pem')
-});
-const wss = new WebSocket.Server({ server });
-var msg;
-
-wss.on('connection', function connection(ws)
-{
-  ws.on('message', function incoming(message)
-  {
-    msg = message;
-    console.log('received: %s', msg);
-    wss.clients.forEach(function (client)
-    {
-       if (client.readyState == WebSocket.OPEN)
-       {
-          client.send( msg );
-       }
-    });
-  });
-});
-
-console.log("Boss Fight Socket Server is now listening on port 5000...")
-server.listen(5000);
-*/
-
 
 let options = {};
 let https_enabled = false;
