@@ -367,6 +367,11 @@ input:checked+.slider:before {
 	border-radius: 50%;
 }
 
+credits {
+	display: flex;
+	justify-content:space-evenly;
+}
+
 * {
 	font-family: myFirstFont;
 	font-size: 18px;

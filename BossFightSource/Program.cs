@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Hosting;
@@ -22,6 +23,9 @@ namespace BossFight
                     {
                         kestrelServerOptions.ConfigureEndpointDefaults(listenOptions =>
                         {
+                            #if DEBUG
+                                return;
+                            #endif
                             var httpsConnectionAdapterOptions = new HttpsConnectionAdapterOptions()
                             {
                                 SslProtocols = SslProtocols.Tls13,
