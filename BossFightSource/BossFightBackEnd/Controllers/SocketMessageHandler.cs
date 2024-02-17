@@ -23,7 +23,7 @@ namespace BossFight.Controllers
         private readonly Dictionary<string, Func<Dictionary<string, JsonElement>, WebSocketReceiveResult, WebSocket, Task>> methodDictionary = new();
         public SocketMessageHandler()
         {
-            ILoggerProvider fileLoggerProvider = new BossFightLoggerProvider("SocketMessageHandler.txt");
+            ILoggerProvider fileLoggerProvider = new BossFightLoggerProvider("logs/SocketMessageHandler.txt");
             ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder.AddConsole();
@@ -166,6 +166,8 @@ namespace BossFight.Controllers
                 && RequestValidator.PlayerExists(pJsonParameters["player_id"].GetInt32(), out Player player, out error)
                 && RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(pJsonParameters["player_id"].GetInt32(), out error))
             {
+                var webSocketConnections = WebSocketConnections.GetInstance();
+
                 var monster = new MonsterInstance { Active = true }.FindOne();
                 var summary = DamageDealer.PlayerAttackMonster(player, monster, true);
                 var response = new Dictionary<string, PlayerAttackSummary>
@@ -190,7 +192,13 @@ namespace BossFight.Controllers
                     string output = JsonSerializer.Serialize(monsterUpdate);
                     var monsterUpdateByteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(output));
                     // send to everyone but the current connection. They just got an update with player_attacked_monster_with_weapon
-                    await WebSocketConnections.GetInstance().SendMessageToEveryOneElseWhoAreLoggedInAsync(pWebSocket, monsterUpdateByteArray);
+                    await webSocketConnections.SendMessageToEveryOneElseWhoAreLoggedInAsync(pWebSocket, monsterUpdateByteArray);
+                }
+
+                var wsc = webSocketConnections.GetConnection(pWebSocket);
+                if (wsc != null)
+                {
+                    wsc.Player = player;
                 }
             }
             else

@@ -123,7 +123,7 @@ namespace BossFight.Models
 
         public Effect()
         {
-            ILoggerProvider fileLoggerProvider = new BossFightLoggerProvider("Effect.txt");
+            ILoggerProvider fileLoggerProvider = new BossFightLoggerProvider("logs/Effect.txt");
             ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder.AddConsole();

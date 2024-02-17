@@ -31,7 +31,7 @@ namespace BossFight
                 })
             );
 
-            ILoggerProvider fileLoggerProvider = new BossFightLoggerProvider("log.txt");
+            ILoggerProvider fileLoggerProvider = new BossFightLoggerProvider("logs/log.txt");
             _loggerFactory = LoggerFactory.Create(logBuilder =>
             {
                 logBuilder.AddConsole();

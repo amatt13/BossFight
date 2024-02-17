@@ -1,4 +1,5 @@
-// You can choose to have an element with the class "window-top" inside of your draggable window that will act as the "handle" for the window or it will attach to the element itself
+let _other_players_window_player_ids_list = []
+
 
 function makeDraggable (element) {
     // Make an element draggable (or if it has a .window-top class, drag based on the .window-top element)
@@ -40,7 +41,7 @@ function makeDraggable (element) {
         let new_y = element.offsetTop - currentPosY;
         let new_x = element.offsetLeft - currentPosX;
 
-        xy = reduceXYTobeWithInBounds(element, new_x, new_y);
+        xy = _reduceXYTobeWithInBounds(element, new_x, new_y);
         new_x = xy["x"];
         new_y = xy["y"];
 
@@ -66,7 +67,7 @@ makeDraggable(document.querySelector('#otherPlayersWindow'));
 // makeDraggable(document.querySelector('#myWindow2'));
 
 
-function reduceXYTobeWithInBounds(element, x, y) {
+function _reduceXYTobeWithInBounds(element, x, y) {
     const max_y = Math.max(document.documentElement.clientHeight, window.innerHeight) - element.clientHeight;
     const min_y = 0;
     const max_x = Math.max(document.documentElement.clientWidth, window.innerWidth) - element.clientWidth;
@@ -96,29 +97,62 @@ function populateOtherPlayersWindow(other_players_list) {
         y = localStorage.getItem("otherPlayersWindowY");
         x = localStorage.getItem("otherPlayersWindowX");
         if (x != null && y != null) {
-            const xy = reduceXYTobeWithInBounds(other_players_window, x, y);
+            const xy = _reduceXYTobeWithInBounds(other_players_window, x, y);
             x = xy["x"];
             y = xy["y"];
             other_players_window.style.top = y + "px";
             other_players_window.style.left = x + "px";
         }
     }
-    let new_html = "";
+
+    let window_content = other_players_window.getElementsByClassName("window-content")[0];
+    let new_html = window_content.innerHTML;
+    let player_ids_list = [..._other_players_window_player_ids_list]
     other_players_list.forEach(player => {
-        new_html += createOtherPlayerCard(player);
+        if (!player_ids_list.includes(player.player_id)) {
+            player_ids_list.push(player.player_id)
+            new_html += _createOtherPlayerCard(player);
+        }
     });
-    other_players_window.getElementsByClassName("window-content")[0].innerHTML = new_html;
+    _other_players_window_player_ids_list = player_ids_list
+
+    window_content.innerHTML = new_html;
+    let table_rows = document.getElementsByClassName("other-players-window-table");
+    for (row of table_rows) {
+        row.onmousedown = _changeCurrentPlayerTarget;
+    }
+}
+
+function getCurrentPlayerTarget() {
+    let result = null;
+
+    let selected = document.querySelector('#otherPlayersWindow').querySelector(".window-content").querySelector(".other-players-window-row-selected");
+    if (selected != undefined)
+        result = selected.playerid;
+
+    return result;
+}
+
+function _changeCurrentPlayerTarget(player_target) {
+    clearCurrentPlayerTarget();
+    player_target.currentTarget.classList.add("other-players-window-row-selected");
+}
+
+function clearCurrentPlayerTarget() {
+    let selected = document.querySelector('#otherPlayersWindow').querySelector(".window-content").querySelector(".other-players-window-row-selected");
+    if (selected != undefined)
+        selected.classList.remove("other-players-window-row-selected");
 }
 
 // This is the PlayerClass "cards"
-function createOtherPlayerCard(player) {
+function _createOtherPlayerCard(player) {
 	const sprite_source = getPlayerClassSprite(player.player_class_name, player.preffered_body_type.name).src;
 	const card_html = `<table class="other-players-window-table" id="otherPlayersWindowTable">
 		<tr class="other-players-window-row">
 			<td class="other-players-window-table-image">
 				<img id="player_class_menu_player_class${ player.player_class_name }_sprite" src="${ sprite_source }" width="75" height="75">
 			</td>
-            <td class="other-players-window-table-paragraph">
+            <td class="other-players-window-table-row-info" playerid="${ player.player_id }">
                 <p>${ player.name } - ${ player.current_hp }/${ player.max_hp } HP - ${ player.current_mana }/${ player.max_mana } mana</p>
             </td>
 		</tr>

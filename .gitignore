@@ -358,3 +358,4 @@ BossFightSource/BossFightBackEnd/appsettings.json
 *appsettings.Development.json
 BossFightSource/BossFightFrontEnd/images/ui_icons/source/*
 BossFightSource/logs/*
+certbot_info/*

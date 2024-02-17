@@ -44,12 +44,14 @@
 .other-players-window-row:hover {
 	background-color: var(--border-colour);
 	font-style: italic;
+	cursor: pointer;
 }
 
 .other-players-window-table-image {
     object-fit: fill;
     width: 75px;
 }
-.other-players-window-table-paragraph {
 
+.other-players-window-row-selected {
+	background-color: var(--border-colour);
 }

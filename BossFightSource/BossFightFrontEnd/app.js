@@ -1,5 +1,6 @@
 ﻿const express = require('express');
 const app = express();
+
 const fs = require('fs');
 const https = require('https');
 const WebSocket = require('ws');
@@ -11,9 +12,9 @@ var site_server = null;
 
 try {
         options = {
-                key: fs.readFileSync("/etc/letsencrypt/live/bossfight.ix.tc/privkey.pem"),
-                cert: fs.readFileSync("/etc/letsencrypt/live/bossfight.ix.tc/fullchain.pem"),
-                ca: fs.readFileSync("/etc/letsencrypt/live/bossfight.ix.tc/chain.pem"),
+                key: fs.readFileSync("/etc/letsencrypt/live/bossfight.uk.to/privkey.pem"),
+                cert: fs.readFileSync("/etc/letsencrypt/live/bossfight.uk.to/fullchain.pem"),
+                ca: fs.readFileSync("/etc/letsencrypt/live/bossfight.uk.to/chain.pem"),
         };
         https_enabled = true;
         port = 443;
