@@ -113,6 +113,9 @@ function populateOtherPlayersWindow(other_players_list) {
             player_ids_list.push(player.player_id)
             new_html += _createOtherPlayerCard(player);
         }
+        else {
+            //TODO already added players must have their stats updated. Such as HP and current class. Edit the new_html variable
+        }
     });
     _other_players_window_player_ids_list = player_ids_list
 
@@ -127,8 +130,11 @@ function getCurrentPlayerTarget() {
     let result = null;
 
     let selected = document.querySelector('#otherPlayersWindow').querySelector(".window-content").querySelector(".other-players-window-row-selected");
-    if (selected != undefined)
-        result = selected.playerid;
+    if (selected != undefined) {
+        const row_info = selected.querySelector(".other-players-window-table-row-info");
+        const playerid = row_info.attributes["playerid"].value;
+        result = parseInt(playerid);
+    }
 
     return result;
 }

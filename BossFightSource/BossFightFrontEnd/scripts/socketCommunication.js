@@ -68,6 +68,9 @@ socket.onmessage = function (event) {
 	else if ("other_players_info_updates" in json_dict) {
 		addPlayersToCanvas(json_dict["other_players_info_updates"]);
 	}
+	else if ("player_cast_ability_on_you" in json_dict) {
+		otherPlayerCastAbilityOnCurrentPlayer(json_dict["player_cast_ability_on_you"]);
+	}
 	else if ("error_message" in json_dict) {
 		error_message = json_dict["error_message"]
 		show_custom_alert(error_message, "alarm")

@@ -42,28 +42,29 @@ namespace BossFight.Models
             return Name;
         }
 
-        public virtual AbilityResult UseAbility(ITarget pCaster, ITarget pTarget, AbilityResult pAbilityResult)
+        public virtual AbilityResult UseAbility(ITarget pCaster, ITarget pTarget)
         {
+            var abilityResult = new AbilityResult();
             var errors = String.Empty;
             Caster = pCaster;
             Target = pTarget;
 
             if (CanCastAbility(ref errors)) {
-                TargetEffect(pTarget, pAbilityResult);
+                TargetEffect(pTarget, abilityResult);
                 SubtractManaCostFromCaster();
-                pAbilityResult.AbilityResultText = pAbilityResult.AbilityResultText.TrimEnd(new char[] { '\r', '\n' });;
-                pAbilityResult.CastSuccess = true;
+                abilityResult.AbilityResultText = abilityResult.AbilityResultText.TrimEnd(new char[] { '\r', '\n' });
+                abilityResult.CastSuccess = true;
             }
             else
             {
                 errors += $"Could not use ability {Name}\n";
-                pAbilityResult.CastSuccess = false;
+                abilityResult.CastSuccess = false;
             }
 
             errors = errors.TrimEnd(new char[] { '\r', '\n' });
-            pAbilityResult.Error = errors;
+            abilityResult.Error = errors;
 
-            return pAbilityResult;
+            return abilityResult;
         }
 
         public virtual bool CanCastAbility(ref string pError)

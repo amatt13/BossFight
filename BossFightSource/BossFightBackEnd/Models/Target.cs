@@ -5,6 +5,7 @@ namespace BossFight.Models
 {
     public interface ITarget: IEffectHolder
     {
+        int Id { get; }
         int Hp { get; set; }
         int Mana { get; set; }
         string Name { get; set; }

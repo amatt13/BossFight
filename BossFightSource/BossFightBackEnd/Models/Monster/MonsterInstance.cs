@@ -23,6 +23,13 @@ namespace BossFight.Models
         [PersistProperty(true)]
         public int? MonsterInstanceId { get; set;  }
 
+        public int Id {
+            get
+            {
+                return MonsterInstanceId.Value;
+            }
+        }
+
         [PersistProperty]
         public int MonsterTemplateId { get; set; }
 

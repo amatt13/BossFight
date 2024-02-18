@@ -18,44 +18,56 @@ namespace BossFight.Controllers
             //{nameof(XXX), typeof(XXX)},
         };
 
-        public static AbilityResult CastAbility(string pAbilityName, ITarget pCaster, int pTargetId, ILogger<SocketMessageHandler> pLogger)
+        public static ITarget FindTargetForAbility(int pTargetId, ITarget pCaster, Ability pAbility, ref string pError)
+        {
+            ITarget target = null;
+
+            if (pAbility.OnlyTargetMonster)
+            {
+                if (RequestValidator.MonsterInstanceExists(pTargetId, out MonsterInstance monsterTarget, out string error))
+                {
+                    target = monsterTarget;
+                }
+                else
+                {
+                    pError = error + "\nMonster was not found";
+                }
+            }
+            else
+            {
+                if (pCaster.Id == pTargetId)
+                {
+                    target = pCaster;
+                }
+                else
+                {
+                    if (RequestValidator.PlayerExists(pTargetId, out Player playerTarget, out string error))
+                    {
+                        target = playerTarget;
+                    }
+                    else
+                    {
+                        pError = error + "\nPlayer was not found";;
+                    }
+                }
+            }
+
+            return target;
+        }
+
+        public static Ability CreateAbility(string pAbilityName, ref string pError)
         {
             Ability ability = null;
-            var result = new AbilityResult();
             try
             {
                 ability = (Ability)Activator.CreateInstance(AbilityDictionary[pAbilityName]);
             }
             catch (KeyNotFoundException e)
             {
-                pLogger.LogError(e.Message);
-                result.Error = $"An internal server error occured when trying to cast {pAbilityName}";
+                pError = e.Message;
             }
 
-            if (ability != null)
-            {
-                ITarget target;
-                if (ability.OnlyTargetMonster)
-                {
-                    if (RequestValidator.MonsterInstanceExists(pTargetId, out MonsterInstance monsterTarget, out string error))
-                    {
-                        target = monsterTarget;
-                    }
-                    else
-                    {
-                        result.Error = error;
-                        return result;
-                    }
-                }
-                else
-                {
-                    target = pCaster;
-                }
-
-                result = ability.UseAbility(pCaster, target, result);
-            }
-
-            return result;
+            return ability;
         }
     }
 }

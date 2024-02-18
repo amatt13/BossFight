@@ -70,14 +70,6 @@ Body {
 	border-radius: 5px;
 }
 
-.context-menu {
-	padding: 0;
-	margin: 0;
-	list-style-type: none;
-	color: var(--default-font-colour);
-	background-color: var(--wallpaper-background-colour);
-}
-
 .custom-alert {
 	padding: 10px;
 	color: black;

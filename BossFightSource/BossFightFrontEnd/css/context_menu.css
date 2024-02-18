@@ -1,0 +1,11 @@
+.context-menu {
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+	color: var(--default-font-colour);
+	background-color: var(--wallpaper-background-colour);
+}
+
+.inventory-context-menu { }
+
+.ability-context-menu { }

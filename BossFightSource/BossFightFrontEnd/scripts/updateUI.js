@@ -47,7 +47,12 @@ function UpdateUiPlayerStats(player) {
 		new_abilities_list += ability_html;
 	});
 	ability_list.innerHTML = new_abilities_list;
-
+	document.querySelectorAll('[id^=button_ability_]').forEach(ability_button => {
+		ability_button.addEventListener('contextmenu', function (event) {
+			event.preventDefault();
+			showContextMenu(event);
+		});
+	})
 }
 
 function UpdateUiPlayerSoldWeapon(json_dict) {
@@ -184,8 +189,8 @@ function UpdateUiShop(shop_dict) {
 }
 
 function CreateAbilityForPlayerColumn(ability) {
-	const ability_html = `<button id="ability_${ability.name}" type="button" class="btn-ability toolTip" onclick="PlayerCast('${ability.ability_cast_key}')">
-	<img src="./images/ui_icons/abilities/${ability.image_source}.png" class="max-size-100-percent">
+	const ability_html = `<button id="button_ability_${ability.name}" type="button" class="btn-ability toolTip" onclick="player_cast('${ability.ability_cast_key}', ${_player.player_id});">
+	<img src="./images/ui_icons/abilities/${ability.image_source}.png" class="max-size-100-percent" data-ability_name="${ability.name}">
 	<span class="toolTipText" onclick="event.stopPropagation();">${ability.description}
 		Costs ${ability.mana_cost} Mana
 	</span>

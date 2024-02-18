@@ -7,6 +7,7 @@
 	<link rel="stylesheet" href="css/toolTip.css" type="text/css" charset="utf-8"/>
 	<link rel="stylesheet" href="css/abilities.css" type="text/css" charset="utf-8"/>
 	<link rel="stylesheet" href="css/dragablewindow.css" type="text/css" charset="utf-8"/>
+	<link rel="stylesheet" href="css/context_menu.css" type="text/css" charset="utf-8"/>
 	<meta charset="utf-8">
 	<meta http-equiv="content_security_policy" content="script-src 'self'; script-src-elem 'self'">
 	<title>Boss Fight</title>
@@ -152,9 +153,15 @@
 </html>
 
 <!-- Inventory context menu -->
-<ul class='custom-menu context-menu'>
-	<li id=custom_menu_equip data-action = "equip" data-equip_id=none>Equip weapon</li>
-	<li id=custom_menu_sell data-action = "sell" data-sell_id=none>Sell weapon</li>
+<ul class='custom-menu context-menu inventory-context-menu'>
+	<li id=custom_menu_equip data-action="equip" data-equip_id=none>Equip weapon</li>
+	<li id=custom_menu_sell data-action="sell" data-sell_id=none>Sell weapon</li>
+</ul>
+
+<!-- Ability context menu -->
+<ul class='custom-menu context-menu ability-context-menu' id="ability-context-menu">
+	<li id=custom_menu_cast_on_self data-action="cast on self" data-ability_name=none>Cast on self</li>
+	<li id=custom_menu_cast_on_player_target data-action="cast on player target" data-target_player_id=none data-ability_name=none>Cast on selected player</li>
 </ul>
 
 <!-- alerts dialog -->

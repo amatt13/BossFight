@@ -24,7 +24,7 @@ namespace BossFight.Models
             }
             else if (_attacPlayerWithSmite)
             {
-                AttacPlayerWithSmite((MonsterInstance)Caster, (Player)Target, pAbilityResult);
+                AttackPlayerWithSmite((MonsterInstance)Caster, (Player)Target, pAbilityResult);
             }
         }
 
@@ -86,7 +86,7 @@ namespace BossFight.Models
             pPLayer.BonusMagicDmg -= _smiteBonus_damage;
         }
 
-        private void AttacPlayerWithSmite(MonsterInstance pMonster, Player pPLayer, AbilityResult pAbilityResult)
+        private void AttackPlayerWithSmite(MonsterInstance pMonster, Player pPLayer, AbilityResult pAbilityResult)
         {
             var monsterAttackSummary = new PlayerAttackSummary(pPLayer, pMonster);
             DamageDealer.MonsterAttackPlayer(pMonster, pPLayer, monsterAttackSummary);

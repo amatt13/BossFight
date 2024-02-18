@@ -6,7 +6,6 @@ using BossFight.Models.Loot;
 using MySqlConnector;
 using System.Text.Json.Serialization;
 using BossFight.BossFightEnums;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 namespace BossFight.Models
 {
@@ -23,6 +22,13 @@ namespace BossFight.Models
         // Persisted on Player table
         [PersistProperty(true)]
         public int? PlayerId { get; set; }
+
+        public int Id {
+            get
+            {
+                return PlayerId.Value;
+            }
+        }
 
         [PersistProperty]
         public int Gold { get; set; }
