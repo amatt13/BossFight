@@ -65,13 +65,15 @@ document.querySelectorAll(".ability-context-menu li").forEach(menuItem => {
 
         switch (action) {
             case "cast on self":
-                const selfAbilityName = document.getElementById("custom_menu_cast_on_self").dataset.ability_name;
-                playerCast(selfAbilityName, _player.player_id);
+                const custom_menu_cast_on_self = document.getElementById("custom_menu_cast_on_self");
+                const self_ability_key = custom_menu_cast_on_self.dataset.ability_cast_key;
+                playerCast(self_ability_key, _player.player_id);
                 break;
             case "cast on player target":
-                const targetAbilityName = document.getElementById("custom_menu_cast_on_player_target").dataset.ability_name;
-                const targetPlayerId = document.getElementById("custom_menu_cast_on_player_target").dataset.target_player_id;
-                playerCast(targetAbilityName, targetPlayerId);
+                const custom_menu_cast_on_player_target = document.getElementById("custom_menu_cast_on_player_target");
+                const target_ability_key = custom_menu_cast_on_player_target.dataset.ability_cast_key;
+                const target_id = custom_menu_cast_on_player_target.dataset.target_player_id;
+                playerCast(target_ability_key, target_id);
                 break;
         }
 
@@ -82,19 +84,18 @@ document.querySelectorAll(".ability-context-menu li").forEach(menuItem => {
 
 // Function to show the ability context menu
 function showContextMenu(event) {
-    const abilityName = event.target.dataset.ability_name;
+    const button_ability_cast_key = event.target.dataset.ability_cast_key;
 
-    // Set data attributes for the custom menu options
-    const customMenuTarget = document.getElementById("custom_menu_cast_on_player_target");
-    customMenuTarget.dataset.target_player_id = getCurrentPlayerTarget();
-    customMenuTarget.dataset.ability_name = abilityName;
+    let custom_menu_cast_on_player_target = document.getElementById("custom_menu_cast_on_player_target");
+    custom_menu_cast_on_player_target.dataset.target_player_id = getCurrentPlayerTarget();
+    custom_menu_cast_on_player_target.dataset.ability_cast_key = button_ability_cast_key;
 
-    const customMenuSelf = document.getElementById("custom_menu_cast_on_self");
-    customMenuSelf.dataset.ability_name = abilityName;
+    let custom_menu_cast_on_self = document.getElementById("custom_menu_cast_on_self");
+    custom_menu_cast_on_self.dataset.ability_cast_key = button_ability_cast_key;
 
     // Show and position the ability context menu
-    const contextMenu = document.querySelector(".ability-context-menu");
-    contextMenu.style.top = `${event.pageY}px`;
-    contextMenu.style.left = `${event.pageX}px`;
-    contextMenu.classList.add('visible');
+    const context_menu = document.querySelector(".ability-context-menu");
+    context_menu.style.top = `${event.pageY}px`;
+    context_menu.style.left = `${event.pageX}px`;
+    context_menu.classList.add('visible');
 }

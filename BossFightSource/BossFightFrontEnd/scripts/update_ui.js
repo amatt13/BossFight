@@ -169,13 +169,13 @@ function UpdateMonsterTierVoteBasedOnCurrentPlayerVote(vote_dict) {
 	}
 }
 
-function CreatePlayerclassTitleCardForShop(playerclass, row) {
-	const sprite_source = getPlayerClassSprite(playerclass.name, "masculine");
+function CreatePlayerclassTitleCardForShop(playerclass) {
+	const sprite_source = getPlayerClassSprite(playerclass.name, _player.preffered_body_type.Name).src;
 	const card_html = `<div style="border: solid; border-color: var(--border-colour); margin-left: 5px">
 		<table>
 			<tr>
 				<td style="width: 50%; float: left">
-					<img id="shop_menu_player_class${ playerclass.name }_sprite" src="${ sprite_source.src }" width="75" height="75" style="object-fit: fill;">
+					<img id="shop_menu_player_class${ playerclass.name }_sprite" src="${ sprite_source }" width="75" height="75" style="object-fit: fill;">
 				</td>
 				<td>
 					<label>${ playerclass.description }</label>
@@ -214,7 +214,7 @@ function UpdateUiShop(shop_dict) {
 		const aquired = player_class["Aquired"];
 		const pc = PlayerClass.createFromDict(player_class["PlayerClass"]);
 		_playerclasses_list.push(pc);
-		const card = CreatePlayerclassTitleCardForShop(pc, playerclass_count);
+		const card = CreatePlayerclassTitleCardForShop(pc);
 		const class_row = `<div style="grid-column: 2; grid-row: ${ playerclass_count };">
 		${ card }
 		<button class="buy-button btn-primary" ${ aquired ? "disabled" : "" } onclick="BuyPlayerClass(${ pc.player_class_id });">${ aquired ? "Already owned" : "Buy" }</button>
@@ -227,7 +227,7 @@ function UpdateUiShop(shop_dict) {
 
 function CreateAbilityForPlayerColumn(ability) {
 	const ability_html = `<button id="button_ability_${ability.name}" type="button" class="btn-ability toolTip" onclick="playerCast('${ability.ability_cast_key}', ${_player.player_id});">
-	<img src="./images/ui_icons/abilities/${ability.image_source}.png" class="max-size-100-percent" data-ability_name="${ability.name}">
+	<img src="./images/ui_icons/abilities/${ability.image_source}.png" class="max-size-100-percent" data-ability_cast_key="${ability.ability_cast_key}">
 	<span class="toolTipText" onclick="event.stopPropagation();">${ability.description}
 		Costs ${ability.mana_cost} Mana
 	</span>

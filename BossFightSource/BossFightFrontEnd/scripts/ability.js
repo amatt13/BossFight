@@ -19,22 +19,22 @@ function playerCast(ability_cast_key, target_id) {
 			LogToCombatLog("Ability was not found");
 			can_cast = false;
 		}
-	
+
 		if (abiliy.mana_cost > _player.mana) {
 			LogToCombatLog("Not enough mana");
 			can_cast = false;
 		}
-	
+
 		if (_player.hp <= 0) {
 			LogToCombatLog("Can not use ability when at or below 0 HP");
 			can_cast = false;
 		}
-	
+
 		if (target_id == null || target_id == undefined) {
 			LogToCombatLog("No valid target selected");
 			can_cast = false;
 		}
-	
+
 		return can_cast;
 	}
 }
