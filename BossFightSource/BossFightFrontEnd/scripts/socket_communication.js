@@ -25,11 +25,11 @@ socket.onmessage = function (event) {
 	var json_dict = JSON.parse(event.data);
 
 	if ("fetch_active_monster" in json_dict) {
-		const monster = Monster.CreateFromDict(json_dict["fetch_active_monster"]);
+		const monster = Monster.createFromDict(json_dict["fetch_active_monster"]);
 		UpdateUiActiveMonster(monster);
 	}
 	else if ("update_player" in json_dict)
-		ReadPlayerMessage(json_dict["update_player"]);
+		updateUiPlayerStatsFromDict(json_dict["update_player"]);
 	else if ("update_player_sold_weapon" in json_dict)
 		UpdateUiPlayerSoldWeapon(json_dict["update_player_sold_weapon"])
 	else if ("update_player_equipped_weapon" in json_dict)
@@ -43,7 +43,7 @@ socket.onmessage = function (event) {
 	else if ("new_monster" in json_dict)
 		NewMonster(json_dict["new_monster"]);
 	else if ("player_signed_in" in json_dict) {
-		ReadPlayerMessage(json_dict["player_signed_in"]["player"]);
+		updateUiPlayerStatsFromDict(json_dict["player_signed_in"]["player"]);
 		if (json_dict["player_signed_in"]["current_vote"] != null) {
 			UpdateMonsterTierVoteBasedOnCurrentPlayerVote(json_dict["player_signed_in"]["current_vote"]);
 		}
@@ -97,7 +97,7 @@ socket.onerror = function (error) {
 };
 function UpdateUiTargets(json_dict)
 {
-	summary = PlayerAttackSummary.CreateFromDict(json_dict);
+	summary = PlayerAttackSummary.createFromDict(json_dict);
 	UpdateUiPlayerAttackedMonsterWithWeapon(summary);
 }
 async function FetchActiveMonster() {
@@ -196,9 +196,8 @@ function playerAttemptedToBuyAPlayerClass(params_dict) {
 	const sucess = params_dict["sucess"];
 	const message = params_dict["message"];
 	if (sucess) {
-		const updated_player = params_dict["updated_player"];
-		const player = Player.CreateFromDict(updated_player);
-		UpdateUiPlayerStats(player);
+		const updated_player_dict = params_dict["updated_player"];
+		updateUiPlayerStatsFromDict(updated_player_dict);
 		show_custom_alert(message, "congratulate");
 	}
 	else {

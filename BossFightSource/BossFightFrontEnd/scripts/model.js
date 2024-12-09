@@ -15,7 +15,7 @@ class Weapon {
 		this.cost = Cost
 	}
 
-	static CreateFromDict(weapon_dict) {
+	static createFromDict(weapon_dict) {
 		const weapon = new Weapon(weapon_dict["WeaponType"], weapon_dict["AttackMessage"], weapon_dict["BossWeapon"], weapon_dict["WeaponLvl"], weapon_dict["AttackPower"], weapon_dict["AttackCritChance"], weapon_dict["SpellPower"],
 			weapon_dict["SpellCritChance"], weapon_dict["LootId"], weapon_dict["LootName"], weapon_dict["LootDropChance"], weapon_dict["Cost"]);
 		return weapon;
@@ -34,8 +34,8 @@ class PlayerPlayerClass {
 		this.player_class = player_class;
 	}
 
-	static CreateFromDict(player_player_class_dict) {
-		const player_class = PlayerClass.CreateFromDict(player_player_class_dict["PlayerClass"]);
+	static createFromDict(player_player_class_dict) {
+		const player_class = PlayerClass.createFromDict(player_player_class_dict["PlayerClass"]);
 		const player_player_class = new PlayerPlayerClass(player_player_class_dict["XP"], player_player_class_dict["Level"], player_player_class_dict["Active"], player_player_class_dict["MaxHp"], player_player_class_dict["MaxMana"], player_player_class_dict["PlayerClassName"], player_player_class_dict["XpNeededToNextLevel"], player_class);
 		return player_player_class;
 	}
@@ -56,7 +56,7 @@ class MonsterTemplate {
 		this.monster_type_list = monster_type_list;
 	}
 
-	static CreateFromDict(monster_template_dict) {
+	static createFromDict(monster_template_dict) {
 		return new MonsterTemplate(monster_template_dict["Tier"], monster_template_dict["Name"], monster_template_dict["BossMonster"], monster_template_dict["MonsterTypeStringList"]);
 	}
 }
@@ -73,9 +73,9 @@ class Monster {
 		this.monster_template = monster_template;
 	}
 
-	static CreateFromDict(monster_dict) {
+	static createFromDict(monster_dict) {
 		const monster_template_dict = monster_dict["MonsterTemplate"];
-		const monster_template = MonsterTemplate.CreateFromDict(monster_template_dict);
+		const monster_template = MonsterTemplate.createFromDict(monster_template_dict);
 		return new Monster(monster_dict["Hp"], monster_dict["MaxHp"], monster_dict["Level"], monster_dict["Name"], monster_dict["IsBossMonster"], monster_dict["MonsterInstanceId"], monster_dict["AttackStrength"], monster_template);
 	}
 }
@@ -94,15 +94,15 @@ class Player {
 		this.preffered_body_type = preffered_body_type
 	}
 
-	static CreateFromDict(playerDict_dict) {
+	static createFromDict(playerDict_dict) {
 		const weapon_dict = playerDict_dict["Weapon"];
-		const weapon = Weapon.CreateFromDict(weapon_dict);
+		const weapon = Weapon.createFromDict(weapon_dict);
 
 		const player_player_class_dict = playerDict_dict["PlayerPlayerClass"];
-		const player_player_class = PlayerPlayerClass.CreateFromDict(player_player_class_dict);
+		const player_player_class = PlayerPlayerClass.createFromDict(player_player_class_dict);
 
 		const preffered_body_type_dict = playerDict_dict["PrefferedBodyType"];
-		const preffered_body_type = BodyType.CreateFromDict(preffered_body_type_dict);
+		const preffered_body_type = BodyType.createFromDict(preffered_body_type_dict);
 
 		let player_weapon_list = [];
 		const player_weapon_dict = playerDict_dict["PlayerWeaponList"];
@@ -127,7 +127,7 @@ class ChatMessage {
 		this.timestamp = timestamp
 	}
 
-	static CreateFromDict(chat_message_dict) {
+	static createFromDict(chat_message_dict) {
 		return new ChatMessage(chat_message_dict["ChatMessageId"], chat_message_dict["PlayerName"], chat_message_dict["MessageContent"], Date.parse(chat_message_dict["Timestamp"]));
 	}
 }
@@ -140,7 +140,7 @@ class PlayerClassRequirement {
 		this.required_player_class_name = RequiredPlayerClassName;
 	}
 
-	static CreateFromDict(player_class_requirement_dict) {
+	static createFromDict(player_class_requirement_dict) {
 		return new PlayerClassRequirement(player_class_requirement_dict["PlayerClassId"], player_class_requirement_dict["RequiredPlayerClassId"], player_class_requirement_dict["LevelRequirement"], player_class_requirement_dict["RequiredPlayerClassName"]);
 	}
 }
@@ -165,7 +165,7 @@ class PlayerClass {
 		this.description = Description;
 	}
 
-	static CreateFromDict(player_class_dict) {
+	static createFromDict(player_class_dict) {
 		let player_class_requirement_list = [];
 		const player_class_requirement_dict = player_class_dict["PlayerClassRequirementList"];
 		player_class_requirement_dict.forEach(pcr => {
@@ -174,7 +174,7 @@ class PlayerClass {
 		let abilities_list = [];
 		const unlocked_abilities_dict = player_class_dict["UnlockedAbilities"];
 		unlocked_abilities_dict.forEach(ability_dict => {
-			abilities_list.push(Ability.CreateFromDict(ability_dict));
+			abilities_list.push(Ability.createFromDict(ability_dict));
 		});
 
 		return new PlayerClass(abilities_list, player_class_dict["AttackPowerBonus"], player_class_dict["BaseHealth"], player_class_dict["BaseMana"], player_class_dict["CritChance"], player_class_dict["HpRegenRate"],
@@ -190,7 +190,7 @@ class BodyType {
 		this.name = name;
 	}
 
-	static CreateFromDict(body_type_dict) {
+	static createFromDict(body_type_dict) {
 		return new BodyType(body_type_dict["BodyTypeId"], body_type_dict["Name"]);
 	}
 }
@@ -210,11 +210,11 @@ class PlayerAttackSummary {
 		this.monster_total_damage = MonsterTotalDamage;
 	}
 
-	static CreateFromDict(player_attack_summary_dict) {
+	static createFromDict(player_attack_summary_dict) {
 		const player_dict = player_attack_summary_dict["Player"];
 		const monster_dict = player_attack_summary_dict["Monster"];
-		const player = Player.CreateFromDict(player_dict);
-		const monster = Monster.CreateFromDict(monster_dict);
+		const player = Player.createFromDict(player_dict);
+		const monster = Monster.createFromDict(monster_dict);
 
 		return new PlayerAttackSummary(player, monster, player_attack_summary_dict["PlayerTotalDamage"], player_attack_summary_dict["PlayerCrit"], player_attack_summary_dict["MonsterCrit"],
 			player_attack_summary_dict["PlayerExtraDamageFromBuffs"], player_attack_summary_dict["PlayerXpEarned"], player_attack_summary_dict["MonsterAffectedByDots"],
@@ -233,7 +233,7 @@ class Ability {
 		this.affects_all_players = affects_all_players;
 	}
 
-	static CreateFromDict(ability_dict) {
+	static createFromDict(ability_dict) {
 		return new Ability(ability_dict["Name"], ability_dict["Description"], ability_dict["OnlyTargetMonster"], ability_dict["ManaCost"], ability_dict["AffectsAllPlayers"], ability_dict["AbilityCastKey"]);
 	}
 }
@@ -252,8 +252,8 @@ class PlayerInformation {
 		this.image_source = getPlayerClassSprite(player_class_name, preffered_body_type.Name);
 	}
 
-	static CreateFromDict(info_dict) {
-		const body_type = BodyType.CreateFromDict(info_dict["PrefferedBodyType"])
+	static createFromDict(info_dict) {
+		const body_type = BodyType.createFromDict(info_dict["PrefferedBodyType"])
 		return new PlayerInformation(info_dict["Name"], info_dict["Level"], info_dict["PlayerId"], info_dict["PlayerClassName"], info_dict["CurrentHp"], info_dict["MaxHp"], info_dict["CurrentMana"], info_dict["MaxMana"], body_type);
 	}
 }

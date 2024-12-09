@@ -74,11 +74,11 @@ function addPlayersToCanvas(json_player_info_list) {
 		let existing_player_info = _player_info_list.find((p) => p.player_id == info_dict["PlayerId"]);
 		if (existing_player_info != null) {
 			const idx_of_player = _player_info_list.indexOf(existing_player_info);
-			const updated_instance = PlayerInformation.CreateFromDict(info_dict);
+			const updated_instance = PlayerInformation.createFromDict(info_dict);
 			_player_info_list[idx_of_player] = updated_instance;
 		}
 		else {
-			_player_info_list.push(PlayerInformation.CreateFromDict(info_dict));
+			_player_info_list.push(PlayerInformation.createFromDict(info_dict));
 		}
 	});
 	populateOtherPlayersWindow(_player_info_list);

@@ -17,9 +17,15 @@ function show_custom_alert(text_message, type) {
     $(".custom-alert").finish().toggle(100);
 }
 
-// hide if something else is clicked
-$(document).bind("mousedown", function (e) {
-    if (!$(e.target).parents(".custom-alert").length > 0) {
-        $(".custom-alert").hide(100);
-    }
+document.addEventListener("click", (ele) => {
+	// let alerts = ele.target.parents.getElementsByClassName("custom-alert");
+    // for (let i = 0; i < alerts.length; i++) {
+    //     alerts[i].hide(100);
+    // }
 });
+// hide if something else is clicked
+// $(document).bind("mousedown", function (e) {
+//     if (!$(e.target).parents(".custom-alert").length > 0) {
+//         $(".custom-alert").hide(100);
+//     }
+// });

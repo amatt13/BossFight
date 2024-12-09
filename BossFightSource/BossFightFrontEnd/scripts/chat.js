@@ -54,7 +54,7 @@ function OpenLog(evt, logName) {
   }
 
 function ReceiveChatMessage(chat_message_dict, blink = true) {
-    chat_message = ChatMessage.CreateFromDict(chat_message_dict);
+    chat_message = ChatMessage.createFromDict(chat_message_dict);
 
     const combined_message_text = `${chat_message.player_name}: ${chat_message.message_content}`
     LogToChatLog(combined_message_text, blink)

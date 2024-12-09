@@ -1,3 +1,34 @@
+function BlinkDiv(div_id, color = 'yellow') {
+	let element = document.getElementById(div_id)
+	const origcolor = element.style.backgroundColor
+	if (origcolor == color)
+
+	return;
+	element.style.backgroundColor = color;
+	let t = setTimeout(function () {
+		element.style.backgroundColor = origcolor;
+	}, (1 * 1000));
+}
+
+function RepopulatePlayerInventory() {
+	// clear inventory, and repopulate it again
+	let player_inventory = document.getElementById("player_inventory");
+	player_inventory.size = 0;
+	_player.player_weapon_list.forEach(player_weapon => {
+		let option = document.createElement("option");
+		option.text = player_weapon.name;
+		option.dataset.weapon_id = player_weapon.weapon_id;
+		player_inventory.add(option);
+	});
+
+	let inventory_lenght = _player.player_weapon_list.length;
+	if (inventory_lenght < 10) {
+		inventory_lenght = 10;
+	}
+
+	player_inventory.size = inventory_lenght;
+}
+
 function UpdateUiActiveMonster(monster, monster_is_new = false) {
 	_monster1 = monster;
 	document.getElementById("monsterSprite").src = `./images/sprites/monsters/${_monster1.monster_name[0].toLowerCase() + _monster1.monster_name.substr(1, _monster1.monster_name.length-1).replaceAll(" ", "")}.png`
@@ -5,6 +36,12 @@ function UpdateUiActiveMonster(monster, monster_is_new = false) {
 		voteUpButton.classList.remove("highligtedButton")
 		voteDownButton.classList.remove("highligtedButton")
 	}
+}
+
+function updateUiPlayerStatsFromDict(player_dict) {
+	let player = Player.createFromDict(player_dict);
+	_player = player;
+	UpdateUiPlayerStats(player);
 }
 
 function UpdateUiPlayerStats(player) {
@@ -71,7 +108,7 @@ function UpdateUiPlayerSoldWeapon(json_dict) {
 }
 
 function UpdateUiPlayerEquippedWeapon(weapon_dict) {
-	const weapon = Weapon.CreateFromDict(weapon_dict);
+	const weapon = Weapon.createFromDict(weapon_dict);
 	_player.weapon = weapon;
 	document.getElementById("player_equipped_weapon_name").innerHTML = _player.weapon.loot_name;
 	BlinkDiv("player_equipped_weapon_name");
@@ -133,7 +170,7 @@ function UpdateMonsterTierVoteBasedOnCurrentPlayerVote(vote_dict) {
 }
 
 function CreatePlayerclassTitleCardForShop(playerclass, row) {
-	const sprite_source = getPlayerClassSprite(playerclass.name);
+	const sprite_source = getPlayerClassSprite(playerclass.name, "masculine");
 	const card_html = `<div style="border: solid; border-color: var(--border-colour); margin-left: 5px">
 		<table>
 			<tr>
@@ -175,7 +212,7 @@ function UpdateUiShop(shop_dict) {
 	player_classes.forEach((player_class, i) => {
 		const playerclass_count = i + 2;
 		const aquired = player_class["Aquired"];
-		const pc = PlayerClass.CreateFromDict(player_class["PlayerClass"]);
+		const pc = PlayerClass.createFromDict(player_class["PlayerClass"]);
 		_playerclasses_list.push(pc);
 		const card = CreatePlayerclassTitleCardForShop(pc, playerclass_count);
 		const class_row = `<div style="grid-column: 2; grid-row: ${ playerclass_count };">
@@ -189,7 +226,7 @@ function UpdateUiShop(shop_dict) {
 }
 
 function CreateAbilityForPlayerColumn(ability) {
-	const ability_html = `<button id="button_ability_${ability.name}" type="button" class="btn-ability toolTip" onclick="player_cast('${ability.ability_cast_key}', ${_player.player_id});">
+	const ability_html = `<button id="button_ability_${ability.name}" type="button" class="btn-ability toolTip" onclick="playerCast('${ability.ability_cast_key}', ${_player.player_id});">
 	<img src="./images/ui_icons/abilities/${ability.image_source}.png" class="max-size-100-percent" data-ability_name="${ability.name}">
 	<span class="toolTipText" onclick="event.stopPropagation();">${ability.description}
 		Costs ${ability.mana_cost} Mana

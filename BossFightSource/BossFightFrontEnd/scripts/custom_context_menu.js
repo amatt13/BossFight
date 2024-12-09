@@ -1,16 +1,19 @@
+let player_inventory = document.getElementById('player_inventory');
+
 // If the document is clicked somewhere
-$(document).bind("mousedown", function (e) {
-
+document.addEventListener("click", (e) => {
     // If the clicked element is not the menu
-    if (!$(e.target).parents(".context-menu").length > 0) {
+    // if (!e.target.parents(".context-menu").length > 0) {
 
-        // Hide it
-        $(".context-menu").hide(100);
-    }
+    //     // Hide it
+    //     //$(".context-menu").hide(100);
+    //     //TODO hide it via class and css
+    //     //e.target.parents(".context-menu")[0]
+    // }
 });
 
 
-$("#player_inventory").bind("contextmenu", function (event) {
+player_inventory.addEventListener("contextmenu", function (event) {
 
     if (event.target.tagName == "OPTION") {
         // select the right clicked option
@@ -22,11 +25,11 @@ $("#player_inventory").bind("contextmenu", function (event) {
         event.preventDefault();
 
         // Show contextmenu
-        $(".inventory-context-menu").finish().toggle(100).css({
-            // In the right position (the mouse)
-            top: event.pageY + "px",
-            left: event.pageX + "px"
-        });
+        // $(".inventory-context-menu").finish().toggle(100).css({
+        //     // In the right position (the mouse)
+        //     top: event.pageY + "px",
+        //     left: event.pageX + "px"
+        // });
     }
 });
 
@@ -60,13 +63,13 @@ document.querySelectorAll(".ability-context-menu li").forEach(ability_element =>
             case "cast on self":
                 const custom_menu_cast_on_self = document.getElementById("custom_menu_cast_on_self");
                 const self_ability_name = custom_menu_cast_on_self.dataset.ability_name;
-                player_cast(self_ability_name, _player.player_id);
+                playerCast(self_ability_name, _player.player_id);
                 break;
             case "cast on player target":
                 const custom_menu_cast_on_player_target = document.getElementById("custom_menu_cast_on_player_target");
                 const target_ability_name = custom_menu_cast_on_player_target.dataset.ability_name;
                 const target_id = custom_menu_cast_on_player_target.dataset.target_player_id;
-                player_cast(target_ability_name, target_id);
+                playerCast(target_ability_name, target_id);
                 break;
         }
         $(".ability-context-menu").hide(100);

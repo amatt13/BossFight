@@ -8,5 +8,5 @@ playerSettingsButton.addEventListener("click", function onOpen(){
 });
 
 function closeSettingsDialog() {
-    pl
+    //pl
 }
