@@ -59,14 +59,14 @@ document.querySelectorAll(".ability-context-menu li").forEach(ability_element =>
             // A case for each action. Your actions here
             case "cast on self":
                 const custom_menu_cast_on_self = document.getElementById("custom_menu_cast_on_self");
-                const self_ability_name = custom_menu_cast_on_self.dataset.ability_name;
-                player_cast(self_ability_name, _player.player_id);
+                const self_ability_key = custom_menu_cast_on_self.dataset.ability_cast_key;
+                player_cast(self_ability_key, _player.player_id);
                 break;
             case "cast on player target":
                 const custom_menu_cast_on_player_target = document.getElementById("custom_menu_cast_on_player_target");
-                const target_ability_name = custom_menu_cast_on_player_target.dataset.ability_name;
+                const target_ability_key = custom_menu_cast_on_player_target.dataset.ability_cast_key;
                 const target_id = custom_menu_cast_on_player_target.dataset.target_player_id;
-                player_cast(target_ability_name, target_id);
+                player_cast(target_ability_key, target_id);
                 break;
         }
         $(".ability-context-menu").hide(100);
@@ -74,14 +74,14 @@ document.querySelectorAll(".ability-context-menu li").forEach(ability_element =>
 });
 
 function showContextMenu(event) {
-    const button_ability_name = event.target.dataset.ability_name;
+    const button_ability_cast_key = event.target.dataset.ability_cast_key;
 
     let custom_menu_cast_on_player_target = document.getElementById("custom_menu_cast_on_player_target");
     custom_menu_cast_on_player_target.dataset.target_player_id = getCurrentPlayerTarget();
-    custom_menu_cast_on_player_target.dataset.ability_name = button_ability_name;
+    custom_menu_cast_on_player_target.dataset.ability_cast_key = button_ability_cast_key;
 
     let custom_menu_cast_on_self = document.getElementById("custom_menu_cast_on_self");
-    custom_menu_cast_on_self.dataset.ability_name = button_ability_name;
+    custom_menu_cast_on_self.dataset.ability_cast_key = button_ability_cast_key;
 
     $(".ability-context-menu").finish().toggle(100).css({
         top: event.pageY + "px",

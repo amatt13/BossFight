@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="css/toolTip.css" type="text/css" charset="utf-8"/>
 	<link rel="stylesheet" href="css/abilities.css" type="text/css" charset="utf-8"/>
 	<link rel="stylesheet" href="css/dragablewindow.css" type="text/css" charset="utf-8"/>
-	<link rel="stylesheet" href="css/context_menu.css" type="text/css" charset="utf-8"/>
+	<link rel="stylesheet" href="css/contextMenu.css" type="text/css" charset="utf-8"/>
 	<meta charset="utf-8">
 	<meta http-equiv="content_security_policy" content="script-src 'self'; script-src-elem 'self'">
 	<title>Boss Fight</title>
@@ -210,7 +210,7 @@
 </div>
 
 <!-- PlayerClass dialog -->
-<div id="playerClassMenu" class="modal-dialog-generic player-Class-dialog">
+<div id="playerClassMenu" class="modal-dialog-generic player-class-dialog">
 	<form method="dialog">
 		<div class="player-class-column-divider">
 			<!-- current player class -->
@@ -276,9 +276,12 @@
 	<label>
 		settings
 	</label>
+	<menu style="bottom: 0px;">
+		<button id="closeSettingsMenuButton" value="default" class="btn-primary">Close</button>
+	</menu>
 </div>
 
-<div hidden id="otherPlayersWindow" class="window">
+<div hidden id="other-players-window" class="window">
 	<div class="window-top">
 	</div>
 		<div class="window-content">

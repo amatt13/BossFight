@@ -61,7 +61,7 @@ function makeDraggable (element) {
 // Make myWindow and myWindow2 draggable in different ways...
 
 // myWindow will only be able to be moved via the top bar (.window-top element). The main element does nothing on mouse down.
-makeDraggable(document.querySelector('#otherPlayersWindow'));
+makeDraggable(document.querySelector('#other-players-window'));
 
 // myWindow2 will be able to moved by grabbing the entire element
 // makeDraggable(document.querySelector('#myWindow2'));
@@ -91,7 +91,7 @@ function _reduceXYTobeWithInBounds(element, x, y) {
 }
 
 function populateOtherPlayersWindow(other_players_list) {
-    let other_players_window = document.querySelector('#otherPlayersWindow');
+    let other_players_window = document.querySelector('#other-players-window');
     if (other_players_window.hidden) {
         other_players_window.hidden = false;
         y = localStorage.getItem("otherPlayersWindowY");
@@ -129,7 +129,7 @@ function populateOtherPlayersWindow(other_players_list) {
 function getCurrentPlayerTarget() {
     let result = null;
 
-    let selected = document.querySelector('#otherPlayersWindow').querySelector(".window-content").querySelector(".other-players-window-row-selected");
+    let selected = document.querySelector('#other-players-window').querySelector(".window-content").querySelector(".other-players-window-row-selected");
     if (selected != undefined) {
         const row_info = selected.querySelector(".other-players-window-table-row-info");
         const playerid = row_info.attributes["playerid"].value;
@@ -145,7 +145,7 @@ function _changeCurrentPlayerTarget(player_target) {
 }
 
 function clearCurrentPlayerTarget() {
-    let selected = document.querySelector('#otherPlayersWindow').querySelector(".window-content").querySelector(".other-players-window-row-selected");
+    let selected = document.querySelector('#other-players-window').querySelector(".window-content").querySelector(".other-players-window-row-selected");
     if (selected != undefined)
         selected.classList.remove("other-players-window-row-selected");
 }

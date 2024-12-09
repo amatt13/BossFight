@@ -1,8 +1,5 @@
 using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using BossFight.Models;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
 using System.Net;
@@ -11,6 +8,9 @@ using System;
 using System.Threading;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using BossFight.BossFightBackEnd.BossFightLogger;
+using Xunit.Sdk;
 
 namespace BossFight.Controllers
 {
@@ -18,9 +18,25 @@ namespace BossFight.Controllers
     [Route("[controller]")]
     public class WebSocketController : ControllerBase
     {
+        private static ILogger<WebSocketController> _logger;
+
+        private static void _initLogger()
+        {
+            ILoggerProvider fileLoggerProvider = new BossFightLoggerProvider("logs/WebSocketController.txt");
+            ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddConsole();
+                builder.AddDebug();
+                builder.AddProvider(fileLoggerProvider);
+                builder.SetMinimumLevel(LogLevel.Trace);
+            });
+            _logger = _loggerFactory.CreateLogger<WebSocketController>();
+        }
+
         public WebSocketController()
         {
             Console.WriteLine("Init WebSocketController");
+            _initLogger();
         }
 
         [HttpGet("/ws")]
@@ -55,15 +71,16 @@ namespace BossFight.Controllers
                 jsonString = Encoding.UTF8.GetString(arraySegment);
                 jsonDictionary = JsonSerializer.Deserialize<Dictionary<String, Object>>(jsonString);
 
-                //await new SocketMessageHandler(Db).HandleMessage(jsonDictionary, result, pWebSocket);
-                await new SocketMessageHandler().HandleMessage(jsonDictionary, result, pWebSocket);
                 try
                 {
+                    await new SocketMessageHandler().HandleMessage(jsonDictionary, result, pWebSocket);
                     result = await pWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
                 catch (WebSocketException e)
                 {
-                    Console.WriteLine(e.Message);
+                    var errorMessage = e.Message;
+                    var StackTrace = e.StackTrace;
+                    _logger.LogError("Websocket error: {errorMessage}\n{StackTrace}", errorMessage, StackTrace);
                 }
             }
         }
