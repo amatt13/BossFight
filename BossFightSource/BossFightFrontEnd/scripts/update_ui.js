@@ -1,35 +1,39 @@
-function BlinkDiv(div_id, color = 'yellow') {
+function blinkDiv(div_id, color = 'yellow') {
 	let element = document.getElementById(div_id)
 	const origcolor = element.style.backgroundColor
 	if (origcolor == color)
 
 	return;
 	element.style.backgroundColor = color;
-	let t = setTimeout(function () {
+	setTimeout(function () {
 		element.style.backgroundColor = origcolor;
 	}, (1 * 1000));
 }
 
-function RepopulatePlayerInventory() {
-	// clear inventory, and repopulate it again
+function repopulatePlayerInventory() {
 	let player_inventory = document.getElementById("player_inventory");
-	player_inventory.size = 0;
-	_player.player_weapon_list.forEach(player_weapon => {
-		let option = document.createElement("option");
-		option.text = player_weapon.name;
-		option.dataset.weapon_id = player_weapon.weapon_id;
-		player_inventory.add(option);
-	});
 
-	let inventory_lenght = _player.player_weapon_list.length;
-	if (inventory_lenght < 10) {
-		inventory_lenght = 10;
-	}
+    // Clear the inventory
+    player_inventory.innerHTML = ""; // Remove all existing options
 
-	player_inventory.size = inventory_lenght;
+    // Repopulate the inventory
+    _player.player_weapon_list.forEach(player_weapon => {
+        let option = document.createElement("option");
+        option.text = player_weapon.name;
+        option.dataset.weapon_id = player_weapon.weapon_id;
+        player_inventory.add(option);
+    });
+
+    // Set the inventory size
+    let inventory_length = _player.player_weapon_list.length;
+    if (inventory_length < 10) {
+        inventory_length = 10;
+    }
+
+    player_inventory.size = inventory_length;
 }
 
-function UpdateUiActiveMonster(monster, monster_is_new = false) {
+function updateUiActiveMonster(monster, monster_is_new = false) {
 	_monster1 = monster;
 	document.getElementById("monsterSprite").src = `./images/sprites/monsters/${_monster1.monster_name[0].toLowerCase() + _monster1.monster_name.substr(1, _monster1.monster_name.length-1).replaceAll(" ", "")}.png`
 	if (monster_is_new ) {
@@ -54,7 +58,7 @@ function UpdateUiPlayerStats(player) {
 	document.getElementById("player_gold").innerHTML = numberToString(_player.gold);
 	document.getElementById("player_equipped_weapon_name").innerHTML = player.weapon.loot_name;
 
-	RepopulatePlayerInventory();
+	repopulatePlayerInventory();
 
 	// set HP bar
 	let progress_player_health = document.getElementById("progress_player_health");
@@ -96,7 +100,7 @@ function UpdateUiPlayerSoldWeapon(json_dict) {
 	const gold = json_dict["gold"]
 	_player.gold = gold;
 	document.getElementById("player_gold").innerHTML = numberToString(_player.gold);  //TODO use bindings instead of manually setting the text whenever something changes?
-	BlinkDiv("player_gold");
+	blinkDiv("player_gold");
 
 	let player_weapon_list = [];
 	let player_weapon_dict = json_dict["weapons"];
@@ -104,21 +108,21 @@ function UpdateUiPlayerSoldWeapon(json_dict) {
 		player_weapon_list.push(new PlayerWeapon(pw["WeaponId"], pw["WeaponName"]))
 	});
 	_player.player_weapon_list = player_weapon_list;
-	RepopulatePlayerInventory();
+	repopulatePlayerInventory();
 }
 
 function UpdateUiPlayerEquippedWeapon(weapon_dict) {
 	const weapon = Weapon.createFromDict(weapon_dict);
 	_player.weapon = weapon;
 	document.getElementById("player_equipped_weapon_name").innerHTML = _player.weapon.loot_name;
-	BlinkDiv("player_equipped_weapon_name");
+	blinkDiv("player_equipped_weapon_name");
 }
 
 function UpdateUiPlayerAttackedMonsterWithWeapon(summary) {
-	UpdateUiActiveMonster(summary.monster);
+	updateUiActiveMonster(summary.monster);
 	_player = summary.player;
 	UpdateUiPlayerStats(summary.player);
-	BlinkDiv("player_xp");
+	blinkDiv("player_xp");
 	player_combat_log_message = CreateAttackSummaryMessage(summary)
 	LogToCombatLog(player_combat_log_message);
 	if (summary.monster_retaliate_message != null && summary.monster_retaliate_message.length > 0) {

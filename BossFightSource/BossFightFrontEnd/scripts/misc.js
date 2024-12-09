@@ -6,5 +6,5 @@ function NewMonster(new_monster_dict) {
 
 	const newMonsterInstance_dict = new_monster_dict["newMonsterInstance"];
 	const monster = Monster.createFromDict(newMonsterInstance_dict);
-	UpdateUiActiveMonster(monster, true)
+	updateUiActiveMonster(monster, true)
 }

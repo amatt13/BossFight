@@ -26,7 +26,7 @@ socket.onmessage = function (event) {
 
 	if ("fetch_active_monster" in json_dict) {
 		const monster = Monster.createFromDict(json_dict["fetch_active_monster"]);
-		UpdateUiActiveMonster(monster);
+		updateUiActiveMonster(monster);
 	}
 	else if ("update_player" in json_dict)
 		updateUiPlayerStatsFromDict(json_dict["update_player"]);
@@ -124,7 +124,7 @@ async function AttackMonster() {
 			socket.send(json_obj);
 		}
 		else {
-			BlinkDiv("player_hp")
+			blinkDiv("player_hp")
 			LogToGeneralLog("Can't attack when you are knocked out", true);
 		}
 	}

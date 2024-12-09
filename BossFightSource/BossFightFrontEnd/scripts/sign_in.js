@@ -14,11 +14,11 @@ async function SignInButtonClicked() {
     const passwordText = String(passwordInput.value).trim();
 
     if (userNameText.length <= 0 || userNameText.length > 100) {
-        BlinkDiv("inputUserName")
+        blinkDiv("inputUserName")
         errorOccured = true;
     }
     if (passwordText.length <= 0 || passwordText.length > 100) {
-        BlinkDiv("inputPassword")
+        blinkDiv("inputPassword")
         errorOccured = true;
     }
 

@@ -63,20 +63,20 @@ function ReceiveChatMessage(chat_message_dict, blink = true) {
 function LogToGeneralLog(pText, blink = false) {
 	document.getElementById("text_log").value += pText + '\n'
 	if (blink) {
-		BlinkDiv("text_log_hover", 'red');
+		blinkDiv("text_log_hover", 'red');
 	}
 }
 
 function LogToCombatLog(pText, blink = false, colur = "yellow") {
 	document.getElementById("combat_log").value += pText + '\n'
 	if (blink) {
-		BlinkDiv("combat_log_hover", colur);
+		blinkDiv("combat_log_hover", colur);
 	}
 }
 
 function LogToChatLog(pText, blink = false) {
 	document.getElementById("chat_log").value += pText + "\n"
 	if (blink) {
-		BlinkDiv("chat_log_hover");
+		blinkDiv("chat_log_hover");
 	}
 }
