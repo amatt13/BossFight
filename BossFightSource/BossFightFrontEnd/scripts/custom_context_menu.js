@@ -1,93 +1,100 @@
+// Reference to the player inventory
 let player_inventory = document.getElementById('player_inventory');
 
-// If the document is clicked somewhere
+// Function to hide all context menus
+function hideAllContextMenus() {
+    document.querySelectorAll('.context-menu').forEach(menu => {
+        menu.classList.remove('visible');
+    });
+}
+
+// Add a click event listener to the document to hide context menus when clicking outside
 document.addEventListener("click", (e) => {
-    // If the clicked element is not the menu
-    // if (!e.target.parents(".context-menu").length > 0) {
-
-    //     // Hide it
-    //     //$(".context-menu").hide(100);
-    //     //TODO hide it via class and css
-    //     //e.target.parents(".context-menu")[0]
-    // }
-});
-
-
-player_inventory.addEventListener("contextmenu", function (event) {
-
-    if (event.target.tagName == "OPTION") {
-        // select the right clicked option
-        event.target.selected = true;
-        document.getElementById("custom_menu_equip").dataset.equip_id = event.target.dataset.weapon_id;
-        document.getElementById("custom_menu_sell").dataset.sell_id = event.target.dataset.weapon_id;
-
-        // Avoid the real one
-        event.preventDefault();
-
-        // Show contextmenu
-        // $(".inventory-context-menu").finish().toggle(100).css({
-        //     // In the right position (the mouse)
-        //     top: event.pageY + "px",
-        //     left: event.pageX + "px"
-        // });
+    // Check if the clicked element is not inside a context menu
+    if (!e.target.closest(".context-menu")) {
+        hideAllContextMenus();
     }
 });
 
-document.querySelectorAll(".inventory-context-menu li").forEach(inventory_element => {
-    inventory_element.addEventListener("click", function () {
-        // This is the triggered action name
-        switch ($(this).attr("data-action")) {
+// Add a contextmenu event to the player inventory
+player_inventory.addEventListener("contextmenu", function (event) {
+    if (event.target.tagName === "OPTION") {
+        // Select the right-clicked option
+        event.target.selected = true;
 
-            // A case for each action. Your actions here
+        // Set custom menu data attributes
+        document.getElementById("custom_menu_equip").dataset.equip_id = event.target.dataset.weapon_id;
+        document.getElementById("custom_menu_sell").dataset.sell_id = event.target.dataset.weapon_id;
+
+        // Prevent the default browser context menu
+        event.preventDefault();
+
+        // Show and position the custom context menu
+        const contextMenu = document.querySelector(".inventory-context-menu");
+        contextMenu.style.top = `${event.pageY}px`;
+        contextMenu.style.left = `${event.pageX}px`;
+        contextMenu.classList.add('visible');
+    }
+});
+
+// Add click listeners for inventory context menu actions
+document.querySelectorAll(".inventory-context-menu li").forEach(menuItem => {
+    menuItem.addEventListener("click", function () {
+        const action = this.dataset.action;
+
+        switch (action) {
             case "equip":
-                const equip_id = document.getElementById("custom_menu_equip").dataset.equip_id;
-                const equip_id_int = parseInt(equip_id)
-                EquipWeapon(equip_id_int);
+                const equip_id = parseInt(document.getElementById("custom_menu_equip").dataset.equip_id);
+                EquipWeapon(equip_id);
                 break;
             case "sell":
-                const sell_id = document.getElementById("custom_menu_sell").dataset.sell_id;
-                const sell_id_int = parseInt(sell_id)
-                SellWeapon(sell_id_int);
+                const sell_id = parseInt(document.getElementById("custom_menu_sell").dataset.sell_id);
+                SellWeapon(sell_id);
                 break;
         }
-        // Hide it AFTER the action was triggered
-        $(".inventory-context-menu").hide(100);
+
+        // Hide the context menu after the action
+        hideAllContextMenus();
     });
 });
 
-document.querySelectorAll(".ability-context-menu li").forEach(ability_element => {
-    ability_element.addEventListener("click", function () {
-        switch ($(this).attr("data-action")) {
+// Add click listeners for ability context menu actions
+document.querySelectorAll(".ability-context-menu li").forEach(menuItem => {
+    menuItem.addEventListener("click", function () {
+        const action = this.dataset.action;
 
-            // A case for each action. Your actions here
+        switch (action) {
             case "cast on self":
-                const custom_menu_cast_on_self = document.getElementById("custom_menu_cast_on_self");
-                const self_ability_name = custom_menu_cast_on_self.dataset.ability_name;
-                playerCast(self_ability_name, _player.player_id);
+                const selfAbilityName = document.getElementById("custom_menu_cast_on_self").dataset.ability_name;
+                playerCast(selfAbilityName, _player.player_id);
                 break;
             case "cast on player target":
-                const custom_menu_cast_on_player_target = document.getElementById("custom_menu_cast_on_player_target");
-                const target_ability_name = custom_menu_cast_on_player_target.dataset.ability_name;
-                const target_id = custom_menu_cast_on_player_target.dataset.target_player_id;
-                playerCast(target_ability_name, target_id);
+                const targetAbilityName = document.getElementById("custom_menu_cast_on_player_target").dataset.ability_name;
+                const targetPlayerId = document.getElementById("custom_menu_cast_on_player_target").dataset.target_player_id;
+                playerCast(targetAbilityName, targetPlayerId);
                 break;
         }
-        $(".ability-context-menu").hide(100);
+
+        // Hide the context menu after the action
+        hideAllContextMenus();
     });
 });
 
+// Function to show the ability context menu
 function showContextMenu(event) {
-    const button_ability_name = event.target.dataset.ability_name;
+    const abilityName = event.target.dataset.ability_name;
 
-    let custom_menu_cast_on_player_target = document.getElementById("custom_menu_cast_on_player_target");
-    custom_menu_cast_on_player_target.dataset.target_player_id = getCurrentPlayerTarget();
-    custom_menu_cast_on_player_target.dataset.ability_name = button_ability_name;
+    // Set data attributes for the custom menu options
+    const customMenuTarget = document.getElementById("custom_menu_cast_on_player_target");
+    customMenuTarget.dataset.target_player_id = getCurrentPlayerTarget();
+    customMenuTarget.dataset.ability_name = abilityName;
 
-    let custom_menu_cast_on_self = document.getElementById("custom_menu_cast_on_self");
-    custom_menu_cast_on_self.dataset.ability_name = button_ability_name;
+    const customMenuSelf = document.getElementById("custom_menu_cast_on_self");
+    customMenuSelf.dataset.ability_name = abilityName;
 
-    $(".ability-context-menu").finish().toggle(100).css({
-        top: event.pageY + "px",
-        left: event.pageX + "px"
-    });
+    // Show and position the ability context menu
+    const contextMenu = document.querySelector(".ability-context-menu");
+    contextMenu.style.top = `${event.pageY}px`;
+    contextMenu.style.left = `${event.pageX}px`;
+    contextMenu.classList.add('visible');
 }

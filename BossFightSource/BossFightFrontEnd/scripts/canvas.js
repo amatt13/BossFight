@@ -18,14 +18,15 @@ playerImage.addEventListener("load", () => {
 });
 
 canvas.addEventListener("mouseup", function(e) {
-	const x = e.pageX-$(canvas).offset().left;
-	const y = e.pageY-$(canvas).offset().top;
+	const rect = canvas.getBoundingClientRect();
+	const x = e.pageX - rect.left;
+    const y = e.pageY - rect.top;
 	const playerx0 = canvas.width-playerImage.width;
 	const playery0 = initialMonsterImageY;
 	const playerx1 = playerx0 + 100;
 	const playery1 = playery0 + 100;
 	const hit = x >= playerx0 && x <= playerx1
-				&& y >= playery0 && y <= playery1;
+			 && y >= playery0 && y <= playery1;
 	if (hit) {
 		alert(`x: ${x} y: ${y}\n${hit}`);
 	}

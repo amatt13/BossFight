@@ -2,30 +2,34 @@
 function show_custom_alert(text_message, type) {
     let icon = "default.png";
     switch(type) {
-        case "alarm": 
+        case "alarm":
             icon = "alarm.png";
             break;
-        case "congratulate": 
+        case "congratulate":
             icon = "congratulate.png";
             break;
     }
-    document.getElementById("custom-alert-text-icon").src = "./images/ui_icons/alert_menu/" + icon;
+    // Set the text, image, and visibiliy of the alert
+    let alert_icon = document.getElementById("custom-alert-text-icon");
+    alert_icon.src = "./images/ui_icons/alert_menu/" + icon
 
-    text_message = text_message.replace("\n", "<br>");
-    document.getElementById("custom-alert-text-label").innerHTML = text_message;
+    let alert_label = document.getElementById("custom-alert-text-label");
+    alert_label.textContent = "";
+    const lines = text_message.split("\n");
+    lines.forEach((line, index) => {
+        if (index > 0) {
+            alert_label.appendChild(document.createElement("br"));
+        }
+        alert_label.appendChild(document.createTextNode(line));
+    });
 
-    $(".custom-alert").finish().toggle(100);
+    let alert_menu = document.getElementById("custom-alert-menu");
+    alert_menu.style.display = "inline";
+    function hideAlertDialog(event) {
+        if (!alert_menu.contains(event.target)) {
+            alert_menu.style.display = "none";
+            document.removeEventListener("click", hideAlertDialog, true);
+        }
+    }
+    document.addEventListener("click", hideAlertDialog, true);
 }
-
-document.addEventListener("click", (ele) => {
-	// let alerts = ele.target.parents.getElementsByClassName("custom-alert");
-    // for (let i = 0; i < alerts.length; i++) {
-    //     alerts[i].hide(100);
-    // }
-});
-// hide if something else is clicked
-// $(document).bind("mousedown", function (e) {
-//     if (!$(e.target).parents(".custom-alert").length > 0) {
-//         $(".custom-alert").hide(100);
-//     }
-// });

@@ -4,6 +4,13 @@
 	list-style-type: none;
 	color: var(--default-font-colour);
 	background-color: var(--wallpaper-background-colour);
+	display: none;
+    position: absolute;
+    z-index: 1000;
+}
+
+.context-menu.visible {
+    display: block;
 }
 
 .inventory-context-menu { }
