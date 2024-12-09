@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.Json;
 using BossFight.BossFightEnums;
 using BossFight.CustemExceptions;
 using BossFight.Extentions;
@@ -267,7 +268,7 @@ AND p.Password = {pPassword.ToDbString()}";
         {
             var allValuesAreFilled = true;
             pError = String.Empty;
-            var fieldsWithMissingValues = pValueList.Where(vp => vp.Item1 == null || vp.Item1 is DBNull);
+            var fieldsWithMissingValues = pValueList.Where(vp => vp.Item1 == null || vp.Item1 is DBNull || ((JsonElement)vp.Item1).ValueKind == JsonValueKind.Null);
             if (fieldsWithMissingValues.Any())
             {
                 pError = String.Join(Environment.NewLine, fieldsWithMissingValues.Select(vp => $"Missing required value for '{ vp.Item2 }'"));

@@ -12,6 +12,9 @@ function playerCast(ability_cast_key, target_id) {
     if (clientSideEvaluation(abiliy_to_be_cast, target_id)) {
     	sendAbilityCastMessage(ability_cast_key, parseInt(target_id));
 	}
+	else {
+		LogToCombatLog(`Failed to use ability ${abiliy_to_be_cast.name}`, true)
+	}
 
 	function clientSideEvaluation(abiliy, target_id) {
 		let can_cast = true;
@@ -30,7 +33,7 @@ function playerCast(ability_cast_key, target_id) {
 			can_cast = false;
 		}
 
-		if (target_id == null || target_id == undefined) {
+		if (target_id == null || target_id == undefined || target_id == "" || target_id == "null") {
 			LogToCombatLog("No valid target selected");
 			can_cast = false;
 		}
