@@ -160,7 +160,7 @@ namespace BossFight.Models
             }
         }
 
-        public int CalckWeaponAttackDamage(MonsterInstance pTargetMonster, PlayerAttackSummary pPlayerAttackSummary)
+        public int CalckulateWeaponAttackDamage(MonsterInstance pTargetMonster, PlayerAttackSummary pPlayerAttackSummary)
         {
             var isCrit = pTargetMonster.AttackOnMonsterIsCrit(GetAttackCritChance());
             var dmg = Weapon.AttackPower + GetAttackBonus();
@@ -175,11 +175,26 @@ namespace BossFight.Models
             return dmg;
         }
 
-        public void SubtractHealth(int pDamageToReceive)
+        public int CalckulateWeaponMagicDamage(MonsterInstance pTargetMonster, PlayerAttackSummary pPlayerAttackSummary)
         {
-            if (pDamageToReceive > 0)
+            var isCrit = pTargetMonster.AttackOnMonsterIsCrit(GetSpellCritChance());
+            var dmg = Weapon.SpellPower + GetSpellBonus();
+
+            if (isCrit)
             {
-                Hp -= pDamageToReceive;
+                dmg = (int)Math.Ceiling(1.25 * dmg);
+                pPlayerAttackSummary.PlayerCrit = true;
+            }
+
+            pPlayerAttackSummary.PlayerTotalDamage = dmg;
+            return dmg;
+        }
+
+        public void SubtractHealth(int pDamage, ITarget pAttacker)
+        {
+            if (pDamage > 0)
+            {
+                Hp -= pDamage;
 
                 if (Hp < -3)
                     Hp = -3;

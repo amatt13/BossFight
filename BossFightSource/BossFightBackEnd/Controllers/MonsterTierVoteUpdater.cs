@@ -2,7 +2,6 @@ using BossFight;
 using BossFight.BossFightEnums;
 using BossFight.Extentions;
 using BossFight.Models;
-using Microsoft.AspNetCore.ResponseCompression;
 
 namespace BossFight.Controllers
 {

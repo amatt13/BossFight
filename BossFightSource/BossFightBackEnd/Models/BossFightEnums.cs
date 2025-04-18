@@ -37,6 +37,19 @@ namespace BossFight.BossFightEnums
         PALADIN = 8
     }
 
+    public enum EffectType
+    {
+        DIVINE_SHIELD = 1,
+        INTIMIDATE = 2,
+        DAMAGE_OVER_TIME = 3,
+    }
+
+    public enum AttackType
+    {
+        WEAPON_SWING,
+        MAGIC,
+    }
+
     public static class EnumTextFormatter
     {
         private static readonly TextInfo _textInfo = new CultureInfo("en-UK", false).TextInfo;

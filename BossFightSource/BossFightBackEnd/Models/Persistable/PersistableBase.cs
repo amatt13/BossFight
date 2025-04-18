@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using MySqlConnector;
 using BossFight.Extentions;
 using System.Diagnostics;
-using System.Runtime.Serialization;
 
 namespace BossFight.Models
 {
@@ -183,6 +183,10 @@ namespace BossFight.Models
             else if (pPropertyInfo.PropertyType.IsEnum)
             {
                 resultString = (int)pPropertyInfo.GetValue(this);
+            }
+            else if (pPropertyInfo.PropertyType == typeof(Dictionary<string, object>))
+            {
+                resultString = "'" + JsonSerializer.Serialize(pPropertyInfo.GetValue(this)) + "'";
             }
             else if (Nullable.GetUnderlyingType(pPropertyInfo.PropertyType) != null && Nullable.GetUnderlyingType(pPropertyInfo.PropertyType).IsEnum)
             {

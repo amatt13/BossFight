@@ -1,4 +1,4 @@
-using System.Text;
+using BossFight.BossFightEnums;
 
 namespace BossFight.Models
 {
@@ -18,7 +18,7 @@ namespace BossFight.Models
             var canCast = base.CanCastAbility(ref pError);
             if (canCast)
             {
-                if (Target.HasEffect(EffectType.DivineShield))
+                if (Target.HasEffect(EffectType.DIVINE_SHIELD))
                 {
                     pError += $"{Target.Name} is already affected by {Name}\n";
                     canCast = false;

@@ -1,3 +1,5 @@
+using BossFight.BossFightEnums;
+
 namespace BossFight.Models
 {
     public interface IEffectHolder

@@ -1,38 +1,37 @@
-using System.Text;
 using BossFight.BossFightEnums;
 using BossFight.Controllers;
 
 namespace BossFight.Models
 {
-    public class Smite: Ability
+    public class FireBolt: Ability
     {
-        private bool _attackMonsterWithSmite = false;
-        private bool _attacPlayerWithSmite = false;
-        private int _smite_damage = 13;
-
-        public Smite()
-            : base("Smite", "Deals bonus damage to undead monsters", pManaCost: 4)
+        private bool _attackMonsterWithFireBoly = false;
+        private bool _attacPlayerWithFireBolt = false;
+        private int _fire_bolt_damage;
+        private int _damagePerTick = 5;
+        public FireBolt()
+            : base("Fire bolt", "Throw a small bolt of fire", pManaCost: 4)
         {
             OnlyTargetMonster = true;
         }
 
         public override void TargetEffect(ITarget pTarget, AbilityResult pAbilityResult)
         {
-            if (_attackMonsterWithSmite)
+            if (_attackMonsterWithFireBoly)
             {
-                AttackMonsterWithSmite((Player)Caster, (MonsterInstance)Target, pAbilityResult);
+                AttackMonsterWithFireBolt((Player)Caster, (MonsterInstance)Target, pAbilityResult);
             }
-            else if (_attacPlayerWithSmite)
+            else if (_attacPlayerWithFireBolt)
             {
-                AttackPlayerWithSmite((MonsterInstance)Caster, (Player)Target, pAbilityResult);
+                AttackPlayerWithFireBolt((MonsterInstance)Caster, (Player)Target, pAbilityResult);
             }
         }
 
         public override bool CanCastAbility(ref string pError)
         {
             var canCast = base.CanCastAbility(ref pError);
-            _attackMonsterWithSmite = false;
-            _attacPlayerWithSmite = false;
+            _attackMonsterWithFireBoly = false;
+            _attacPlayerWithFireBolt = false;
 
             if (canCast)
             {
@@ -41,19 +40,13 @@ namespace BossFight.Models
                     canCast = false;
                     pError += $"{Target.Name} must be alive.\n";
                 }
-                else if (!Target.MonsterTypeList.Contains(MonsterType.UNDEAD))
-                {
-                    canCast = false;
-                    pError += $"Smite only works on undead targets. {Target.Name} is {EnumTextFormatter.EnumPrinter(Target.MonsterTypeList)}\n";
-                }
-
-                if (canCast)
+                else
                 {
                     if (Caster is Player playerCaster && Target is MonsterInstance)
                     {
                         if (RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(playerCaster.PlayerId.Value, out string error))
                         {
-                            _attackMonsterWithSmite = true;
+                            _attackMonsterWithFireBoly = true;
                         }
                         else
                         {
@@ -63,7 +56,7 @@ namespace BossFight.Models
                     }
                     else if (Caster is MonsterInstance && Target is Player)
                     {
-                        _attacPlayerWithSmite = true;
+                        _attacPlayerWithFireBolt = true;
                     }
                     else
                     {
@@ -76,18 +69,27 @@ namespace BossFight.Models
             return canCast;
         }
 
-        private void AttackMonsterWithSmite(Player pPLayer, MonsterInstance pMonster, AbilityResult pAbilityResult)
+        private void AttackMonsterWithFireBolt(Player pPLayer, MonsterInstance pMonster, AbilityResult pAbilityResult)
         {
-            pPLayer.BonusMagicDmg += _smite_damage;
-            var summary = DamageDealer.PlayerAttackMonster(pPLayer, pMonster, AttackType.WEAPON_SWING, true);
+            // Apply dot
+            new DamageOverTimeEffect(Target, Caster, _damagePerTick);
+            pAbilityResult.AbilityResultText = $"You cast {Name} on {Target.Name}";
+
+            // Apply magic attack damage
+            pPLayer.BonusMagicDmg += _fire_bolt_damage;
+            var summary = DamageDealer.PlayerAttackMonster(pPLayer, pMonster, AttackType.MAGIC, true);
             pAbilityResult.PlayerAttackSummary = summary;
             pAbilityResult.ReloadMonster = true;
-            pAbilityResult.AbilityResultText = $"You used Smite to deal { _smite_damage } bonus damage";
-            pPLayer.BonusMagicDmg -= _smite_damage;
+            pAbilityResult.AbilityResultText = $"Your {Name} dealt { summary.PlayerTotalDamage } damage";
+            pPLayer.BonusMagicDmg -= _fire_bolt_damage;
         }
 
-        private void AttackPlayerWithSmite(MonsterInstance pMonster, Player pPLayer, AbilityResult pAbilityResult)
+        private void AttackPlayerWithFireBolt(MonsterInstance pMonster, Player pPLayer, AbilityResult pAbilityResult)
         {
+            // Apply dot
+            new DamageOverTimeEffect(Target, Caster, _damagePerTick);
+            pAbilityResult.AbilityResultText = $"{Caster.Name} cast {Name} on {Target.Name}";
+
             var monsterAttackSummary = new PlayerAttackSummary(pPLayer, pMonster);
             DamageDealer.MonsterAttackPlayer(pMonster, pPLayer, monsterAttackSummary);
             pAbilityResult.PlayerAttackSummary = monsterAttackSummary;

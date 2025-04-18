@@ -4,22 +4,22 @@ namespace BossFight.Models.Loot
     {
         public int PlayerId { get; set; }
         public int DamageDealtByPlayer { get; set; }
-        public double RelativeDamageDealtByPlayer { get; set; }
         public int GoldEarned { get; set; }
-        public Player Player { get; set; }
+
+        public LootEntry() {}
 
         public LootEntry(int pPlayerId, int pDamageDealtByPlayer, int pGoldEarned)
         {
             PlayerId = pPlayerId;
             DamageDealtByPlayer = pDamageDealtByPlayer;
-            RelativeDamageDealtByPlayer = 0.0d;
             GoldEarned = pGoldEarned;
-            Player = new Player();
         }
 
-        public void SetPlayer(Player pPlayer)
+        public LootEntry(MonsterDamageTracker pMonsterDamageTracker, int pGoldEarned)
         {
-            Player = pPlayer;
+            PlayerId = pMonsterDamageTracker.PlayerId;
+            DamageDealtByPlayer = pMonsterDamageTracker.DamageReceivedFromPlayer;
+            GoldEarned = pGoldEarned;
         }
     }
 }

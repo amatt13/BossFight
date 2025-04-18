@@ -1,3 +1,7 @@
+using System;
+using System.Text;
+using System.Threading.Channels;
+
 namespace BossFight.Models
 {
     public class PlayerAttackSummary
@@ -9,8 +13,15 @@ namespace BossFight.Models
         public bool MonsterCrit { get; set; }
         public int PlayerExtraDamageFromBuffs { get; set; }
         public int PlayerXpEarned { get; set; }
-        public string MonsterAffectedByDots { get; set; }
-        public string MonsterRetaliateMessage { get; set; }
+        private StringBuilder _monsterRetaliateMessageBuilder = new();
+        private static char[] _trim = new char[] { '\r', '\n' };
+        public string MonsterRetaliateMessage
+        {
+            get
+            {
+                return String.Join("\n", _monsterRetaliateMessageBuilder).TrimEnd(_trim);;
+            }
+        }
         public bool PlayerKilledMonster { get; set; }
         public int MonsterTotalDamage {get; set;}
 
@@ -18,6 +29,19 @@ namespace BossFight.Models
         {
             Player = pPlayer;
             Monster = pMonster;
+        }
+
+        public string AddMonsterRetaliateMessage(StringBuilder pMessages)
+        {
+            var text = String.Join("\n", pMessages);
+            AddMonsterRetaliateMessage(text);
+            return MonsterRetaliateMessage;
+        }
+
+        public string AddMonsterRetaliateMessage(string pMessage)
+        {
+            _monsterRetaliateMessageBuilder.AppendLine(pMessage);
+            return MonsterRetaliateMessage;
         }
     }
 }

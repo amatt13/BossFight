@@ -138,7 +138,7 @@ function ReSizeCanvas() {
 }
 
 function ResetFont() {
-	_ctx.font = "30px myFirstFont";
+	_ctx.font = "30px generalFont";
 }
 
 let monsterImageX = initialMonsterImageX, monsterImageY = initialMonsterImageY;
@@ -180,7 +180,7 @@ function AnimatePlayer() {
 }
 
 function AnimateOtherPlayers() {
-	_ctx.font = "15px myFirstFont";
+	_ctx.font = "15px generalFont";
 
 	const number_of_players_to_draw = _player_info_list.length;
 	if (number_of_players_to_draw > 0) {
@@ -239,7 +239,7 @@ let _enable_damage_to_show = false;
 function DrawDamage() {
 	var monster_name_y = monsterImageY + monsterImage.height - 100;
 	var monster_name_x = monsterImageX;
-	_ctx.font = "60px myFirstFont";
+	_ctx.font = "60px generalFont";
 	_ctx.fillText(`${ _damage_to_show }!`, monster_name_x, monster_name_y);
 }
 
@@ -253,7 +253,7 @@ let _damage_to_showPlayer;
 function DrawDamageOnPlayer(){
 	var Player_y = initialMonsterImageY - 20;
 	var player_x = playerWidthPlacement + 72 / 2 - 5;
-	_ctx.font = "60px myFirstFont";
+	_ctx.font = "60px generalFont";
 	_ctx.fillText(`${ _damage_to_showPlayer }!`, player_x, Player_y);
 }
 

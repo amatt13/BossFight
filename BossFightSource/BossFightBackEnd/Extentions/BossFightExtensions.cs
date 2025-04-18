@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 
 namespace BossFight.Extentions
 {
@@ -26,6 +28,10 @@ namespace BossFight.Extentions
             else if (pObject.GetType().IsEnum)
             {
                 result = ((int)pObject).ToDbString();
+            }
+            else if (pObject is Dictionary<string, object> stringDict)
+            {
+                result = "'" + JsonSerializer.Serialize(stringDict) + "'";
             }
             else
                 result = pObject.ToString();

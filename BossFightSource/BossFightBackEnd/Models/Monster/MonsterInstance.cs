@@ -64,8 +64,6 @@ namespace BossFight.Models
         }
 
         // From other tables
-        [JsonIgnore]
-        public Dictionary<int, DamageTrackerEntry> DamageOverTimeTracker { get; set; }  // key is player_id
 
         public IEnumerable<MonsterDamageTracker> MonsterDamageTrackerList { get; set; }
 
@@ -254,9 +252,10 @@ namespace BossFight.Models
             return (int)maxHp;
         }
 
-        public void SubtractHealth(int pDamage, Player pAttackingPlayer)
+        public void SubtractHealth(int pDamage, ITarget pAttacker)
         {
-            var monsterDamageTrackerItem = MonsterDamageTrackerList.FirstOrDefault(mdt => mdt.PlayerId == pAttackingPlayer.PlayerId);
+            Player player = pAttacker as Player;
+            var monsterDamageTrackerItem = MonsterDamageTrackerList.FirstOrDefault(mdt => mdt.PlayerId == player.PlayerId);
             if (monsterDamageTrackerItem != null)
             {
                 monsterDamageTrackerItem.DamageReceivedFromPlayer += pDamage;
@@ -264,7 +263,8 @@ namespace BossFight.Models
             }
             else
             {
-                monsterDamageTrackerItem = new MonsterDamageTracker(pAttackingPlayer, this, pDamage);
+                // This tracker will also keep track of damage from DoTs and so on! (And even attribute the damage to correct caster/player)
+                monsterDamageTrackerItem = new MonsterDamageTracker(player, this, pDamage);
                 monsterDamageTrackerItem.Persist();
                 _ = MonsterDamageTrackerList.Append(monsterDamageTrackerItem);
             }

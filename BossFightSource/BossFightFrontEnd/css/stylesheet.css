@@ -1,6 +1,11 @@
 @font-face {
-	font-family: myFirstFont;
+	font-family: generalFont;
 	src: url("./RPGSystem.ttf");
+}
+
+@font-face {
+	font-family: logFont;
+	src: url("./joystix\ monospace.otf");
 }
 
 :root {
@@ -213,6 +218,8 @@ hover-light-grey:hover {
 	resize: none;
 	grid-column: 1/-1;
 	grid-row: 4;
+	font-family: logFont;
+	font-size: 12px;
 }
 
 .highligtedButton {
@@ -365,6 +372,6 @@ credits {
 }
 
 * {
-	font-family: myFirstFont;
+	font-family: generalFont;
 	font-size: 18px;
 }

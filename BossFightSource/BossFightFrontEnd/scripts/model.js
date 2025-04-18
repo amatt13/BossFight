@@ -204,7 +204,6 @@ class PlayerAttackSummary {
 		this.monster_crit = MonsterCrit;
 		this.player_extra_damage_from_buffs = PlayerExtraDamageFromBuffs;
 		this.player_xp_earned = PlayerXpEarned;
-		this.monster_affected_by_dots = MonsterAffectedByDots;  //TODO delete me?
 		this.monster_retaliate_message = MonsterRetaliateMessage;
 		this.player_killed_monster = PlayerKilledMonster;
 		this.monster_total_damage = MonsterTotalDamage;

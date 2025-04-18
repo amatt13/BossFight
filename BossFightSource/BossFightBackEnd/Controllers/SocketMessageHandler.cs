@@ -11,6 +11,7 @@ using Ganss.Xss;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using BossFight.BossFightBackEnd.BossFightLogger;
+using BossFight.BossFightEnums;
 
 namespace BossFight.Controllers
 {
@@ -169,7 +170,7 @@ namespace BossFight.Controllers
                 var webSocketConnections = WebSocketConnections.GetInstance();
 
                 var monster = new MonsterInstance { Active = true }.FindOne();
-                var summary = DamageDealer.PlayerAttackMonster(player, monster, true);
+                var summary = DamageDealer.PlayerAttackMonster(player, monster, AttackType.WEAPON_SWING, true);
                 var response = new Dictionary<string, PlayerAttackSummary>
                 {
                     { "player_attacked_monster_with_weapon", summary }
@@ -180,7 +181,8 @@ namespace BossFight.Controllers
 
                 if (summary.PlayerKilledMonster)
                 {
-                    await NewMonster(monster, player);
+                    monster = new MonsterInstance { Active = true }.FindOne();
+                    await MonsterSpawner.NewMonster(monster, player);
                 }
                 else
                 {
@@ -203,44 +205,6 @@ namespace BossFight.Controllers
             }
             else
                 await ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
-        }
-
-        //TODO: move to another class
-        private static async Task NewMonster(MonsterInstance pMonster, Player pPLayer)
-        {
-            var newMonsterInstance = MonsterSpawner.SpawnNewMonster();
-            if (newMonsterInstance != null)
-            {
-                var monsterWasKilledMessage = $"{(pMonster.IsBossMonster ? "BOSS KILL\n" : String.Empty)}{pPLayer.Name} killed {pMonster.Name}!";
-                var monsterDamageInfo = "Player - Damage dealt\n" + String.Join(
-                    "\n", pMonster.MonsterDamageTrackerList
-                    .OrderBy(x => x.DamageReceivedFromPlayer)
-                    .Select(x => $"{x.Player.Name} {x.DamageReceivedFromPlayer}")
-                    ) + "\n__________";
-                var votesTotal = MonsterTierVoteUpdater.CountMonsterTierVotesTotalForActiveMonster();
-
-                var newMonsterMessage = new Dictionary<string, object>
-                {
-                    { "new_monster", new Dictionary<string, object>
-                        {
-                            { "newMonsterInstance", newMonsterInstance },
-                            { "monsterWasKilledMessage", monsterWasKilledMessage },
-                            { "monsterDamageInfo", monsterDamageInfo }
-                        }
-                    }
-                };
-                var monsterTierVotesTotalMessage = new Dictionary<string, MonsterTierVoteUpdater.MonsterTierVotesTotal>
-                {
-                    { "monster_tier_votes_total", votesTotal }
-                };
-                var monsterByteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(newMonsterMessage)));
-                var voteByteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(monsterTierVotesTotalMessage)));
-                foreach (var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
-                {
-                    await ws.WebSocket.SendAsync(monsterByteArray, WebSocketMessageType.Text, true, CancellationToken.None);
-                    await ws.WebSocket.SendAsync(voteByteArray, WebSocketMessageType.Text, true, CancellationToken.None);
-                }
-            }
         }
 
         // takes: userName: "string", password: "string"
@@ -609,7 +573,7 @@ namespace BossFight.Controllers
                                 {
                                     if (abilityCastResult.PlayerAttackSummary.PlayerKilledMonster)
                                     {
-                                        await NewMonster(abilityCastResult.PlayerAttackSummary.Monster, player);
+                                        await MonsterSpawner.NewMonster(abilityCastResult.PlayerAttackSummary.Monster, player);
                                     }
                                     else
                                     {

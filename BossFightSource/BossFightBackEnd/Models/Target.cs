@@ -18,5 +18,6 @@ namespace BossFight.Models
         bool IsAlive();
         bool IsAtFullHealth();
         string PossessiveName();
+        void SubtractHealth(int pDamage, ITarget pAttacker);
     }
 }

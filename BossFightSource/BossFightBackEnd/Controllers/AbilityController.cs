@@ -15,6 +15,7 @@ namespace BossFight.Controllers
             {nameof(DivineShield), typeof(DivineShield)},
             {nameof(GreaterHeal), typeof(GreaterHeal)},
             {nameof(Smite), typeof(Smite)},
+            {nameof(FireBolt), typeof(FireBolt)},
             //{nameof(XXX), typeof(XXX)},
         };
 

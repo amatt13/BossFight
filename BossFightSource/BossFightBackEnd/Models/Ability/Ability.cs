@@ -70,7 +70,7 @@ namespace BossFight.Models
         public virtual bool CanCastAbility(ref string pError)
         {
             var canCastAbility = true;
-            if (ManaCost >= Caster.Mana)
+            if (ManaCost > Caster.Mana)
             {
                 pError += "You do not have enough mana\n";
                 canCastAbility = false;
