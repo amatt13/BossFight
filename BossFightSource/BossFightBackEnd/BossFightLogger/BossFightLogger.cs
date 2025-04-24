@@ -7,6 +7,7 @@ namespace BossFight.BossFightBackEnd.BossFightLogger
     public class BossFightLoggerProvider : ILoggerProvider
     {
         private readonly string _filePath;
+        private static readonly object _lock = new();
 
         public BossFightLoggerProvider(string filePath)
         {
@@ -46,7 +47,7 @@ namespace BossFight.BossFightBackEnd.BossFightLogger
             {
                 if (formatter == null)
                 {
-                    throw new ArgumentNullException(nameof(formatter));
+                    return;
                 }
 
                 if (!IsEnabled(logLevel))
@@ -55,13 +56,19 @@ namespace BossFight.BossFightBackEnd.BossFightLogger
                 }
 
                 string message = formatter(state, exception);
-                if (string.IsNullOrEmpty(message))
-                {
+                if (string.IsNullOrWhiteSpace(message))
                     return;
+
+                if (exception != null)
+                {
+                    message += Environment.NewLine + exception;
                 }
 
-                using StreamWriter writer = new(_filePath, true);
-                writer.WriteLine($"[{DateTime.Now:yyyy/MM/dd HH:mm:ss}] [{logLevel}] {message}");
+                lock (_lock)
+                {
+                    using StreamWriter writer = new(_filePath, true);
+                    writer.WriteLine($"[{DateTime.Now:yyyy/MM/dd HH:mm:ss}] [{logLevel}] {message}");
+                }
             }
         }
     }

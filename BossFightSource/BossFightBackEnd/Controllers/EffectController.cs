@@ -30,10 +30,20 @@ namespace BossFight.Models
             _effectList = pEffectList;
         }
 
-        public bool AddEffect(Effect pEffect)
+        public bool AddEffect(Effect pEffect, bool pReplaceEffect)
         {
             var effectAdded = false;
-            if (!HasEffect(pEffect.EffectType))
+            if (HasEffect(pEffect, out Effect foundEffect))
+            {
+                if (pReplaceEffect)
+                {
+                    foundEffect.Remove(foundEffect.EffectHolder);
+                    foundEffect.Delete(foundEffect.EffectId.Value);
+                    _effectList = _effectList.Append(pEffect);
+                    effectAdded = true;
+                }
+            }
+            else
             {
                 _effectList = _effectList.Append(pEffect);
                 effectAdded = true;
@@ -42,14 +52,15 @@ namespace BossFight.Models
             return effectAdded;
         }
 
-        public void RemoveEffect(EffectType pEffectType)
+        public void RemoveEffect(Effect pEffect)
         {
-            _effectList = _effectList.Where(effect => effect.EffectType != pEffectType);
+            _effectList = _effectList.Where(effect => effect.Name != pEffect.Name);
         }
 
-        public bool HasEffect(EffectType pEffectType)
+        public bool HasEffect(Effect pEffect, out Effect foundEffect)
         {
-            return _effectList.NullSafeAny(e => e.EffectType == pEffectType);
+            foundEffect = _effectList.FirstOrDefault(e => e.Name == pEffect.Name);
+            return foundEffect != null;
         }
 
         public void RemoveExpiredEffects()
@@ -135,10 +146,10 @@ namespace BossFight.Models
         : base()
         { }
 
-        public DamageOverTimeEffect(ITarget pDebuffTarget, ITarget pCaster, int pDamagePerTick)
+        public DamageOverTimeEffect(ITarget pDebuffTarget, ITarget pCaster, int pDamagePerTick, int pCharges)
         : base()
         {
-            Charges = 2;
+            Charges = pCharges;
             Damage = pDamagePerTick;
             Fields["Damage"] = Damage;
             EffectType = EffectType.DAMAGE_OVER_TIME;

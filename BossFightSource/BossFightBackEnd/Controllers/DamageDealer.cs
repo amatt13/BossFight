@@ -62,8 +62,8 @@ namespace BossFight.Controllers
 
             var playerAttack = pAttackType switch
             {
-                AttackType.WEAPON_SWING => pPlayer.CalckulateWeaponAttackDamage(pTargetMonster, playerAttackSummary),
-                AttackType.MAGIC => pPlayer.CalckulateWeaponMagicDamage(pTargetMonster, playerAttackSummary),
+                AttackType.WEAPON_SWING => pPlayer.Combat.CalckulateWeaponAttackDamage(pTargetMonster, playerAttackSummary),
+                AttackType.MAGIC => pPlayer.Combat.CalckulateWeaponMagicDamage(pTargetMonster, playerAttackSummary),
                 _ => throw new Exception($"Invalid AttackType for player attack. AttackType : '{EnumTextFormatter.EnumPrinter(pAttackType)}'"),
             };
             MonsterReceiveDamge(pTargetMonster, playerAttack, pPlayer);

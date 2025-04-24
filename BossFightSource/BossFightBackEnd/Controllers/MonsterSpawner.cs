@@ -17,14 +17,14 @@ namespace BossFight.Controllers
         private static readonly object _spawnNewMonsterLock = new();
         public static readonly int MAX_MONSTER_TIER = 5;
 
-        public static async Task NewMonster(MonsterInstance pMonster, Player pPLayer)
+        public static async Task NewMonster(MonsterInstance pCurrentMonster, Player pPLayer)
         {
             var newMonsterInstance = SpawnNewMonster();
             if (newMonsterInstance != null)
             {
-                var goldResult = DistributeEarnedGoldForInvolvedPlayers(pMonster);
-                var monsterDamageInfo = BuildMonsterDamageInfoText(pMonster, goldResult);
-                var monsterWasKilledMessage = $"{(pMonster.IsBossMonster ? "BOSS KILL\n" : String.Empty)}{pPLayer.Name} killed {pMonster.Name}!";
+                var goldResult = DistributeEarnedGoldForInvolvedPlayers(pCurrentMonster);
+                var monsterDamageInfo = BuildMonsterDamageInfoText(pCurrentMonster, goldResult);
+                var monsterWasKilledMessage = $"{(pCurrentMonster.IsBossMonster ? "BOSS KILL\n" : String.Empty)}{pPLayer.Name} killed {pCurrentMonster.Name}!";
 
                 var votesTotal = MonsterTierVoteUpdater.CountMonsterTierVotesTotalForActiveMonster();
 
@@ -105,6 +105,7 @@ namespace BossFight.Controllers
                         newMonster.Persist();
 
                         currentMonster.Active = false;
+                        currentMonster.ActiveEffects.ForEach(effect => effect.Delete(effect.EffectId.Value));
                         currentMonster.Persist();
 
                         newMonster = newMonster.FindOne(null);
@@ -140,7 +141,7 @@ AND p.Gold + @goldToAdd <= 999999999999";
                     goldCmd.Parameters.AddParameter(trackerEntry.PlayerId.ToDbString(), "@playerId");
                     goldCmd.ExecuteNonQuery();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     connection.Close();
                     throw;

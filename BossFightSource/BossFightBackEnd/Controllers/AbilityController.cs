@@ -16,6 +16,7 @@ namespace BossFight.Controllers
             {nameof(GreaterHeal), typeof(GreaterHeal)},
             {nameof(Smite), typeof(Smite)},
             {nameof(FireBolt), typeof(FireBolt)},
+            {nameof(CutDeep), typeof(CutDeep)},
             //{nameof(XXX), typeof(XXX)},
         };
 
@@ -23,7 +24,7 @@ namespace BossFight.Controllers
         {
             ITarget target = null;
 
-            if (pAbility.OnlyTargetMonster)
+            if (pAbility.OnlyTargetFoe)
             {
                 if (RequestValidator.MonsterInstanceExists(pTargetId, out MonsterInstance monsterTarget, out string error))
                 {
