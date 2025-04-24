@@ -1,10 +1,11 @@
-using BossFight.BossFightBackEnd.BossFightLogger;
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
+using BossFight.BossFightBackEnd.BossFightLogger;
+using BossFight.Controllers;
 
 namespace BossFight
 {
@@ -22,6 +23,7 @@ namespace BossFight
         {
             GlobalConnection.SetConnectionString(Configuration["ConnectionStrings:DefaultConnection"]);
             services.AddControllers();
+            services.AddSingleton<SocketMessageHandler>();
             services.AddCors(corsOptions =>
                 corsOptions.AddPolicy("MyPolicy", builder =>
                 {

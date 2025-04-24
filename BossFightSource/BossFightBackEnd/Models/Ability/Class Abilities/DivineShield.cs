@@ -18,7 +18,7 @@ namespace BossFight.Models
             var canCast = base.CanCastAbility(ref pError);
             if (canCast)
             {
-                if (Target.HasEffect(EffectType.DIVINE_SHIELD))
+                if (Target.HasEffect(new DivineShieldEffect(), out Effect _))
                 {
                     pError += $"{Target.Name} is already affected by {Name}\n";
                     canCast = false;

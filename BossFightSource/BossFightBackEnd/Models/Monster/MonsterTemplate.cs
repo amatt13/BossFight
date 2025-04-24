@@ -5,7 +5,6 @@ using BossFight.BossFightEnums;
 using BossFight.Extentions;
 using MySqlConnector;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc;
 using AngleSharp.Text;
 
 namespace BossFight.Models

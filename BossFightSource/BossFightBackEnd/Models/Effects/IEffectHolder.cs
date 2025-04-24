@@ -7,9 +7,9 @@ namespace BossFight.Models
         /// <summary>
         /// Returns true if the effect was added to the ITarget
         /// </summary>
-        bool AddEffect(Effect pEffect);
-        void RemoveEffect(EffectType pEffectType);
-        bool HasEffect(EffectType pEffectType);
+        bool AddEffect(Effect pEffect, bool pReplaceEffect);
+        void RemoveEffect(Effect pEffect);
+        bool HasEffect(Effect pEffect, out Effect foundEffect);
         void RemoveExpiredEffects();
     }
 }

@@ -6,7 +6,7 @@ function playerCast(ability_cast_key, target_id) {
 		}
 	});
 
-	if (abiliy_to_be_cast.only_target_monster)
+	if (abiliy_to_be_cast.only_target_foe)
 		target_id = _monster1.monster_instance_id;
 
     if (clientSideEvaluation(abiliy_to_be_cast, target_id)) {

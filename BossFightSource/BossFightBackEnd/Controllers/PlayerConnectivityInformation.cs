@@ -17,7 +17,6 @@ namespace BossFight
 
         private readonly ILogger<PlayerConnectivityInformation> _logger;
 
-        private readonly int _minuteInMilliseconds = 60_000;
         private readonly int _interval = 3_000;
 
         private List<BossFightWebSocket> _bossFightWebSocketList {get; set;}
@@ -61,13 +60,13 @@ namespace BossFight
             var playerInformationList = _bossFightWebSocketList.Select(
                 bfws => new PlayerInformation(
                     bfws.Player.Name,
-                    bfws.Player.Level,
+                    bfws.Player.Stats.GetLevel(),
                     bfws.PlayerId.Value,
                     bfws.Player.PlayerPlayerClass.PlayerClass.Name,
                     bfws.Player.Hp,
-                    bfws.Player.GetMaxHp(),
+                    bfws.Player.Stats.GetMaxHp(),
                     bfws.Player.Mana,
-                    bfws.Player.GetMaxMana(),
+                    bfws.Player.Stats.GetMaxMana(),
                     bfws.Player.PrefferedBodyType
                     )
                 );

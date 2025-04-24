@@ -8,9 +8,6 @@ using BossFight.Extentions;
 using Microsoft.Extensions.Logging;
 using BossFight.BossFightBackEnd.BossFightLogger;
 using BossFight.BossFightEnums;
-using Microsoft.Extensions.Localization;
-using System.Text.Json.Serialization.Metadata;
-using System.Linq;
 
 namespace BossFight.Models
 {
@@ -68,16 +65,98 @@ namespace BossFight.Models
 
         // From other tables
         // The effect can be applied to players or monsters.
-        public Player EffectHolderPlayer { get; protected set; }
-        public MonsterInstance EffectHolderMonster { get; protected set; }
+        [JsonIgnore]
+        private Player _effectHolderPlayer;
+
+        [JsonIgnore]
+        public Player EffectHolderPlayer
+        {
+            get
+            {
+                _effectHolderPlayer ??= new Player().FindOne(EffectHolderPlayerId);
+                return _effectHolderPlayer;
+            }
+            protected set
+            {
+                _effectHolderPlayer = value;
+            }
+        }
+
+        [JsonIgnore]
+        private MonsterInstance _effectHolderMonster;
+
+        [JsonIgnore]
+        public MonsterInstance EffectHolderMonster
+        {
+            get
+            {
+                _effectHolderMonster ??= new MonsterInstance().FindOne(EffectHolderMonsterId);
+                return _effectHolderMonster;
+            }
+            protected set
+            {
+                _effectHolderMonster = value;
+            }
+        }
+
         // The effect can be applied by a player or monster.
-        public Player EffectCasterPlayer { get; protected set; }
-        public MonsterInstance EffectCasterMonster { get; protected set; }
+        [JsonIgnore]
+        private Player _effectCasterPlayer;
+
+        [JsonIgnore]
+        public Player EffectCasterPlayer
+        {
+            get
+            {
+                _effectCasterPlayer ??= new Player().FindOne(EffectCasterPlayerId);
+                return _effectCasterPlayer;
+            }
+            protected set
+            {
+                _effectCasterPlayer = value;
+            }
+        }
+
+        [JsonIgnore]
+        private MonsterInstance _effectCasterMonster;
+
+        [JsonIgnore]
+        public MonsterInstance EffectCasterMonster
+        {
+            get
+            {
+                _effectCasterMonster ??= new MonsterInstance().FindOne(EffectCasterMonsterId);
+                return _effectCasterMonster;
+            }
+            protected set
+            {
+                _effectCasterMonster = value;
+            }
+        }
 
         // Calculated fields/properties
         [JsonIgnore]
-        public Dictionary<string, string>
-         SearchFields { get; set; }
+        public Dictionary<string, string> SearchFields { get; set; }
+
+        [JsonIgnore]
+        public ITarget EffectHolder
+        {
+            get
+            {
+                if (EffectBelongsToPlayer())
+                {
+                    return EffectHolderPlayer;
+                }
+                else if (EffectBelongsToMonster())
+                {
+                    return EffectHolderMonster;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         public Effect()
         {
@@ -133,10 +212,10 @@ namespace BossFight.Models
                     EffectCasterPlayerId = pBaseEffect.EffectCasterPlayerId,
                     EffectCasterMonsterId = pBaseEffect.EffectCasterMonsterId,
                     //Name = pBaseEffect.Name;  // Should be set by the subclass
-                    EffectHolderPlayer = pBaseEffect.EffectHolderPlayer,
-                    EffectHolderMonster = pBaseEffect.EffectHolderMonster,
-                    EffectCasterPlayer = pBaseEffect.EffectCasterPlayer,
-                    EffectCasterMonster = pBaseEffect.EffectCasterMonster,
+                    EffectHolderPlayer = pBaseEffect._effectHolderPlayer,
+                    EffectHolderMonster = pBaseEffect._effectHolderMonster,
+                    EffectCasterPlayer = pBaseEffect._effectCasterPlayer,
+                    EffectCasterMonster = pBaseEffect._effectCasterMonster,
                     Fields = pBaseEffect.Fields
                 };
                 foreach(var key in newInstance.Fields.Keys)
@@ -167,28 +246,28 @@ namespace BossFight.Models
             };
         }
 
-        protected virtual bool Apply(ITarget pTarget, ITarget pCaster)
+        protected virtual bool Apply(ITarget pTarget, ITarget pCaster, bool pReplaceEffect = true)
         {
             _logger.LogTrace("Applying effect to {pTarget}", pTarget);
             SetEffectHolderITarget(pTarget);
             SetEffectCasterITarget(pCaster);
-            return pTarget.AddEffect(this);
+            return pTarget.AddEffect(this, pReplaceEffect);
         }
 
         public virtual void Remove(ITarget pTarget)
         {
             _logger.LogTrace("Removing effect from {pTarget}", pTarget);
-            pTarget.RemoveEffect(EffectType);
+            pTarget.RemoveEffect(this);
         }
 
         public bool EffectBelongsToPlayer()
         {
-            return EffectHolderPlayer?.PlayerId != null || EffectHolderPlayerId.HasValue;
+            return EffectHolderPlayerId.HasValue;
         }
 
         public bool EffectBelongsToMonster()
         {
-            return EffectHolderMonster?.MonsterInstanceId != null || EffectHolderMonsterId.HasValue;
+            return EffectHolderMonsterId.HasValue;
         }
 
         protected void SetEffectHolderPlayer(Player pPlayer)
@@ -287,8 +366,6 @@ namespace BossFight.Models
             {
                 if (effect.EffectCasterMonsterId.HasValue)
                     effect.EffectCasterMonster = new MonsterInstance().FindOneForParent(effect.EffectCasterMonsterId, pConnection);
-                if (effect.EffectCasterPlayerId.HasValue)
-                    effect.EffectCasterPlayer = new Player().FindOneForParent(effect.EffectCasterPlayerId, pConnection);
             }
 
             return result;

@@ -34,7 +34,7 @@ namespace BossFight
                             };
                             httpsConnectionAdapterOptions.AllowAnyClientCertificate();
 
-                            var cert = X509Certificate2.CreateFromPemFile("/etc/letsencrypt/live/bossfight.ix.tc/fullchain.pem", "/etc/letsencrypt/live/bossfight.ix.tc/privkey.pem");
+                            var cert = X509Certificate2.CreateFromPemFile("/etc/letsencrypt/live/bossfight.uk.to/fullchain.pem", "/etc/letsencrypt/live/bossfight.uk.to/privkey.pem");
                             if (cert == null)
                             {
                                 throw new Exception("FAILED TO CREATE CERTIFICATE");

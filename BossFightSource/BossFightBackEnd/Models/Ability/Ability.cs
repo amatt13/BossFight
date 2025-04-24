@@ -20,7 +20,7 @@ namespace BossFight.Models
         [JsonIgnore]
         public ITarget Target { get; set; }
 
-        public bool OnlyTargetMonster { get; set; }
+        public bool OnlyTargetFoe { get; set; }
 
         public int ManaCost { get; set; }
 
@@ -32,7 +32,7 @@ namespace BossFight.Models
             Description = pDescription;
             Caster = null;
             Target = null;
-            OnlyTargetMonster = false;
+            OnlyTargetFoe = false;
             ManaCost = pManaCost;
             AffectsAllPlayers = false;
         }
@@ -79,6 +79,11 @@ namespace BossFight.Models
             {
                 pError += "You are knocked out\n";
                 canCastAbility = false;
+            }
+            else if (Target != null && Target.IsDead())
+            {
+                canCastAbility = false;
+                pError += $"{Target.Name} must be alive.\n";
             }
 
             if (Caster is Player player)

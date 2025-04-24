@@ -13,7 +13,7 @@ namespace BossFight.Models
         public Smite()
             : base("Smite", "Deals bonus damage to undead monsters", pManaCost: 4)
         {
-            OnlyTargetMonster = true;
+            OnlyTargetFoe = true;
         }
 
         public override void TargetEffect(ITarget pTarget, AbilityResult pAbilityResult)
@@ -36,18 +36,7 @@ namespace BossFight.Models
 
             if (canCast)
             {
-                if (Target.IsDead())
-                {
-                    canCast = false;
-                    pError += $"{Target.Name} must be alive.\n";
-                }
-                else if (!Target.MonsterTypeList.Contains(MonsterType.UNDEAD))
-                {
-                    canCast = false;
-                    pError += $"Smite only works on undead targets. {Target.Name} is {EnumTextFormatter.EnumPrinter(Target.MonsterTypeList)}\n";
-                }
-
-                if (canCast)
+                if (Target.MonsterTypeList.Contains(MonsterType.UNDEAD))
                 {
                     if (Caster is Player playerCaster && Target is MonsterInstance)
                     {
@@ -70,6 +59,11 @@ namespace BossFight.Models
                         canCast = false;
                         pError += "No valid targets\n";
                     }
+                }
+                else
+                {
+                    canCast = false;
+                    pError += $"Smite only works on undead targets. {Target.Name} is {EnumTextFormatter.EnumPrinter(Target.MonsterTypeList)}\n";
                 }
             }
 

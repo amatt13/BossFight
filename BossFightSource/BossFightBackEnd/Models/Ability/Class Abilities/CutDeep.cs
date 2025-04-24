@@ -3,36 +3,35 @@ using BossFight.Controllers;
 
 namespace BossFight.Models
 {
-    public class FireBolt: Ability
+    public class CutDeep: Ability
     {
-        private bool _attackMonsterWithFireBolt = false;
-        private bool _attacPlayerWithFireBolt = false;
-        private int _fire_bolt_damage = 7;
-        private int _damagePerTick = 5;
-        private int _charges = 2;
-        public FireBolt()
-            : base("Fire bolt", "Throw a small bolt of fire", pManaCost: 14)
+        private bool _attackMonsterWithCutDeep = false;
+        private bool _attacPlayerWithCutDeep = false;
+        private int _damagePerTick = 3;
+        private int _charges = 4;
+        public CutDeep()
+            : base("Cut deep", "Inflicts a severe wound that causes steady blood loss after the initial strike", pManaCost: 6)
         {
             OnlyTargetFoe = true;
         }
 
         public override void TargetEffect(ITarget pTarget, AbilityResult pAbilityResult)
         {
-            if (_attackMonsterWithFireBolt)
+            if (_attackMonsterWithCutDeep)
             {
-                AttackMonsterWithFireBolt((Player)Caster, (MonsterInstance)Target, pAbilityResult);
+                AttackMonsterWithCutDeep((Player)Caster, (MonsterInstance)Target, pAbilityResult);
             }
-            else if (_attacPlayerWithFireBolt)
+            else if (_attacPlayerWithCutDeep)
             {
-                AttackPlayerWithFireBolt((MonsterInstance)Caster, (Player)Target, pAbilityResult);
+                AttackPlayerWithCutDeep((MonsterInstance)Caster, (Player)Target, pAbilityResult);
             }
         }
 
         public override bool CanCastAbility(ref string pError)
         {
             var canCast = base.CanCastAbility(ref pError);
-            _attackMonsterWithFireBolt = false;
-            _attacPlayerWithFireBolt = false;
+            _attackMonsterWithCutDeep = false;
+            _attacPlayerWithCutDeep = false;
 
             if (canCast)
             {
@@ -40,7 +39,7 @@ namespace BossFight.Models
                 {
                     if (RequestValidator.PlayerCanAttackMonsterWithEquippedWeapon(playerCaster.PlayerId.Value, out string error))
                     {
-                        _attackMonsterWithFireBolt = true;
+                        _attackMonsterWithCutDeep = true;
                     }
                     else
                     {
@@ -50,7 +49,7 @@ namespace BossFight.Models
                 }
                 else if (Caster is MonsterInstance && Target is Player)
                 {
-                    _attacPlayerWithFireBolt = true;
+                    _attacPlayerWithCutDeep = true;
                 }
                 else
                 {
@@ -62,26 +61,23 @@ namespace BossFight.Models
             return canCast;
         }
 
-        private void AttackMonsterWithFireBolt(Player pPLayer, MonsterInstance pMonster, AbilityResult pAbilityResult)
+        private void AttackMonsterWithCutDeep(Player pPLayer, MonsterInstance pMonster, AbilityResult pAbilityResult)
         {
             // Apply dot
             new DamageOverTimeEffect(Target, Caster, _damagePerTick, _charges);
-            pAbilityResult.AbilityResultText = $"You cast {Name} on {Target.Name}";
+            pAbilityResult.AbilityResultText = $"You use {Name} on {Target.Name}";
 
-            // Apply magic attack damage
-            pPLayer.BonusMagicDmg += _fire_bolt_damage;
             var summary = DamageDealer.PlayerAttackMonster(pPLayer, pMonster, AttackType.MAGIC, true);
             pAbilityResult.PlayerAttackSummary = summary;
             pAbilityResult.ReloadMonster = true;
-            pAbilityResult.AbilityResultText = $"Your {Name} dealt { summary.PlayerTotalDamage } damage";
-            pPLayer.BonusMagicDmg -= _fire_bolt_damage;
+            pAbilityResult.AbilityResultText = $"{Name} has been inflicted on { Target.Name } damage";
         }
 
-        private void AttackPlayerWithFireBolt(MonsterInstance pMonster, Player pPLayer, AbilityResult pAbilityResult)
+        private void AttackPlayerWithCutDeep(MonsterInstance pMonster, Player pPLayer, AbilityResult pAbilityResult)
         {
             // Apply dot
             new DamageOverTimeEffect(Target, Caster, _damagePerTick, _charges);
-            pAbilityResult.AbilityResultText = $"{Caster.Name} cast {Name} on {Target.Name}";
+            pAbilityResult.AbilityResultText = $"{Caster.Name} use {Name} on {Target.Name}";
 
             var monsterAttackSummary = new PlayerAttackSummary(pPLayer, pMonster);
             DamageDealer.MonsterAttackPlayer(pMonster, pPLayer, monsterAttackSummary);

@@ -204,13 +204,16 @@ namespace BossFight.Models
 
             var id = (int?)GetType().GetProperty(IdColumn).GetValue(this);
             using var connection = GlobalConnection.GetNewOpenConnection();
+            using var cmd = connection.CreateCommand();
+
+            var propsToPersist = GetType()
+                .GetProperties()
+                .Where(prop => prop.IsDefined(typeof(PersistPropertyAttribute), true));
 
             // null for new objects
-            using var cmd = connection.CreateCommand();
             if (id == null)
             {
                 // Insert new
-                var propsToPersist = GetType().GetProperties().Where(prop => prop.IsDefined(typeof(PersistPropertyAttribute), true));
                 var insert = $"INSERT { TableName }";
                 var colums = String.Join(", ", propsToPersist.Where(prop => (prop.GetCustomAttributes(true).First(x => x is PersistPropertyAttribute) as PersistPropertyAttribute).IsIdProperty == false).Select(p => p.Name));
                 var values = String.Join(", ", propsToPersist.Where(prop => (prop.GetCustomAttributes(true).First(x => x is PersistPropertyAttribute) as PersistPropertyAttribute).IsIdProperty == false).Select(p => GetValueFromProperyInfo(p) ?? "NULL"));
@@ -221,7 +224,6 @@ namespace BossFight.Models
             else
             {
                 // Update existing
-                var propsToPersist = GetType().GetProperties().Where(prop => prop.IsDefined(typeof(PersistPropertyAttribute), true));
                 var updateTableString = $"UPDATE { TableName }";
                 var whereString = $"WHERE { IdColumn } = @id";
                 var setString = "SET ";

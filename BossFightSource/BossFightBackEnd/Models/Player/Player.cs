@@ -12,9 +12,6 @@ namespace BossFight.Models
     public class Player : PersistableBase<Player>, ITarget
     {
         [JsonIgnore]
-        private static readonly Random _random = new();
-
-        [JsonIgnore]
         public override string TableName { get; set; } = nameof(Player);
         [JsonIgnore]
         public override string IdColumn { get; set; } = nameof(PlayerId);
@@ -54,7 +51,7 @@ namespace BossFight.Models
         public int Mana { get; set; }
 
         [PersistProperty]
-        public string Name { get; set; } = "DEFAULT EFFECT";
+        public string Name { get; set; }
 
         public List<MonsterType> MonsterTypeList { get; } = new List<MonsterType>{MonsterType.PLAYER};
 
@@ -66,19 +63,26 @@ namespace BossFight.Models
         public List<int?> LootList { get; set; }  //TODO change to real loot list (combinded list -> see PlayerWeapon.cs)
         public Weapon Weapon { get; set; }
         public List<int?> AutoSellList { get; set; }
-        public int Level { get => PlayerPlayerClass.Level; }
+        public int Level { get => Stats.GetLevel(); }
         public int BonusMagicDmg { get; set; }
         public IEnumerable<PlayerWeapon> PlayerWeaponList { get; set; }
         public BodyType PrefferedBodyType { get; set; }
         public IEnumerable<Effect> ActiveEffects { get; set; }
 
+        // Behaviors
         [JsonIgnore]
         private EffectManager _effectManager {get; set;}
+
+        [JsonIgnore]
+        public PlayerCombat Combat => new(this);
+
+        [JsonIgnore]
+        public PlayerStats Stats => new(this);
+
 
         public Player() { }
 
         #region PersistableBase implementation
-
         public override void BeforePersist()
         {
             base.BeforePersist();
@@ -148,8 +152,47 @@ namespace BossFight.Models
 
             return TrimAdditionalSearchCriteriaText(additionalSearchCriteriaText, pStartWithAnd);
         }
-
         #endregion PersistableBase implementation
+
+        #region ITarget methods implementation
+        public bool IsDead()
+        {
+            return Combat.IsDead();
+        }
+
+        public bool IsAlive()
+        {
+            return !IsDead();
+        }
+
+        public bool IsAtFullHealth()
+        {
+            return Combat.IsAtFullHealth();
+        }
+
+        public void SubtractHealth(int pDamage, ITarget pAttacker)
+        {
+            Combat.SubtractHealth(pDamage, pAttacker);
+        }
+
+        public int GetMaxHp()
+        {
+            return Stats.GetMaxHp();
+        }
+
+        public string PossessiveName()
+        {
+            if (Name.Last() == 's')
+            {
+                return Name + "'";
+            }
+            else
+            {
+                return Name + "'s";
+            }
+        }
+
+        #endregion
 
         public void UpdateBossFightConnectionWithPlayer()
         {
@@ -157,47 +200,6 @@ namespace BossFight.Models
             if (bossFightConnection != null)
             {
                 bossFightConnection.Player = this;
-            }
-        }
-
-        public int CalckulateWeaponAttackDamage(MonsterInstance pTargetMonster, PlayerAttackSummary pPlayerAttackSummary)
-        {
-            var isCrit = pTargetMonster.AttackOnMonsterIsCrit(GetAttackCritChance());
-            var dmg = Weapon.AttackPower + GetAttackBonus();
-
-            if (isCrit)
-            {
-                dmg = (int)Math.Ceiling(1.25 * dmg);
-                pPlayerAttackSummary.PlayerCrit = true;
-            }
-
-            pPlayerAttackSummary.PlayerTotalDamage = dmg;
-            return dmg;
-        }
-
-        public int CalckulateWeaponMagicDamage(MonsterInstance pTargetMonster, PlayerAttackSummary pPlayerAttackSummary)
-        {
-            var isCrit = pTargetMonster.AttackOnMonsterIsCrit(GetSpellCritChance());
-            var dmg = Weapon.SpellPower + GetSpellBonus();
-
-            if (isCrit)
-            {
-                dmg = (int)Math.Ceiling(1.25 * dmg);
-                pPlayerAttackSummary.PlayerCrit = true;
-            }
-
-            pPlayerAttackSummary.PlayerTotalDamage = dmg;
-            return dmg;
-        }
-
-        public void SubtractHealth(int pDamage, ITarget pAttacker)
-        {
-            if (pDamage > 0)
-            {
-                Hp -= pDamage;
-
-                if (Hp < -3)
-                    Hp = -3;
             }
         }
 
@@ -213,56 +215,9 @@ namespace BossFight.Models
             return $"{ Name.PadLeft(pLengthOfLongestPlayerName, '.') } { goldStr } gold";
         }
 
-        public int GetMaxHp()
-        {
-            return PlayerPlayerClass.MaxHp;
-        }
-
-        public int GetMaxMana()
-        {
-            return PlayerPlayerClass.MaxMana;
-        }
-
-        public int GetLevel()
-        {
-            return PlayerPlayerClass.Level;
-        }
-
-        public bool IsKnockedOut()
-        {
-            return IsDead();
-        }
-
-        public bool IsDead()
-        {
-            return Hp <= 0;
-        }
-
-        public bool IsAlive()
-        {
-            return !IsDead();
-        }
-
-        public bool IsAtFullHealth()
-        {
-            return Hp >= GetMaxHp();
-        }
-
-        public string PossessiveName()
-        {
-            if (Name.Last() == 's')
-            {
-                return Name + "'";
-            }
-            else
-            {
-                return Name + "'s";
-            }
-        }
-
         public void GainXp(int pGainedXp, int? pMonsterLevel = null)
         {
-            pGainedXp = ExperienceCalculator.CalcXpPenalty(pGainedXp, GetLevel(), pMonsterLevel);
+            pGainedXp = ExperienceCalculator.CalcXpPenalty(pGainedXp, Stats.GetLevel(), pMonsterLevel);
             PlayerPlayerClass.XP += pGainedXp;
             var xpNeededToNextLevel = ExperienceCalculator.XpNeededToNextLevel(PlayerPlayerClass);
             if (xpNeededToNextLevel <= 0)
@@ -279,43 +234,6 @@ namespace BossFight.Models
         {
             WeaponId = pWeaponId;
             Persist();
-        }
-
-        public bool HasEnoughManaForAbility(Ability pAbility)
-        {
-            return Mana >= pAbility.ManaCost;
-        }
-
-        public int GetAttackBonus()
-        {
-            return (int)Math.Floor((double)Level / 2) + BonusMagicDmg + PlayerPlayerClass.AttackPowerBonus;
-        }
-
-        public int GetSpellBonus()
-        {
-            return (int)Math.Floor((double)Level / 2) + PlayerPlayerClass.SpellPowerBonus;
-        }
-
-        public int GetAttackCritChance()
-        {
-            var critChance = Weapon.AttackCritChance;
-            critChance += PlayerPlayerClass.CritChance;
-            return critChance;
-        }
-
-        public int GetSpellCritChance()
-        {
-            var critChance = Weapon.SpellCritChance;
-            critChance += PlayerPlayerClass.CritChance;
-            return critChance;
-        }
-
-        public bool PlayerSpellIsCrit(int pBonusCritChance = 0)
-        {
-            var critChance = GetSpellCritChance();
-            critChance += pBonusCritChance;
-            var roll = _random.Next(0, 101);
-            return roll <= critChance;
         }
 
         public void AddLoot(int? pLootToAdd)
@@ -350,25 +268,19 @@ namespace BossFight.Models
             return AutoSellList.Contains(pLootId);
         }
 
-        public void RestoreAllHealthAndMana()
+        public bool AddEffect(Effect pEffect, bool pReplaceEffect)
         {
-            Hp = GetMaxHp();
-            Mana = GetMaxMana();
+            return _effectManager.AddEffect(pEffect, pReplaceEffect);
         }
 
-        public bool AddEffect(Effect pEffect)
+        public void RemoveEffect(Effect pEffect)
         {
-            return _effectManager.AddEffect(pEffect);
+            _effectManager.RemoveEffect(pEffect);
         }
 
-        public void RemoveEffect(EffectType pEffectType)
+        public bool HasEffect(Effect pEffect, out Effect pFoundEffect)
         {
-            _effectManager.RemoveEffect(pEffectType);
-        }
-
-        public bool HasEffect(EffectType pEffectType)
-        {
-            return _effectManager.HasEffect(pEffectType);
+            return _effectManager.HasEffect(pEffect, out pFoundEffect);
         }
 
         public void RemoveExpiredEffects()

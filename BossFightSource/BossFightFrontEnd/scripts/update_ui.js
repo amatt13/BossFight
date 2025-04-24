@@ -232,9 +232,9 @@ function UpdateUiShop(shop_dict) {
 function CreateAbilityForPlayerColumn(ability) {
 	const ability_html = `<button id="button_ability_${ability.name}" type="button" class="btn-ability toolTip" onclick="playerCast('${ability.ability_cast_key}', ${_player.player_id});">
 	<img src="./images/ui_icons/abilities/${ability.image_source}.png" class="max-size-100-percent" data-ability_cast_key="${ability.ability_cast_key}">
-	<span class="toolTipText" onclick="event.stopPropagation();">${ability.description}
-		Costs ${ability.mana_cost} Mana
-	</span>
+	<span class="toolTipText" onclick="event.stopPropagation();">${ability.name}
+${ability.description}
+Costs ${ability.mana_cost} Mana</span>
 </button>`
 
 return ability_html;

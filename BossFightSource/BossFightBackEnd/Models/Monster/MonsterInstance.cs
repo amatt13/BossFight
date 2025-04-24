@@ -266,7 +266,7 @@ namespace BossFight.Models
                 // This tracker will also keep track of damage from DoTs and so on! (And even attribute the damage to correct caster/player)
                 monsterDamageTrackerItem = new MonsterDamageTracker(player, this, pDamage);
                 monsterDamageTrackerItem.Persist();
-                _ = MonsterDamageTrackerList.Append(monsterDamageTrackerItem);
+                MonsterDamageTrackerList = MonsterDamageTrackerList.Append(monsterDamageTrackerItem);
             }
 
             Hp -= pDamage;
@@ -311,19 +311,19 @@ namespace BossFight.Models
             return roll <= pCritChance;
         }
 
-        public bool AddEffect(Effect pEffect)
+        public bool AddEffect(Effect pEffect, bool pReplaceEffect)
         {
-            return _effectManager.AddEffect(pEffect);
+            return _effectManager.AddEffect(pEffect, pReplaceEffect);
         }
 
-        public void RemoveEffect(EffectType pEffectType)
+        public void RemoveEffect(Effect pEffect)
         {
-            _effectManager.RemoveEffect(pEffectType);
+            _effectManager.RemoveEffect(pEffect);
         }
 
-        public bool HasEffect(EffectType pEffectType)
+        public bool HasEffect(Effect pEffect, out Effect pFoundEffect)
         {
-            return _effectManager.HasEffect(pEffectType);
+            return _effectManager.HasEffect(pEffect, out pFoundEffect);
         }
 
         public void RemoveExpiredEffects()

@@ -61,7 +61,29 @@ namespace BossFight.Controllers
             {
                 var methodName = method.Method.Name;
                 _logger.LogDebug("Executing {methodName}", methodName);
-                await method(dataJsonDictionary, pWebSocketReceiveResult, pWebSocket);
+                try
+                {
+                    await method(dataJsonDictionary, pWebSocketReceiveResult, pWebSocket);
+                }
+                catch (WebSocketException e)
+                {
+                    var error = (WebSocketError)e.ErrorCode;
+                    if (error == WebSocketError.InvalidState)
+                    {
+                        var errorMessage = e.Message;
+                        _logger.LogWarning("Invalid state for socket: {errorMessage}", errorMessage);
+
+                        await pWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Invalid state", CancellationToken.None);
+                        var webSocketConnections = WebSocketConnections.GetInstance();
+                        webSocketConnections.RemoveConnection(pWebSocket);
+                        _logger.LogInformation("Websocket removed");
+                    }
+                    else
+                    {
+                        _logger.LogError("Unexpected WebSocketError '{error}'", error);
+                        throw;
+                    }
+                }
             }
             else
             {

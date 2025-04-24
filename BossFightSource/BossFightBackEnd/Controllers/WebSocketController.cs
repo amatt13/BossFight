@@ -10,7 +10,6 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using BossFight.BossFightBackEnd.BossFightLogger;
-using Xunit.Sdk;
 
 namespace BossFight.Controllers
 {
@@ -19,6 +18,7 @@ namespace BossFight.Controllers
     public class WebSocketController : ControllerBase
     {
         private static ILogger<WebSocketController> _logger;
+        private readonly SocketMessageHandler _messageHandler;
 
         private static void _initLogger()
         {
@@ -33,9 +33,10 @@ namespace BossFight.Controllers
             _logger = _loggerFactory.CreateLogger<WebSocketController>();
         }
 
-        public WebSocketController()
+        public WebSocketController(SocketMessageHandler pMessageHandler)
         {
             Console.WriteLine("Init WebSocketController");
+             _messageHandler = pMessageHandler;
             _initLogger();
         }
 
@@ -56,7 +57,7 @@ namespace BossFight.Controllers
             }
         }
 
-        private static async Task ReadMessage(HttpContext pContext, WebSocket pWebSocket)
+        private async Task ReadMessage(HttpContext pContext, WebSocket pWebSocket)
         {
             Console.WriteLine($"ReadMessage. From '{pContext.Connection.RemoteIpAddress}'");
             var buffer = new byte[1024 * 4];
@@ -73,14 +74,13 @@ namespace BossFight.Controllers
 
                 try
                 {
-                    await new SocketMessageHandler().HandleMessage(jsonDictionary, result, pWebSocket);
+                    await _messageHandler.HandleMessage(jsonDictionary, result, pWebSocket);
                     result = await pWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
                 catch (WebSocketException e)
                 {
                     var errorMessage = e.Message;
                     var StackTrace = e.StackTrace;
-                    _logger.LogError("Websocket error: {errorMessage}\n{StackTrace}", errorMessage, StackTrace);
                 }
             }
         }
