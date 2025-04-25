@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BossFight.Extentions;
 using MySqlConnector;
 using System.Text.Json.Serialization;
+using BossFight.Extentions;
 
-namespace BossFight.Models.DB
+namespace BossFight.Models
 {
     public class PersistableImplementationTemplate : PersistableBase<PersistableImplementationTemplate>, IPersist<PersistableImplementationTemplate>
     {

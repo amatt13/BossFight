@@ -41,7 +41,8 @@ namespace BossFight.Controllers.SocketMessageHandlers
                                 {
                                     targetPlayer.Persist();
                                     var bfws = webSocketConnections.GetConnection(targetPlayer);
-                                    await _castAbilityUpdatePlayerTarget(targetPlayer, player, bfws, abilityCastResult);
+                                    if (bfws != null)
+                                        await _castAbilityUpdatePlayerTarget(targetPlayer, player, bfws, abilityCastResult);
                                 }
 
                                 var response = new Dictionary<string, object>

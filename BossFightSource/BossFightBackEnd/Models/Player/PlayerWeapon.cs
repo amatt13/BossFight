@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace BossFight.Models
 {
-    public class PlayerWeapon : PersistableBase<PlayerWeapon>, IPersist<PlayerWeapon>
+    public class PlayerWeapon : PersistableBase<PlayerWeapon>, IPersist<PlayerWeapon>, IPlayerLoot
     {
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(PlayerWeapon);
@@ -34,6 +34,11 @@ namespace BossFight.Models
         public string WeaponName { get => Weapon.LootName; }
 
         public PlayerWeapon () { }
+
+        public static IPlayerLoot CreateInstance(int pLootId, Player pPlayer)
+        {
+            return new PlayerWeapon{WeaponId=pLootId, PlayerId=pPlayer.PlayerId};
+        }
 
         #region PersistableBase implementation
 

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using BossFight.BossFightEnums;
-using BossFight.Models.Loot;
 
 namespace BossFight.Models
 {

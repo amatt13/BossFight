@@ -1,10 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using BossFight.BossFightEnums;
 using BossFight.Extentions;
-using BossFight.Models.DB;
-using BossFight.Models.Loot;
 using MySqlConnector;
 using System.Text.Json.Serialization;
 
@@ -12,9 +8,6 @@ namespace BossFight.Models
 {
     public class Weapon : LootItem<Weapon>
     {
-        [JsonIgnore]
-        public const float DEFAULTWEAPONDROPCHANCE = 1.0f;
-
         [JsonIgnore]
         public override string TableName { get; set; } = nameof(Weapon);
 
@@ -46,9 +39,8 @@ namespace BossFight.Models
 
         public Weapon() { }
 
-        public Weapon(int pWeaponId, string pName, string pAttackMessage, WeaponType pWeaponType = null, int pAttackPower = 1, int pCost = 0, int pAttackCritChance = 3, float pDropChance = Weapon.DEFAULTWEAPONDROPCHANCE,
-                      int pSpellPower = 0, int pSpellCritChance = 0, bool pBossWeapon = false, int pWeaponLvl = 1)
-            : base(pWeaponId, pName, pDropChance, pCost)
+        public Weapon(int pWeaponId, string pName, string pAttackMessage, WeaponType pWeaponType = null, int pAttackPower = 1, int pCost = 0, int pAttackCritChance = 3, int pSpellPower = 0, int pSpellCritChance = 0, bool pBossWeapon = false, int pWeaponLvl = 1)
+            : base(pWeaponId, pName, pCost)
         {
             WeaponType = pWeaponType;
             AttackMessage = pAttackMessage;
@@ -87,13 +79,6 @@ namespace BossFight.Models
             return result;
         }
 
-        public void SetBossWeaponProperties(int pWeaponLevel)
-        {
-            BossWeapon = true;
-            WeaponLevel = pWeaponLevel;
-            // CalcWeaponStats();
-        }
-
         public string InventoryStr()
         {
             var spellStr = "";
@@ -105,6 +90,11 @@ namespace BossFight.Models
         public string GetWeaponTypeStr()
         {
             return WeaponType.ToString();
+        }
+
+        public override string ToString()
+        {
+            return LootName;
         }
 
         public string ShopStr(int pLengthOfLongestName, int pLengthOfLongestTypeName, int pLongestAttackDigit, int pLongestGoldPriceDigit, int pLongestCritChanceDigit, int pLongestSpellPowerDigit, int pLongestSpellCritChanceDigit)

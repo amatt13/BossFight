@@ -10,6 +10,13 @@ namespace BossFight.Extentions
             return pMySqlDataReader.GetInt32(pColumnName);
         }
 
+        public static T GetEnum<T>(this MySqlDataReader pMySqlDataReader, string pColumnName)
+        where T: Enum
+        {
+            var value = pMySqlDataReader[pColumnName].ToString().ToUpper();
+            return (T)Enum.Parse(typeof(T), value);
+        }
+
         public static int? GetIntNullable(this MySqlDataReader pMySqlDataReader, string pColumnName, int? pFallbackValue = null)
         {
             return Convert.IsDBNull(pMySqlDataReader[pColumnName]) ? pFallbackValue : (int?)pMySqlDataReader.GetInt32(pColumnName);

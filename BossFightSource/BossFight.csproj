@@ -6,6 +6,7 @@
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
     <ThreadPoolMinThreads>500</ThreadPoolMinThreads>
     <GenerateProgramFile>false</GenerateProgramFile>
+    <NoWarn>CS0121;IDE1006;IDE0044;IDE0035;CS0162</NoWarn>
   </PropertyGroup>
 
  <ItemGroup>

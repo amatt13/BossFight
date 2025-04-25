@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using BossFight.Models;
 using BossFight.Extentions;
-using BossFight.Models.Loot;
 
 namespace BossFight.Controllers
 {
@@ -22,7 +21,9 @@ namespace BossFight.Controllers
             var newMonsterInstance = SpawnNewMonster();
             if (newMonsterInstance != null)
             {
-                var goldResult = DistributeEarnedGoldForInvolvedPlayers(pCurrentMonster);
+                var goldResult = LootController.DistributeEarnedGoldForInvolvedPlayers(pCurrentMonster);
+                var loot = LootController.GenerateLoot(pCurrentMonster);
+                var lootResult = LootController.DistributeDroppedLootForInvolvedPlayers(loot, pCurrentMonster.MonsterDamageTrackerList);
                 var monsterDamageInfo = BuildMonsterDamageInfoText(pCurrentMonster, goldResult);
                 var monsterWasKilledMessage = $"{(pCurrentMonster.IsBossMonster ? "BOSS KILL\n" : String.Empty)}{pPLayer.Name} killed {pCurrentMonster.Name}!";
 
@@ -44,10 +45,31 @@ namespace BossFight.Controllers
                 };
                 var monsterByteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(newMonsterMessage)));
                 var voteByteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(monsterTierVotesTotalMessage)));
-                foreach (var ws in WebSocketConnections.GetInstance().GetAllOpenConnections())
+                var webSocketConnections = WebSocketConnections.GetInstance();
+                foreach (var ws in webSocketConnections.GetAllOpenConnections())
                 {
                     await ws.WebSocket.SendAsync(monsterByteArray, WebSocketMessageType.Text, true, CancellationToken.None);
                     await ws.WebSocket.SendAsync(voteByteArray, WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+
+                foreach (var player in lootResult)
+                {
+                    var lootDropsForPlayer = lootResult[player];
+                    var playerConnection = webSocketConnections.GetConnection(player);
+                    if (playerConnection != null)
+                    {
+                        var lootMessage = "You have obtained the following item(s):\n" + String.Join('\n', lootDropsForPlayer.Select(l => l.LootName));
+                        var lootObtainedMessage = new Dictionary<string, object>
+                        {
+                            { "loot_obtained_message", new Dictionary<string, object>
+                                {
+                                    { "lootMessage", lootMessage },
+                                }
+                            }
+                        };
+                        var lootObtainedByteArray = new ArraySegment<Byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(lootObtainedMessage)));
+                        await playerConnection.WebSocket.SendAsync(lootObtainedByteArray, WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
                 }
             }
         }
@@ -113,42 +135,6 @@ namespace BossFight.Controllers
                 }
             }
             return newMonster;
-        }
-
-        private static List<LootEntry> DistributeEarnedGoldForInvolvedPlayers(MonsterInstance pDeadMonster)
-        {
-            var goldResult = new List<LootEntry>();
-            using var connection = GlobalConnection.GetNewOpenConnection();
-
-            foreach(var trackerEntry in pDeadMonster.MonsterDamageTrackerList)
-            {
-                var goldEarned = (int)Math.Floor(1 + trackerEntry.DamageReceivedFromPlayer * pDeadMonster.Level * 0.50 / 10);
-                if (pDeadMonster.IsBossMonster)
-                    goldEarned = (int)Math.Floor(goldEarned * 1.2);
-
-                goldResult.Add(new LootEntry(trackerEntry, goldEarned));
-
-                var goldGainCmd = @"UPDATE Player p
-SET p.Gold = p.Gold + @goldToAdd
-WHERE p.PlayerId = @playerId
-AND p.Gold + @goldToAdd <= 999999999999";
-
-                try
-                {
-                    using var goldCmd = connection.CreateCommand();
-                    goldCmd.CommandText = goldGainCmd;
-                    goldCmd.Parameters.AddParameter(goldEarned.ToDbString(), "@goldToAdd");
-                    goldCmd.Parameters.AddParameter(trackerEntry.PlayerId.ToDbString(), "@playerId");
-                    goldCmd.ExecuteNonQuery();
-                }
-                catch (Exception)
-                {
-                    connection.Close();
-                    throw;
-                }
-            }
-            connection.Close();
-            return goldResult;
         }
 
         ///<summary>

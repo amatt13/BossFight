@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using MySqlConnector;
@@ -31,7 +32,7 @@ namespace BossFight.Extentions
                 _ => pParameterValue?.ToString()
             };
 
-            if (!pParameterName.StartsWith("@"))
+            if (!pParameterName.StartsWith('@'))
                 pParameterName = '@' + pParameterName;
 
             var sqlParam = new MySqlParameter

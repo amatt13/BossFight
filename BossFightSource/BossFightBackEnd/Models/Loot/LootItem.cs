@@ -1,16 +1,8 @@
 using System;
 
-namespace BossFight.Models.Loot
+namespace BossFight.Models
 {
-    public interface iLootItem
-    { 
-        int? LootId { get; set; }
-        string LootName { get; set; }
-
-        int GetSellPrice();
-    }
-
-    public abstract class LootItem<T> : PersistableBase<LootItem<T>>, iLootItem
+    public abstract class LootItem<T> : PersistableBase<LootItem<T>>, ILootItem
     {
         [PersistProperty(true)]
         public int? LootId { get; set; }
@@ -19,18 +11,14 @@ namespace BossFight.Models.Loot
         public string LootName { get; set; }
 
         [PersistProperty]
-        public float LootDropChance { get; set; }
-
-        [PersistProperty]
         public int Cost { get; set; }
 
         public LootItem() { }
 
-        public LootItem(int pLootId, string pLootName, float pLootDropChance, int pCost)
+        public LootItem(int pLootId, string pLootName, int pCost)
         {
             LootId = pLootId;
             LootName = pLootName;
-            LootDropChance = pLootDropChance;
             Cost = pCost;
         }
 

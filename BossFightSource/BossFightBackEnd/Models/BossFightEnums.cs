@@ -50,6 +50,15 @@ namespace BossFight.BossFightEnums
         MAGIC,
     }
 
+    public enum LootType
+    {
+        WEAPON = 1,
+        ARMOR = 2,
+        RING = 3,
+        CONSUMABLE = 4,
+        CRAFTING_MATERIAL = 5,
+    }
+
     public static class EnumTextFormatter
     {
         private static readonly TextInfo _textInfo = new CultureInfo("en-UK", false).TextInfo;

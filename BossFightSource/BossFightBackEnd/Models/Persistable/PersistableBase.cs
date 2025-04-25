@@ -128,7 +128,7 @@ namespace BossFight.Models
             if (!String.IsNullOrEmpty(additionalSearchCriteriaString))
                 whereString += $"WHERE { additionalSearchCriteriaString }";
 
-            if (whereString != String.Empty && !whereString.EndsWith("\n"))
+            if (whereString != String.Empty && !whereString.EndsWith('\n'))
                 whereString += "\n";
 
             return whereString;

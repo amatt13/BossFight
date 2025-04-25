@@ -80,7 +80,8 @@ namespace BossFight.Controllers
                 catch (WebSocketException e)
                 {
                     var errorMessage = e.Message;
-                    var StackTrace = e.StackTrace;
+                    // var StackTrace = e.StackTrace;
+                    _logger.LogError("An unexpected WebSocketException occured: '{errorMessage}'", errorMessage);
                 }
             }
         }

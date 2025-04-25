@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BossFight.Extentions;
-using BossFight.Models.Loot;
 using MySqlConnector;
 using System.Text.Json.Serialization;
 using BossFight.BossFightEnums;
@@ -250,13 +249,13 @@ namespace BossFight.Models
             }
         }
 
-        public void AddLoot(iLootItem pLootToAdd)
+        public void AddLoot(ILootItem pLootToAdd)
         {
             var lootId = pLootToAdd.LootId;
             AddLoot(lootId);
         }
 
-        public string SellLoot(iLootItem pLootToSell)
+        public string SellLoot(ILootItem pLootToSell)
         {
             LootList.Remove(pLootToSell.LootId);
             var sellPrice = pLootToSell.GetSellPrice();

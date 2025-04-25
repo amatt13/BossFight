@@ -106,16 +106,13 @@ namespace BossFight
         {
             lock (_lock)
             {
-                return _connections.FirstOrDefault(elem => elem.PlayerId == pPlayerId);
+                return _connections.FirstOrDefault(elem => elem.PlayerId == pPlayerId && elem.WebSocket.State == WebSocketState.Open);
             }
         }
 
         public BossFightWebSocket GetConnection(Player pPlayer)
         {
-            lock (_lock)
-            {
-                return _connections.FirstOrDefault(elem => elem.PlayerId == pPlayer.PlayerId.Value);
-            }
+            return GetConnection(pPlayer.PlayerId.Value);
         }
 
         public List<BossFightWebSocket> GetAllConnections()

@@ -76,6 +76,10 @@ socket.onmessage = function (event) {
 		show_custom_alert(error_message, "alarm")
 		LogToGeneralLog(error_message, true);
 	}
+	else if ("loot_obtained_message" in json_dict) {
+		const loot_obtained_message = json_dict["loot_obtained_message"];
+		LogToGeneralLog(loot_obtained_message["lootMessage"], true);
+	}
 	else
 		LogToGeneralLog(`Unkown message received '${JSON.stringify(json_dict)}'`, true);
 

@@ -16,13 +16,13 @@ namespace BossFight
 
         public static int CalculateExperienceFromDamageDealtToMonster(int pDamageDealt, MonsterInstance pMonster)
         {
-            var xp = 1;
-            xp += (int)Math.Floor((double)pDamageDealt * 1.1);
-            xp += (int)Math.Floor((double)pMonster.Level / 3);
+            var xp = 1d;
+            xp += Math.Floor((double)pDamageDealt * 1.1);
+            xp += Math.Floor((double)pMonster.Level / 3);
             if (pMonster.IsBossMonster)
-                xp = (int)Math.Ceiling((double)xp * 1.2);
+                xp = (int)Math.Ceiling(xp * 1.2);
 
-            return xp;
+            return (int)xp;
         }
 
         public static int CalcXpPenalty(int pXP, int pPlayerLevel, int? pMonsterLevel)
@@ -32,7 +32,7 @@ namespace BossFight
             decimal result = pXP;
             decimal playerLevel_decimal = pPlayerLevel;
             decimal monsterLevel_decimal = pMonsterLevel.GetValueOrDefault(pPlayerLevel);
-            
+
             if (monsterLevel_decimal > playerLevel_decimal + 2)
             {
                 result = pXP * (playerLevel_decimal / monsterLevel_decimal);

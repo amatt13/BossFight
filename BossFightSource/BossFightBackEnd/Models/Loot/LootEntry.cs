@@ -1,24 +1,21 @@
-namespace BossFight.Models.Loot
+namespace BossFight.Models
 {
     public class LootEntry
     {
         public int PlayerId { get; set; }
-        public int DamageDealtByPlayer { get; set; }
         public int GoldEarned { get; set; }
 
         public LootEntry() {}
 
-        public LootEntry(int pPlayerId, int pDamageDealtByPlayer, int pGoldEarned)
+        public LootEntry(int pPlayerId, int pGoldEarned)
         {
             PlayerId = pPlayerId;
-            DamageDealtByPlayer = pDamageDealtByPlayer;
             GoldEarned = pGoldEarned;
         }
 
         public LootEntry(MonsterDamageTracker pMonsterDamageTracker, int pGoldEarned)
         {
             PlayerId = pMonsterDamageTracker.PlayerId;
-            DamageDealtByPlayer = pMonsterDamageTracker.DamageReceivedFromPlayer;
             GoldEarned = pGoldEarned;
         }
     }

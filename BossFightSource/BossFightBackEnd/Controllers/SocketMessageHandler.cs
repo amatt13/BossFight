@@ -84,6 +84,12 @@ namespace BossFight.Controllers
                         throw;
                     }
                 }
+                catch (Exception e)
+                {
+                    var message = e.Message;
+                    _logger.LogError("Unexpected exception '{error}'", message);
+                    throw;
+                }
             }
             else
             {
