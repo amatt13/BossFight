@@ -58,7 +58,18 @@ namespace BossFight.Controllers
                     var playerConnection = webSocketConnections.GetConnection(player);
                     if (playerConnection != null)
                     {
-                        var lootMessage = "You have obtained the following item(s):\n" + String.Join('\n', lootDropsForPlayer.Select(l => l.LootName));
+                        var sb = new StringBuilder();
+                        foreach(var lootEntry in lootDropsForPlayer)
+                        {
+                            var item = lootEntry.Item1;
+                            var quantity = lootEntry.Item2;
+                            var msg = item.LootName;
+                            if (quantity > 1)
+                                msg += " x" + quantity;
+                            sb.AppendLine(msg);
+                        }
+                        var plural = lootDropsForPlayer.Count > 1 ? "s" : "";
+                        var lootMessage = $"You have obtained the following item{plural}:\n" + sb.ToString();
                         var lootObtainedMessage = new Dictionary<string, object>
                         {
                             { "loot_obtained_message", new Dictionary<string, object>

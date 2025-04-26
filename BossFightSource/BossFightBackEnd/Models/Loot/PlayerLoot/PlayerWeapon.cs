@@ -22,7 +22,10 @@ namespace BossFight.Models
         public int? PlayerId { get; set; }
 
         [PersistProperty]
-        public int WeaponId { get; set; }
+        public int? WeaponId { get; set; }
+
+        [PersistProperty]
+        public int? Quantity { get; set; }
 
         // From other tables
         [JsonIgnore]
@@ -35,9 +38,14 @@ namespace BossFight.Models
 
         public PlayerWeapon () { }
 
-        public static IPlayerLoot CreateInstance(int pLootId, Player pPlayer)
+        public static IPlayerLoot CreateInstance(int pLootId, Player pPlayer, int pQuantity)
         {
-            return new PlayerWeapon{WeaponId=pLootId, PlayerId=pPlayer.PlayerId};
+            return new PlayerWeapon{WeaponId=pLootId, PlayerId=pPlayer.PlayerId, Quantity=pQuantity};
+        }
+
+        public IPlayerLoot SearchForExsostingLootEntry(int? pId = null)
+        {
+            return FindOne(pId);
         }
 
         #region PersistableBase implementation
@@ -52,7 +60,8 @@ namespace BossFight.Models
                 {
                     PlayerWeaponId = reader.GetInt(nameof(PlayerWeaponId)),
                     PlayerId = reader.GetInt(nameof(PlayerId)),
-                    WeaponId = reader.GetInt(nameof(WeaponId))
+                    WeaponId = reader.GetInt(nameof(WeaponId)),
+                    Quantity = reader.GetInt(nameof(Quantity)),
                 };
                 playerWeapon.Weapon = (Weapon)new Weapon().FindOne(playerWeapon.WeaponId);
                 result.Add(playerWeapon);
@@ -68,6 +77,9 @@ namespace BossFight.Models
 
             if (pw.PlayerId != null)
                 additionalSearchCriteriaText += $"AND { nameof(PlayerId) } = { pw.PlayerId }\n";
+
+            if (pw.WeaponId.HasValue)
+                additionalSearchCriteriaText += $"AND { nameof(WeaponId) } = { pw.WeaponId }\n";
 
             return TrimAdditionalSearchCriteriaText(additionalSearchCriteriaText, pStartWithAnd);
         }

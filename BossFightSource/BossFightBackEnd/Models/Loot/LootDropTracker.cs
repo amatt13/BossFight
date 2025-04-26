@@ -1,26 +1,27 @@
+using System;
 using System.Collections.Generic;
 
 namespace BossFight.Models
 {
     public class LootDropTracker
         {
-            private Dictionary<Player, List<ILootItem>> _entires = new();
+            private Dictionary<Player, List<Tuple<ILootItem, int>>> _entires = new();
 
             public LootDropTracker() {}
 
-            public void Add(Player pPlayer, ILootItem pLootItem)
+            public void Add(Player pPlayer, Tuple<ILootItem, int> pLootItem)
             {
-                if (_entires.TryGetValue(pPlayer, out List<ILootItem> obtainedLoot))
+                if (_entires.TryGetValue(pPlayer, out List<Tuple<ILootItem, int>> obtainedLoot))
                 {
                     obtainedLoot.Add(pLootItem);
                 }
                 else
                 {
-                    _entires[pPlayer] = new List<ILootItem>{ pLootItem };
+                    _entires[pPlayer] = new List<Tuple<ILootItem, int>>{ pLootItem };
                 }
             }
 
-            public List<ILootItem> this[Player pPlayer]
+            public List<Tuple<ILootItem, int>> this[Player pPlayer]
             {
                 get
                 {
@@ -32,7 +33,7 @@ namespace BossFight.Models
                 }
             }
 
-            public Dictionary<Player, List<ILootItem>>.KeyCollection.Enumerator GetEnumerator()
+            public Dictionary<Player, List<Tuple<ILootItem, int>>>.KeyCollection.Enumerator GetEnumerator()
             {
                 return _entires.Keys.GetEnumerator();
             }
