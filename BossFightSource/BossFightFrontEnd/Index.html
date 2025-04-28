@@ -105,7 +105,7 @@
 				<!-- Player inventory/classes -->
 				<div style="grid-column: 2; grid-row: 1/20;">
 					<select id="player_inventory" size="1" style="flex-grow:1; float:left; width: 100%;"></select>
-					<button id="openShopButton" type="button" class="btn-primary" style="flex-grow:1; float:left; margin-top: 5px;">Open shop</button>
+					<button id="openPlayerClassShopButton" type="button" class="btn-primary" style="flex-grow:1; float:left; margin-top: 5px;">Open Class shop</button>
 					<button id="openUnlockedClassesButton" type="button" class="btn-primary" style="flex-grow:1; float:left; margin-top: 5px;">Change Class</button>
 				</div>
 			</div>
@@ -174,30 +174,38 @@
 	<label id="custom-alert-text-label"></label>
 </ul>
 
-<!-- shop dialog -->
+<!-- PlayerClass shop dialog -->
 <div id="dialogBackground" class="shop-background"></div>
-<div id="shopDialog" class="modal-dialog-generic shop-dialog">
+<div id="playerClassShopDialog" class="modal-dialog-generic shop-dialog">
 	<form method="dialog">
-		<div class="shop-column-divider">
-			<!-- weapons -->
-			<div class="column" style="float:left; padding-left: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: var(--border-colour); margin-left: 5px; margin-right: 5px; flex: 50%;">
-				<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color: var(--default-font-colour); padding-top: 15px;">
-					<label style="grid-column: 1; grid-row: 1; text-align: center;  font-size: xx-large;">Weapons</label>
-					<div id="testWeaponContainer1" style="grid-column: 1; grid-row: 2;">
-						<button class="buy-button btn-primary" id="test1">Buy</button>
-						<label class="buy-label">Weapon 1</label>
-					</div>
-					<div id="testWeaponContainer2" style="grid-column: 1; grid-row: 3;">
-						<button  class="buy-button btn-primary">Buy</button>
-						<label class="buy-label">Weapon 2</label>
-					</div>
+		<!-- classes -->
+		<div style="display: flex; flex-direction: column; padding: 10px;">
+			<label id="player-class-shop-dialog-title">Classes</label>
+			<div id="playerclass_buy_options">
+		</div>
+
+		<menu style="position: sticky; bottom: 0px;">
+			<label id="shop_gold_amount_label" style="right:300px; float: right; position: sticky;"></label>
+			<button id="closeShopButton" value="default" class="btn-primary btn-shop">Close shop</button>
+		</menu>
+	</form>
+</div>
+
+<!-- X shop dialog -->
+<div id="dialogBackground" class="shop-background"></div>
+<div id="XShopDialog" class="modal-dialog-generic shop-dialog">
+	<form method="dialog"></form>
+		<!-- weapons -->
+		<div class="column" style="float:left; padding-left: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: var(--border-colour); margin-left: 5px; margin-right: 5px; flex: 50%;">
+			<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color: var(--default-font-colour); padding-top: 15px;">
+				<label style="grid-column: 1; grid-row: 1; text-align: center;  font-size: xx-large;">Weapons</label>
+				<div id="testWeaponContainer1" style="grid-column: 1; grid-row: 2;">
+					<button class="buy-button btn-primary" id="test1">Buy</button>
+					<label class="buy-label">Weapon 1</label>
 				</div>
-			</div>
-			<!-- classes -->
-			<div class="column" style="float:right; padding-right: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: var(--border-colour); margin-left: 5px; margin-right: 5px; flex: 50%;">
-				<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color: var(--default-font-colour); padding-top: 15px;">
-					<label style="grid-column: 1; grid-row: 1; text-align: center; font-size: xx-large;">Classes</label>
-					<div id="playerclass_buy_options" style="grid-column: 1; grid-row: 2;"></div>
+				<div id="testWeaponContainer2" style="grid-column: 1; grid-row: 3;">
+					<button  class="buy-button btn-primary">Buy</button>
+					<label class="buy-label">Weapon 2</label>
 				</div>
 			</div>
 		</div>
@@ -216,7 +224,7 @@
 			<div class="column player-class-selector-left-pane-column">
 				<div class="player-class-selector-left-pane-container">
 					<label id="playerClassSelectorLeftPaneTitle" class="playerClassSelectorLeftPaneTitle" style="grid-column: 1/-1; grid-row: 1;">Current Class name</label>
-					<img id="playerClassSelectorLeftPaneSprite" class="player-class-selector-left-pane-sprite" width="250" height="250" style="object-fit: fill; grid-column: 1/-1; grid-row: 2;">
+					<img id="playerClassSelectorLeftPaneSprite" class="player-class-selector-left-pane-sprite" width="150" height="150" style="object-fit: fill; grid-column: 1/-1; grid-row: 2;">
 					<div class="masculin-feminine-slider" style="grid-column: 1/-1; grid-row: 3;">
 						<p class="masculine-feminine-slider-symbol">masculine ♂️</p>
 						<label class="switch" style="float: left;">

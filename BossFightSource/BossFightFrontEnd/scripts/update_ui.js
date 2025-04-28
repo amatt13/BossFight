@@ -173,39 +173,6 @@ function UpdateMonsterTierVoteBasedOnCurrentPlayerVote(vote_dict) {
 	}
 }
 
-function CreatePlayerclassTitleCardForShop(playerclass) {
-	const sprite_source = getPlayerClassSprite(playerclass.name, _player.preffered_body_type.Name).src;
-	const card_html = `<div style="border: solid; border-color: var(--border-colour); margin-left: 5px">
-		<table>
-			<tr>
-				<td style="width: 50%; float: left">
-					<img id="shop_menu_player_class${ playerclass.name }_sprite" src="${ sprite_source }" width="75" height="75" style="object-fit: fill;">
-				</td>
-				<td>
-					<label>${ playerclass.description }</label>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<label>${ playerclass.name.toLowerCase() } - cost ${ numberToString(playerclass.purchase_price) }</label>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<label>Base health: ${ numberToString(playerclass.base_health) }</label>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<label>Base mana: ${ numberToString(playerclass.base_mana) }</label>
-				</td>
-			</tr>
-		</table>
-	</div>`
-
-	return card_html;
-}
-
 let _playerclasses_list = new Array();
 
 function UpdateUiShop(shop_dict) {
@@ -213,20 +180,42 @@ function UpdateUiShop(shop_dict) {
 	let player_class_html = "";
 	_playerclasses_list = new Array();
 
-	player_classes.forEach((player_class, i) => {
-		const playerclass_count = i + 2;
-		const aquired = player_class["Aquired"];
+	player_classes
+	.sort((a, b) => a["PlayerClass"]["PurchasePrice"] - b["PlayerClass"]["PurchasePrice"])
+	.forEach((player_class) => {
 		const pc = PlayerClass.createFromDict(player_class["PlayerClass"]);
 		_playerclasses_list.push(pc);
-		const card = CreatePlayerclassTitleCardForShop(pc);
-		const class_row = `<div style="grid-column: 2; grid-row: ${ playerclass_count };">
-		${ card }
-		<button class="buy-button btn-primary" ${ aquired ? "disabled" : "" } onclick="BuyPlayerClass(${ pc.player_class_id });">${ aquired ? "Already owned" : "Buy" }</button>
-	</div>`;
-		player_class_html += class_row;
+		const aquired = player_class["Aquired"];
+		const card = CreatePlayerclassTitleCardForShop(pc, aquired);
+		player_class_html += card;
 	});
 
 	document.getElementById("playerclass_buy_options").innerHTML = player_class_html;
+}
+
+function CreatePlayerclassTitleCardForShop(playerclass, aquired) {
+	const sprite_source = getPlayerClassSprite(playerclass.name, _player.preffered_body_type.Name).src;
+	const card_html = `
+	<div class="player-class-card">
+		<div class="player-class-card-title">
+			<img id="shop_menu_player_class${ playerclass.name }_sprite"
+				src="${ sprite_source }"
+				width="75" height="75"
+				style="object-fit: fill;">
+			<label style="flex: 1;">${ playerclass.description }</label>
+		</div>
+
+		<div style="margin-top: 10px;">
+			<label style="display: block;">${ playerclass.name.toLowerCase()} - cost ${ numberToString(playerclass.purchase_price) }</label>
+			<label style="display: block;">Base health: ${ numberToString(playerclass.base_health) }</label>
+			<label style="display: block;">Base mana: ${ numberToString(playerclass.base_mana) }</label>
+		</div>
+		<button class="buy-button btn-primary" ${ aquired ? "disabled" : "" } onclick="BuyPlayerClass(${ playerclass.player_class_id });">
+			${ aquired ? "Already owned" : "Buy" }
+		</button>
+	</div>
+	`;
+	return card_html;
 }
 
 function CreateAbilityForPlayerColumn(ability) {

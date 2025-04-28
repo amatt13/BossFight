@@ -1,23 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using BossFight.Models;
-using BossFight.CustemExceptions;
 
 namespace BossFight.Controllers
 {
     public static class ShopController
     {
-        public static Dictionary<string, object> GetShopForPlayer(Player pPlayer)
+        public static Dictionary<string, object> GetPlayerClassShopForPlayer(Player pPlayer)
         {
             var shop = new Dictionary<string, object>();
             var playerClasses = PlayerUnlocks.UnlockedClasses(pPlayer, false);
             shop["playerClasses"] = playerClasses;
-
-            //TODO add weapons as well
 
             return shop;
         }

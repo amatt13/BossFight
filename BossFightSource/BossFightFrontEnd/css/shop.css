@@ -21,7 +21,40 @@
 }
 
 .shop-column-divider {
-	width: 100%; 
-	display: flex; 
+	width: 100%;
+	display: flex;
 	padding-top: 5px;
+}
+
+#player-class-shop-dialog-title {
+	text-align: center;
+	font-size: xx-large;
+}
+
+#playerclass_buy_options {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	grid-auto-rows: minmax(200px, auto); /* reasonable card height */
+	row-gap: 30px;
+	column-gap: 10px;
+	padding: 10px;
+	margin-top: 15px;
+	align-items: stretch;
+}
+
+.player-class-card {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	border: solid 1px var(--border-colour);
+	padding: 10px;
+	margin-left: 5px;
+	height: 100%;
+}
+
+.player-class-card-title {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
 }

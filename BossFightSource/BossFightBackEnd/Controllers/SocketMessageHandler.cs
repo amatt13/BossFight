@@ -45,7 +45,7 @@ namespace BossFight.Controllers
             methodDictionary[nameof(PlayerHandler.EquipWeapon)] = PlayerHandler.EquipWeapon;
             methodDictionary[nameof(PlayerHandler.GetUnlockedClassesForPlayer)] = PlayerHandler.GetUnlockedClassesForPlayer;
             methodDictionary[nameof(ShopHandler.SellWeapon)] = ShopHandler.SellWeapon;
-            methodDictionary[nameof(ShopHandler.GetShopForPlayer)] = ShopHandler.GetShopForPlayer;
+            methodDictionary[nameof(ShopHandler.GetPlayerClassShopForPlayer)] = ShopHandler.GetPlayerClassShopForPlayer;
             methodDictionary[nameof(ShopHandler.BuyPlayerClass)] = ShopHandler.BuyPlayerClass;
             //methodDictionary[nameof(MyHandler.Example)] = MyHandler.Example;
         }

@@ -41,7 +41,7 @@ namespace BossFight.Controllers.SocketMessageHandlers
                 await SocketMessageHandler.ReplyWithErrorMessage(pWebSocketReceiveResult, pWebSocket, error);
         }
 
-        public static async Task GetShopForPlayer(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
+        public static async Task GetPlayerClassShopForPlayer(Dictionary<string, JsonElement> pJsonParameters, WebSocketReceiveResult pWebSocketReceiveResult, WebSocket pWebSocket)
         {
             var requiredValues = SocketMessageHandler.CreateValueList(pJsonParameters, new List<string> { "player_id" });
 
@@ -50,7 +50,7 @@ namespace BossFight.Controllers.SocketMessageHandlers
                 var playerId = pJsonParameters["player_id"].GetInt32();
                 if (RequestValidator.PlayerExists(playerId, out Player player, out error))
                 {
-                    var shop = ShopController.GetShopForPlayer(player);
+                    var shop = ShopController.GetPlayerClassShopForPlayer(player);
                     var response = new Dictionary<string, object>
                     {
                         { "shopMenu", shop }
