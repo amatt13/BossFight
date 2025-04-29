@@ -46,7 +46,19 @@ namespace BossFight.Models
         {
             if (pDamage > 0)
             {
-                _player.Hp -= pDamage;
+                int overkillDamage = 0;
+
+                if (_player.Hp - pDamage < 0)
+                {
+                    overkillDamage = Math.Abs(_player.Hp - pDamage);
+                    _player.Hp = 0; // Ensure health doesn't go below zero
+                }
+                else
+                {
+                    _player.Hp -= pDamage;
+                }
+
+                
 
                 if (_player.Hp < -3)
                     _player.Hp = -3;
