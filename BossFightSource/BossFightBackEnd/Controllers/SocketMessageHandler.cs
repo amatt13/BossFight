@@ -59,36 +59,44 @@ namespace BossFight.Controllers
 
             if (methodDictionary.TryGetValue(handler, out var method))
             {
-                var methodName = method.Method.Name;
-                _logger.LogDebug("Executing {methodName}", methodName);
-                try
+                if (pWebSocket.State == WebSocketState.Open)
                 {
-                    await method(dataJsonDictionary, pWebSocketReceiveResult, pWebSocket);
-                }
-                catch (WebSocketException e)
-                {
-                    var error = (WebSocketError)e.ErrorCode;
-                    if (error == WebSocketError.InvalidState)
+                    var methodName = method.Method.Name;
+                    _logger.LogDebug("Executing {methodName}", methodName);
+                    try
                     {
-                        var errorMessage = e.Message;
-                        _logger.LogWarning("Invalid state for socket: {errorMessage}", errorMessage);
-
-                        await pWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Invalid state", CancellationToken.None);
-                        var webSocketConnections = WebSocketConnections.GetInstance();
-                        webSocketConnections.RemoveConnection(pWebSocket);
-                        _logger.LogInformation("Websocket removed");
+                        await method(dataJsonDictionary, pWebSocketReceiveResult, pWebSocket);
                     }
-                    else
+                    catch (WebSocketException e)
                     {
-                        _logger.LogError("Unexpected WebSocketError '{error}'", error);
+                        var error = (WebSocketError)e.ErrorCode;
+                        if (error == WebSocketError.InvalidState)
+                        {
+                            var errorMessage = e.Message;
+                            _logger.LogWarning("Invalid state for socket: {errorMessage}", errorMessage);
+
+                            await pWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Invalid state", CancellationToken.None);
+                            var webSocketConnections = WebSocketConnections.GetInstance();
+                            webSocketConnections.RemoveConnection(pWebSocket);
+                            _logger.LogInformation("Websocket removed");
+                        }
+                        else
+                        {
+                            _logger.LogError("Unexpected WebSocketError '{error}'", error);
+                            throw;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        var message = e.Message;
+                        _logger.LogError("Unexpected exception '{error}'", message);
                         throw;
                     }
                 }
-                catch (Exception e)
+                else
                 {
-                    var message = e.Message;
-                    _logger.LogError("Unexpected exception '{error}'", message);
-                    throw;
+                    var state = pWebSocket.State;
+                    _logger.LogWarning("Tried to send on closed WebSocket (state: {state})", state);
                 }
             }
             else

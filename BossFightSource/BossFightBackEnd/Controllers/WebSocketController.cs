@@ -65,24 +65,28 @@ namespace BossFight.Controllers
             string jsonString;
             Dictionary<String, Object> jsonDictionary;
 
-            WebSocketReceiveResult result = await pWebSocket.ReceiveAsync(arraySegment, CancellationToken.None);
-            while (result.CloseStatus == null)
+            try
             {
-                arraySegment = new ArraySegment<byte>(buffer, 0, result.Count);
-                jsonString = Encoding.UTF8.GetString(arraySegment);
-                jsonDictionary = JsonSerializer.Deserialize<Dictionary<String, Object>>(jsonString);
-
-                try
+                WebSocketReceiveResult result = await pWebSocket.ReceiveAsync(arraySegment, CancellationToken.None);
+                while (result.CloseStatus == null)
                 {
+                    arraySegment = new ArraySegment<byte>(buffer, 0, result.Count);
+                    jsonString = Encoding.UTF8.GetString(arraySegment);
+                    jsonDictionary = JsonSerializer.Deserialize<Dictionary<String, Object>>(jsonString);
+
                     await _messageHandler.HandleMessage(jsonDictionary, result, pWebSocket);
                     result = await pWebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
-                catch (WebSocketException e)
-                {
-                    var errorMessage = e.Message;
-                    // var StackTrace = e.StackTrace;
-                    _logger.LogError("An unexpected WebSocketException occured: '{errorMessage}'", errorMessage);
-                }
+            }
+            catch (WebSocketException e)
+            {
+                var errorMessage = e.Message;
+                // var StackTrace = e.StackTrace;
+                _logger.LogError("An unexpected WebSocketException occured: '{errorMessage}'", errorMessage);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Unexpected receive error: {Message}", ex.Message);
             }
         }
 
