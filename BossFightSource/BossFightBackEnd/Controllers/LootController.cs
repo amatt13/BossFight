@@ -18,7 +18,17 @@ namespace BossFight.Controllers
 
             foreach(var trackerEntry in pDeadMonster.MonsterDamageTrackerList)
             {
-                var goldEarned = (int)Math.Floor(1 + trackerEntry.DamageReceivedFromPlayer * pDeadMonster.Level * 0.50 / 10);
+                var effectiveDamage = trackerEntry.DamageReceivedFromPlayer;
+                var overkillDamage = trackerEntry.OverkillDamage; // Assuming OverkillDamage is tracked in MonsterDamageTracker
+
+                var goldEarned = (int)Math.Floor(1 + effectiveDamage * pDeadMonster.Level * 0.50 / 10);
+
+                // Award a smaller amount of gold for overkill damage
+                if (overkillDamage > 0)
+                {
+                    goldEarned += (int)Math.Floor(overkillDamage * pDeadMonster.Level * 0.10 / 10);
+}
+
                 if (pDeadMonster.IsBossMonster)
                     goldEarned = (int)Math.Floor(goldEarned * 1.2);
 
