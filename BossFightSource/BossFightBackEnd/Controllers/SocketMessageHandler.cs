@@ -97,6 +97,16 @@ namespace BossFight.Controllers
                 {
                     var state = pWebSocket.State;
                     _logger.LogWarning("Tried to send on closed WebSocket (state: {state})", state);
+                    try
+                    {
+                        await pWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                        pWebSocket.Dispose();
+                    }
+                    catch (Exception)
+                    {
+
+                        // We just give up at this point
+                    }
                 }
             }
             else

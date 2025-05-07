@@ -26,10 +26,11 @@
 	padding-top: 5px;
 }
 
-#player-class-shop-dialog-title {
+.shop-dialog-title {
 	text-align: center;
 	font-size: xx-large;
 }
+
 
 #playerclass_buy_options {
 	display: grid;

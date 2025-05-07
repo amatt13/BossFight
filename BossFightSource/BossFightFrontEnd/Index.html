@@ -1,6 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+	<link rel="shortcut icon" href="favicon.gif">
 	<link rel="stylesheet" href="css/stylesheet.css" type="text/css" charset="utf-8"/>
 	<link rel="stylesheet" href="css/shop.css" type="text/css" charset="utf-8"/>
 	<link rel="stylesheet" href="css/playerClassMenu.css" type="text/css" charset="utf-8"/>
@@ -105,7 +106,8 @@
 				<!-- Player inventory/classes -->
 				<div style="grid-column: 2; grid-row: 1/20;">
 					<select id="player_inventory" size="1" style="flex-grow:1; float:left; width: 100%;"></select>
-					<button id="openPlayerClassShopButton" type="button" class="btn-primary" style="flex-grow:1; float:left; margin-top: 5px;">Open Class shop</button>
+					<button id="openPlayerClassShopButton" type="button" class="btn-primary" style="flex-grow:1; float:left; margin-top: 5px; margin-right: 5px;">Open Class shop</button>
+					<button id="openItemShopButton" type="button" class="btn-primary" style="flex-grow:1; float:left; margin-top: 5px; margin-right: 5px;">Open item shop</button>
 					<button id="openUnlockedClassesButton" type="button" class="btn-primary" style="flex-grow:1; float:left; margin-top: 5px;">Change Class</button>
 				</div>
 			</div>
@@ -156,6 +158,13 @@
 </body>
 </html>
 
+<div hidden id="other-players-window" class="window">
+	<div class="window-top">
+	</div>
+		<div class="window-content">
+	</div>
+</div>
+
 <!-- Inventory context menu -->
 <ul class='custom-menu context-menu inventory-context-menu'>
 	<li id=custom_menu_equip data-action="equip" data-equip_id=none>Equip weapon</li>
@@ -174,47 +183,7 @@
 	<label id="custom-alert-text-label"></label>
 </ul>
 
-<!-- PlayerClass shop dialog -->
 <div id="dialogBackground" class="shop-background"></div>
-<div id="playerClassShopDialog" class="modal-dialog-generic shop-dialog">
-	<form method="dialog">
-		<!-- classes -->
-		<div style="display: flex; flex-direction: column; padding: 10px;">
-			<label id="player-class-shop-dialog-title">Classes</label>
-			<div id="playerclass_buy_options">
-		</div>
-
-		<menu style="position: sticky; bottom: 0px;">
-			<label id="shop_gold_amount_label" style="right:300px; float: right; position: sticky;"></label>
-			<button id="closeShopButton" value="default" class="btn-primary btn-shop">Close shop</button>
-		</menu>
-	</form>
-</div>
-
-<!-- X shop dialog -->
-<div id="dialogBackground" class="shop-background"></div>
-<div id="XShopDialog" class="modal-dialog-generic shop-dialog">
-	<form method="dialog"></form>
-		<!-- weapons -->
-		<div class="column" style="float:left; padding-left: 5px; flex-grow:1; flex-shrink: 0; border: solid; color: var(--border-colour); margin-left: 5px; margin-right: 5px; flex: 50%;">
-			<div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(1080, auto); gap: 10px; color: var(--default-font-colour); padding-top: 15px;">
-				<label style="grid-column: 1; grid-row: 1; text-align: center;  font-size: xx-large;">Weapons</label>
-				<div id="testWeaponContainer1" style="grid-column: 1; grid-row: 2;">
-					<button class="buy-button btn-primary" id="test1">Buy</button>
-					<label class="buy-label">Weapon 1</label>
-				</div>
-				<div id="testWeaponContainer2" style="grid-column: 1; grid-row: 3;">
-					<button  class="buy-button btn-primary">Buy</button>
-					<label class="buy-label">Weapon 2</label>
-				</div>
-			</div>
-		</div>
-		<menu style="position: sticky; bottom: 0px;">
-			<label id="shop_gold_amount_label" style="right:300px; float: right; position: sticky;"></label>
-			<button id="closeShopButton" value="default" class="btn-primary btn-shop">Close shop</button>
-		</menu>
-	</form>
-</div>
 
 <!-- PlayerClass dialog -->
 <div id="playerClassMenu" class="modal-dialog-generic player-class-dialog">
@@ -279,6 +248,38 @@
 	</form>
 </div>
 
+<!-- PlayerClass shop dialog -->
+<div id="playerClassShopDialog" class="modal-dialog-generic shop-dialog">
+	<form method="dialog">
+		<!-- classes -->
+		<div style="display: flex; flex-direction: column; padding: 10px;">
+			<label class="shop-dialog-title">Classes</label>
+			<div id="playerclass_buy_options"></div>
+		</div>
+		<menu style="position: sticky; bottom: 0px;">
+			<label class="shop-gold-amount-display" style="right:300px; float: right; position: sticky;">NA</label>
+			<button id="playerClassShopCloseShopButton" value="default" class="btn-primary btn-shop">Close shop</button>
+		</menu>
+	</form>
+</div>
+
+<!-- item shop dialog -->
+<div id="itemShopDialog" class="modal-dialog-generic shop-dialog">
+	<form method="dialog"></form>
+		<!-- weapons -->
+		<div style="display: flex; flex-direction: column; padding: 10px;">
+			<label class="shop-dialog-title">Items</label>
+			<div id="item_buy_options"></div>
+		</div>
+		<menu style="position: sticky; bottom: 0px;">
+			<label class="shop-gold-amount-display" style="right:300px; float: right; position: sticky;">NA</label>
+			<button id="itemShopCloseShopButton" value="default" class="btn-primary btn-shop">Close shop</button>
+		</menu>
+	</form>
+</div>
+
+
+
 <div id="playerSettingsDialog" class="modal-dialog-generic">
 	<label>
 		settings
@@ -288,12 +289,6 @@
 	</menu>
 </div>
 
-<div hidden id="other-players-window" class="window">
-	<div class="window-top">
-	</div>
-		<div class="window-content">
-	</div>
-</div>
 
 <img id="monsterSprite" src="./images/sprites/monsters/goblin.png" alt="Current monster sprite" class="hidden">
 
