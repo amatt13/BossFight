@@ -7,7 +7,7 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
 }
 else {
 	console.log("secure remote host");
-	conn_string = "wss://bossfight.ix.tc:5000/ws";
+	conn_string = "wss://bossfight.uk.to:5000/ws";
 }
 //socket = new WebSocket("wss://bossfight.ix.tc:5000/ws");
 
